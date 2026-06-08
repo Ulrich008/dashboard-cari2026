@@ -1,122 +1,170 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useEffect, useState } from "react";
+import { BrowserRouter, Routes, Route, useNavigate, useLocation } from "react-router-dom";
+import { AuthProvider } from "./contexts/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Sidebar from "./components/Sidebar";
+import Dashboard from "./pages/Dashboard";
+import PagesListContent from "./pages/PagesListContent";
+import CreatePageContent from "./pages/CreatePageContent";
+import Program from "./pages/Program";
+import CreateProgramContent from "./pages/CreateProgramContent";
+import Speakers from "./pages/Speakers";
+import CreateSpeaker from "./pages/CreateSpeaker";
+import Sponsors from "./pages/Sponsors";
+import CreateSponsor from "./pages/CreateSponsor";
+import Documents from "./pages/Documents";
+import CreateDocument from "./pages/CreateDocument";
+import UsersRoles from "./pages/UsersRoles";
+import CreateUser from "./pages/CreateUser";
+import SiteInfo from "./pages/SiteInfo";
+import Participants from "./pages/Participants";
+import CreateParticipant from "./pages/CreateParticipant";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
 
-function App() {
-  const [count, setCount] = useState(0)
+const PATH_TO_LABEL = {
+  "/dashboard":           "Tableau de bord",
+  "/pages":               "Pages",
+  "/pages/create":        "Pages",
+  "/pages/edit":          "Pages",
+  "/participants":        "Participants",
+  "/participants/create": "Participants",
+  "/participants/edit":   "Participants",
+  "/program":             "Program",
+  "/program/create":      "Program",
+  "/program/edit":        "Program",
+  "/speakers":            "Speakers / Committees",
+  "/speakers/create":     "Speakers / Committees",
+  "/speakers/edit":       "Speakers / Committees",
+  "/sponsors":            "Sponsors / Partners",
+  "/sponsors/create":     "Sponsors / Partners",
+  "/sponsors/edit":       "Sponsors / Partners",
+  "/documents":           "Documents",
+  "/documents/create":    "Documents",
+  "/documents/edit":      "Documents",
+  "/roles":               "Users & Roles",
+  "/roles/create":        "Users & Roles",
+  "/roles/edit":          "Users & Roles",
+  "/site":                "Site Info",
+};
+
+function Layout() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  const activeItem =
+    PATH_TO_LABEL[location.pathname] ??
+    (location.pathname.startsWith("/pages") ? "Pages" :
+     location.pathname.startsWith("/program") ? "Program" :
+     location.pathname.startsWith("/speakers") ? "Speakers / Committees" :
+     location.pathname.startsWith("/sponsors") ? "Sponsors / Partners" :
+     location.pathname.startsWith("/documents") ? "Documents" :
+     location.pathname.startsWith("/roles") ? "Users & Roles" :
+     location.pathname.startsWith("/participants") ? "Participants" : "Tableau de bord");
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div className="flex min-h-screen bg-[#f5f6f8]">
+      <Sidebar
+        activeItem={activeItem}
+        onNavigate={(path) => navigate(path)}
+      />
 
-      <div className="ticks"></div>
+      <main className={`flex-1 ${!isMobile ? 'ml-0' : ''}`}>
+        <Routes>
+          {/* Dashboard */}
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/" element={<Dashboard />} />
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+          {/* Pages */}
+          <Route path="/pages" element={<PagesListContent />} />
+          <Route path="/pages/create" element={
+            <CreatePageContent
+              onCancel={() => navigate("/pages")}
+              onSave={(data) => { console.log("Enregistré", data); navigate("/pages"); }}
+            />
+          } />
+          <Route path="/pages/edit/:id" element={
+            <CreatePageContent
+              onCancel={() => navigate("/pages")}
+              onSave={(data) => { console.log("Mis à jour", data); navigate("/pages"); }}
+            />
+          } />
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+          {/* Program */}
+          <Route path="/program" element={<Program />} />
+          <Route path="/program/create" element={<CreateProgramContent />} />
+          <Route path="/program/edit/:id" element={<CreateProgramContent />} />
+
+          {/* Speakers / Committees */}
+          <Route path="/speakers" element={<Speakers />} />
+          <Route path="/speakers/create" element={<CreateSpeaker />} />
+          <Route path="/speakers/edit/:id" element={<CreateSpeaker />} />
+
+          {/* Sponsors / Partners */}
+          <Route path="/sponsors" element={<Sponsors />} />
+          <Route path="/sponsors/create" element={<CreateSponsor />} />
+          <Route path="/sponsors/edit/:id" element={<CreateSponsor />} />
+
+          {/* Documents */}
+          <Route path="/documents" element={<Documents />} />
+          <Route path="/documents/create" element={<CreateDocument />} />
+          <Route path="/documents/edit/:id" element={<CreateDocument />} />
+
+          {/* Users & Roles */}
+          <Route path="/roles" element={<UsersRoles />} />
+          <Route path="/roles/create" element={<CreateUser />} />
+          <Route path="/roles/edit/:id" element={<CreateUser />} />
+
+          {/* Participants */}
+          <Route path="/participants" element={<Participants />} />
+          <Route path="/participants/create" element={<CreateParticipant />} />
+          <Route path="/participants/edit/:id" element={<CreateParticipant />} />
+
+          {/* Site Info */}
+          <Route path="/site" element={<SiteInfo />} />
+
+          <Route path="*" element={<RedirectToPages />} />
+        </Routes>
+      </main>
+    </div>
+  );
 }
 
-export default App
+function RedirectToPages() {
+  const navigate = useNavigate();
+  useEffect(() => { navigate("/dashboard", { replace: true }); }, [navigate]);
+  return null;
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          {/* Auth routes */}
+          <Route path="/login" element={<Login />} />
+
+          {/* Protected routes */}
+          <Route
+            path="/*"
+            element={
+              <ProtectedRoute>
+                <Layout />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
+  );
+}
