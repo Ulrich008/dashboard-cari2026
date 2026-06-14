@@ -165,7 +165,7 @@ export default function CreateUser() {
           });
         }
 
-        navigate("/users");
+        navigate("/roles");
       } catch (error) {
         console.error("Erreur lors de la sauvegarde:", error);
         Swal.fire({
@@ -189,7 +189,7 @@ export default function CreateUser() {
       <div className="flex items-center justify-between px-8 pt-8 pb-6">
         <div className="flex items-center gap-4">
           <button
-            onClick={() => navigate("/users")}
+            onClick={() => navigate("/roles")}
             className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
             title="Retour"
           >
@@ -276,21 +276,19 @@ export default function CreateUser() {
                     <div className="relative">
                       <Icon d={ICONS.role} size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                       <select
-                        value={formData.role}
-                        onChange={(e) => setFormData({...formData, role: e.target.value})}
+                        value={formData.role_admin_id}
+                        onChange={(e) => setFormData({...formData, role_admin_id: e.target.value})}
                         className="w-full pl-10 pr-3 py-2.5 rounded-lg border border-gray-200 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30 focus:border-[#1a7a3c] transition appearance-none"
                       >
-                        {USER_ROLES.map(role => (
-                          <option key={role.value} value={role.value}>
-                            {role.label} - {role.description}
+                        <option value="">Sélectionner un rôle</option>
+                        {roles.map(role => (
+                          <option key={role.id} value={role.id}>
+                            {role.libelle}
                           </option>
                         ))}
                       </select>
                     </div>
-                    {errors.role && <p className="text-xs text-red-500">{errors.role}</p>}
-                    <p className="text-xs text-gray-400 mt-1">
-                      {getRoleDescription(formData.role)}
-                    </p>
+                    {errors.role_admin_id && <p className="text-xs text-red-500">{errors.role_admin_id}</p>}
                   </div>
 
                   {/* Mot de passe */}
