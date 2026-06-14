@@ -244,7 +244,7 @@ export default function UsersRoles() {
             </button>
 
             <button
-              onClick={() => navigate("/users/create")}
+              onClick={() => navigate("/roles/create")}
               className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#1a7a3c] text-white text-sm font-semibold hover:bg-[#155f2f] transition-colors shadow-sm shrink-0"
             >
               <Icon d={ICONS.plus} size={15} />
@@ -353,7 +353,7 @@ export default function UsersRoles() {
                           <Icon d={ICONS.eye} size={16} />
                         </button>
                         <button
-                          onClick={() => navigate(`/users/edit/${user.id}`)}
+                          onClick={() => navigate(`/roles/edit/${user.id}`)}
                           className="text-gray-400 hover:text-[#1a7a3c] transition-colors"
                           title="Modifier"
                         >

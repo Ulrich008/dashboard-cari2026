@@ -300,8 +300,8 @@ export default function CreatePageContent() {
           <div className="flex-1 flex flex-col">
             {tab === "editor" ? (
               <textarea
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
+                value={formData.contenu_html}
+                onChange={(e) => setFormData({ ...formData, contenu_html: e.target.value })}
                 placeholder="<!-- Écrivez votre contenu React/HTML ici -->"
                 spellCheck={false}
                 className="flex-1 w-full p-5 text-sm font-mono text-gray-700 placeholder-gray-300 resize-none focus:outline-none bg-transparent leading-relaxed"
@@ -310,7 +310,7 @@ export default function CreatePageContent() {
             ) : (
               <div
                 className="flex-1 p-5 text-sm text-gray-700 overflow-auto"
-                dangerouslySetInnerHTML={{ __html: content || "<p class='text-gray-300 italic'>Aucun contenu à afficher.</p>" }}
+                dangerouslySetInnerHTML={{ __html: formData.contenu_html || "<p class='text-gray-300 italic'>Aucun contenu à afficher.</p>" }}
               />
             )}
           </div>
