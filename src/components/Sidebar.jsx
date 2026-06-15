@@ -36,6 +36,7 @@ const ICONS = {
 const NAV_ITEMS = [
   { label: "Tableau de bord",       icon: "dashboard", path: "/dashboard" },
   { label: "Pages",                 icon: "pages",     path: "/pages" },
+  { label: "Menus",                 icon: "menu",      path: "/menus" },
   { label: "Participants",          icon: "users",     path: "/participants" },
   { label: "Program",               icon: "program",   path: "/program" },
   { label: "Speakers / Committees", icon: "speakers",  path: "/speakers" },

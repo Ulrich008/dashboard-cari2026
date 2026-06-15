@@ -19,6 +19,8 @@ import CreateUser from "./pages/CreateUser";
 import SiteInfo from "./pages/SiteInfo";
 import Participants from "./pages/Participants";
 import CreateParticipant from "./pages/CreateParticipant";
+import MenusPage from "./pages/MenusPage";
+import CreateMenuContent from "./pages/CreateMenuContent";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 
@@ -45,6 +47,9 @@ const PATH_TO_LABEL = {
   "/roles":               "Users & Roles",
   "/roles/create":        "Users & Roles",
   "/roles/edit":          "Users & Roles",
+  "/menus":               "Menus",
+  "/menus/create":        "Menus",
+  "/menus/edit":          "Menus",
   "/site":                "Site Info",
 };
 
@@ -70,7 +75,8 @@ function Layout() {
      location.pathname.startsWith("/sponsors") ? "Sponsors / Partners" :
      location.pathname.startsWith("/documents") ? "Documents" :
      location.pathname.startsWith("/roles") ? "Users & Roles" :
-     location.pathname.startsWith("/participants") ? "Participants" : "Tableau de bord");
+     location.pathname.startsWith("/participants") ? "Participants" :
+     location.pathname.startsWith("/menus") ? "Menus" : "Tableau de bord");
 
   return (
     <div className="flex min-h-screen bg-[#f5f6f8]">
@@ -129,6 +135,11 @@ function Layout() {
           <Route path="/participants" element={<Participants />} />
           <Route path="/participants/create" element={<CreateParticipant />} />
           <Route path="/participants/edit/:id" element={<CreateParticipant />} />
+
+          {/* Menus de navigation */}
+          <Route path="/menus" element={<MenusPage />} />
+          <Route path="/menus/create" element={<CreateMenuContent />} />
+          <Route path="/menus/edit/:id" element={<CreateMenuContent />} />
 
           {/* Site Info */}
           <Route path="/site" element={<SiteInfo />} />
