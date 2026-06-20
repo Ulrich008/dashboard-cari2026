@@ -144,13 +144,14 @@ export default function CreatePageContent() {
 
   const [formData, setFormData] = useState({
     titre: "", slug: "", contexte: "", description: "", url_frontend: "",
-    contenu_html: "", statut: "draft", activated: true,
-    menu_parent_id: "", menu_label: "", menu_ordre: 0,
+    contenu_html: "", statut: "published", activated: true,
+    menu_parent_id: "", menu_sub_id: "", menu_label: "", menu_ordre: 0,
   });
   const [tab, setTab] = useState("editor");
   const [isLoading, setIsLoading] = useState(false);
 
   // Data for insert panels
+  const [allMenus,   setAllMenus]   = useState([]);
   const [rootMenus,  setRootMenus]  = useState([]);
   const [speakers,   setSpeakers]   = useState([]);
   const [sponsors,   setSponsors]   = useState([]);
@@ -162,7 +163,14 @@ export default function CreatePageContent() {
     // menuService returns an Axios promise → extract r.data.data
     // speakerService / sponsorService / documentService / programService are async
     // and already return the array directly
-    menuService.getAll().then(r => setRootMenus((r.data.data ?? r.data).filter(m => !m.parent_id))).catch(() => {});
+    menuService.getAll().then(r => {
+      const data = r.data.data ?? r.data;
+      const flatten = (arr) =>
+        arr.flatMap(m => [m, ...(m.children?.length ? flatten(m.children) : [])]);
+      const flat = flatten(data);
+      setAllMenus(flat);
+      setRootMenus(flat.filter(m => !m.parent_id));
+    }).catch(() => {});
     speakerService.getAll().then(arr => {
       const data = Array.isArray(arr) ? arr : [];
       setSpeakers(data.map(s => ({ ...s, nom_complet: `${s.prenom ?? ''} ${s.nom ?? ''}`.trim() })));
@@ -174,6 +182,7 @@ export default function CreatePageContent() {
     if (isEditing) {
       pageService.getById(id)
         .then(page => {
+          const mi = page.menu ?? null;
           setFormData({
             titre:          page.titre          || "",
             slug:           page.slug           || "",
@@ -183,14 +192,34 @@ export default function CreatePageContent() {
             contenu_html:   page.contenu_html   || "",
             statut:         page.statut         || "draft",
             activated:      page.activated !== undefined ? page.activated : true,
-            menu_parent_id: "",
-            menu_label:     "",
-            menu_ordre:     0,
+            menu_parent_id: mi
+              ? (mi.parent_id ? String(mi.parent_id) : String(mi.id))
+              : "",
+            menu_sub_id:    mi?.parent_id ? String(mi.id) : "",
+            menu_label:     mi?.label     || "",
+            menu_ordre:     mi?.ordre     ?? 0,
           });
         })
         .catch(() => Swal.fire({ icon: 'error', title: 'Erreur', text: 'Impossible de charger la page.' }));
     }
   }, [id, isEditing]);
+
+  const handleMenuParentChange = (value) => {
+    setFormData(prev => ({ ...prev, menu_parent_id: value, menu_sub_id: "" }));
+  };
+
+  const handleSubMenuChange = (value) => {
+    const sub = allMenus.find(m => String(m.id) === value);
+    setFormData(prev => {
+      const updates = { menu_sub_id: value };
+      if (sub) {
+        if (sub.page_slug) updates.slug = sub.page_slug;
+        if (sub.url && !prev.url_frontend) updates.url_frontend = sub.url;
+        if (sub.label && !prev.menu_label) updates.menu_label = sub.label;
+      }
+      return { ...prev, ...updates };
+    });
+  };
 
   const handleTitleChange = (v) => {
     setFormData(prev => ({
@@ -216,6 +245,7 @@ export default function CreatePageContent() {
       statut:         formData.statut,
       activated:      formData.activated,
       menu_parent_id: formData.menu_parent_id ? Number(formData.menu_parent_id) : null,
+      menu_sub_id:    formData.menu_sub_id    ? Number(formData.menu_sub_id)    : null,
       menu_label:     formData.menu_label     || null,
       menu_ordre:     formData.menu_ordre     ? Number(formData.menu_ordre) : 0,
     };
@@ -234,6 +264,10 @@ export default function CreatePageContent() {
       setIsLoading(false);
     }
   };
+
+  const subMenus = allMenus.filter(
+    m => String(m.parent_id) === String(formData.menu_parent_id)
+  );
 
   const inputClass = "w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30 focus:border-[#1a7a3c] transition";
 
@@ -274,7 +308,7 @@ export default function CreatePageContent() {
 
           {/* Slug */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-gray-700">Slug <span className="text-[#1a7a3c]">*</span></label>
+            <label className="text-xs font-semibold text-gray-700">Slug</label>
             <input type="text" value={formData.slug}
               onChange={e => setFormData({ ...formData, slug: e.target.value })}
               placeholder="ex: calls-papers" className={`${inputClass} font-mono text-xs`} />
@@ -306,12 +340,26 @@ export default function CreatePageContent() {
           <div className="flex flex-col gap-1.5">
             <label className="text-xs font-semibold text-gray-700">Placer dans le menu</label>
             <select value={formData.menu_parent_id}
-              onChange={e => setFormData({ ...formData, menu_parent_id: e.target.value })}
+              onChange={e => handleMenuParentChange(e.target.value)}
               className={inputClass}>
               <option value="">— Aucun menu —</option>
               {rootMenus.map(m => <option key={m.id} value={m.id}>{m.label}</option>)}
             </select>
           </div>
+
+          {/* Sous-menu (conditionnel) */}
+          {formData.menu_parent_id && subMenus.length > 0 && (
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-gray-700">Sous-menu</label>
+              <select value={formData.menu_sub_id}
+                onChange={e => handleSubMenuChange(e.target.value)}
+                className={inputClass}>
+                <option value="">— Aucun sous-menu —</option>
+                {subMenus.map(m => <option key={m.id} value={m.id}>{m.label}</option>)}
+              </select>
+              <p className="text-xs text-gray-400">remplit le slug si disponible</p>
+            </div>
+          )}
 
           {/* Nom dans le menu */}
           <div className="flex flex-col gap-1.5">

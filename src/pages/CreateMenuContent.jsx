@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import menuService from "../services/menuService";
+import { pageService } from "../services/pageService";
 
 const Icon = ({ d, size = 18, className = "" }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
@@ -45,14 +46,28 @@ export default function CreateMenuContent() {
     page_slug: "",
     activated: true,
   });
-  const [rootMenus, setRootMenus] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [rootMenus,        setRootMenus]        = useState([]);
+  const [allPages,         setAllPages]         = useState([]);
+  const [assignedSlugs,    setAssignedSlugs]    = useState(new Set());
+  const [showSuggestions,  setShowSuggestions]  = useState(false);
+  const [isLoading,        setIsLoading]        = useState(false);
 
   useEffect(() => {
+    const flattenMenus = (arr) =>
+      arr.flatMap(m => [m, ...(m.children?.length ? flattenMenus(m.children) : [])]);
+
+    pageService.getAll()
+      .then(data => setAllPages(Array.isArray(data) ? data : []))
+      .catch(() => {});
+
     menuService.getAll()
       .then(res => {
         const all = res.data.data ?? res.data;
         setRootMenus(all.filter(m => !m.parent_id));
+
+        const flat = flattenMenus(all);
+        const used = new Set(flat.map(m => m.page_slug).filter(Boolean));
+        setAssignedSlugs(used);
       })
       .catch(() => {});
 
@@ -68,10 +83,23 @@ export default function CreateMenuContent() {
             page_slug: item.page_slug || "",
             activated: item.activated !== undefined ? item.activated : true,
           });
+          // En mode edit, le slug actuel ne doit pas bloquer la suggestion
+          setAssignedSlugs(prev => {
+            const next = new Set(prev);
+            next.delete(item.page_slug);
+            return next;
+          });
         })
         .catch(() => Swal.fire('Erreur', 'Impossible de charger le menu.', 'error'));
     }
   }, [id, isEditing]);
+
+  const slugSuggestions = useMemo(() => {
+    const query = formData.page_slug.toLowerCase();
+    return allPages
+      .map(p => p.slug)
+      .filter(s => s && !assignedSlugs.has(s) && s.toLowerCase().includes(query));
+  }, [allPages, assignedSlugs, formData.page_slug]);
 
   const handleSave = async () => {
     if (!formData.label.trim()) {
@@ -148,7 +176,7 @@ export default function CreateMenuContent() {
               placeholder="Ex: CALLS, Call for Papers…" className={inputClass} />
           )}
 
-          {field("URL (lien de navigation)",false,
+          {field("URL (lien de navigation)", false,
             <>
               <input type="text" value={formData.url}
                 onChange={e => setFormData({ ...formData, url: e.target.value })}
@@ -176,10 +204,46 @@ export default function CreateMenuContent() {
 
           {field("Slug de la page associée (optionnel)", false,
             <>
-              <input type="text" value={formData.page_slug}
-                onChange={e => setFormData({ ...formData, page_slug: e.target.value })}
-                placeholder="Ex: calls-papers" className={`${inputClass} font-mono`} />
-              <p className="text-xs text-gray-400">Relier ce menu à une page existante dans la DB.</p>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={formData.page_slug}
+                  onChange={e => setFormData({ ...formData, page_slug: e.target.value })}
+                  onFocus={() => setShowSuggestions(true)}
+                  onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+                  placeholder="Ex: calls-papers"
+                  className={`${inputClass} font-mono`}
+                  autoComplete="off"
+                />
+                {showSuggestions && slugSuggestions.length > 0 && (
+                  <ul className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                    {slugSuggestions.map(slug => (
+                      <li
+                        key={slug}
+                        onMouseDown={() => {
+                          setFormData(prev => ({ ...prev, page_slug: slug }));
+                          setShowSuggestions(false);
+                        }}
+                        className="px-3 py-2 text-sm font-mono text-gray-700 hover:bg-[#1a7a3c]/10 cursor-pointer"
+                      >
+                        {slug}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+              <p className="text-xs text-gray-400">
+                Relier ce menu à une page existante. Tapez pour filtrer les slugs disponibles.
+                {formData.page_slug && (
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, page_slug: "" }))}
+                    className="ml-2 text-red-400 hover:text-red-600"
+                  >
+                    Effacer
+                  </button>
+                )}
+              </p>
             </>
           )}
 
