@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import { sponsorService } from "../services/sponsorService";
+import fichierService from "../services/fichierService";
 
 const Icon = ({ d, size = 18, className = "" }) => (
   <svg
@@ -67,6 +68,7 @@ export default function CreateSponsor() {
   });
 
   const [logoPreview, setLogoPreview] = useState(null);
+  const [logoUploading, setLogoUploading] = useState(false);
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
@@ -92,7 +94,7 @@ export default function CreateSponsor() {
         activated: sponsor.activated !== undefined ? sponsor.activated : true,
       });
       if (sponsor.logo_fichier_id) {
-        setLogoPreview(sponsor.logo_fichier_id);
+        setLogoPreview(`${import.meta.env.VITE_API_URL}/public/fichiers/${sponsor.logo_fichier_id}`);
       }
     } catch (error) {
       console.error("Erreur lors du chargement du sponsor:", error);
@@ -116,18 +118,19 @@ export default function CreateSponsor() {
 
   const handleLogoChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      if (file.size > 2 * 1024 * 1024) {
-        alert("Le fichier ne doit pas dépasser 2MB");
-        return;
-      }
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setLogoPreview(reader.result);
-        setFormData({ ...formData, logo: reader.result });
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      Swal.fire({ icon: 'warning', title: 'Fichier trop lourd', text: 'Le fichier ne doit pas dépasser 2MB.' });
+      return;
     }
+    const reader = new FileReader();
+    reader.onloadend = () => setLogoPreview(reader.result);
+    reader.readAsDataURL(file);
+    setLogoUploading(true);
+    fichierService.upload(file, 'logo_sponsor')
+      .then(fichier => setFormData(prev => ({ ...prev, logo_fichier_id: fichier.id })))
+      .catch(() => Swal.fire({ icon: 'error', title: 'Erreur', text: "Impossible d'uploader le logo." }))
+      .finally(() => setLogoUploading(false));
   };
 
   const handleSubmit = async () => {
@@ -245,6 +248,7 @@ export default function CreateSponsor() {
                     <p className="text-xs text-gray-400">
                       Format recommandé : PNG, JPG. Taille max : 2MB
                     </p>
+                    {logoUploading && <p className="text-xs text-[#1a7a3c] mt-1">Upload en cours…</p>}
                   </div>
                 </div>
               </div>

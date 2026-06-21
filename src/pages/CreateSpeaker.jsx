@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import { speakerService } from "../services/speakerService";
+import fichierService from "../services/fichierService";
 
 const Icon = ({ d, size = 18, className = "" }) => (
   <svg
@@ -56,6 +57,7 @@ export default function CreateSpeaker() {
   });
 
   const [photoPreview, setPhotoPreview] = useState(null);
+  const [photoUploading, setPhotoUploading] = useState(false);
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
@@ -81,7 +83,7 @@ export default function CreateSpeaker() {
         activated: speaker.activated,
       });
       if (speaker.photo_fichier_id) {
-        setPhotoPreview(speaker.photo_fichier_id);
+        setPhotoPreview(`${import.meta.env.VITE_API_URL}/public/fichiers/${speaker.photo_fichier_id}`);
       }
     } catch (error) {
       console.error("Erreur lors du chargement du speaker:", error);
@@ -106,16 +108,19 @@ export default function CreateSpeaker() {
 
   const handlePhotoChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      // TODO: Implémenter l'upload de fichier et récupérer l'ID
-      // Pour l'instant, on utilise un placeholder
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPhotoPreview(reader.result);
-        setFormData({ ...formData, photo_fichier_id: 1 }); // Placeholder ID
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      Swal.fire({ icon: 'warning', title: 'Fichier trop lourd', text: 'Le fichier ne doit pas dépasser 2MB.' });
+      return;
     }
+    const reader = new FileReader();
+    reader.onloadend = () => setPhotoPreview(reader.result);
+    reader.readAsDataURL(file);
+    setPhotoUploading(true);
+    fichierService.upload(file, 'photo_speaker')
+      .then(fichier => setFormData(prev => ({ ...prev, photo_fichier_id: fichier.id })))
+      .catch(() => Swal.fire({ icon: 'error', title: 'Erreur', text: "Impossible d'uploader la photo." }))
+      .finally(() => setPhotoUploading(false));
   };
 
   const handleSubmit = async () => {
@@ -224,6 +229,7 @@ export default function CreateSpeaker() {
                   <p className="text-xs text-gray-400">
                     Format recommandé : JPG, PNG. Taille max : 2MB
                   </p>
+                  {photoUploading && <p className="text-xs text-[#1a7a3c] mt-1">Upload en cours…</p>}
                 </div>
               </div>
 

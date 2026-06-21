@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import { programmeService } from "../services/programmeService";
 import { evenementService } from "../services/evenementService";
+import fichierService from "../services/fichierService";
 
 const Icon = ({ d, size = 18, className = "" }) => (
   <svg
@@ -30,6 +31,8 @@ const ICONS = {
   x:        "M18 6L6 18M6 6l12 12",
   location: "M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0zM12 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6z",
   users:    "M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75",
+  upload:   "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12",
+  file:     "M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7zM14 2v4a2 2 0 0 0 2 2h4",
 };
 
 const PROGRAM_TYPES = [
@@ -56,10 +59,13 @@ export default function CreateProgramContent() {
     salle: "",
     speaker_committee_ids: [],
     papier_ids: [],
+    planning_fichier_id: null,
   });
 
   const [evenements, setEvenements] = useState([]);
   const [newSpeakerId, setNewSpeakerId] = useState("");
+  const [planningFileName, setPlanningFileName] = useState(null);
+  const [planningUploading, setPlanningUploading] = useState(false);
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
@@ -101,7 +107,11 @@ export default function CreateProgramContent() {
         salle: program.salle || "",
         speaker_committee_ids: program.speaker_committee_ids || [],
         papier_ids: program.papier_ids || [],
+        planning_fichier_id: program.planning_fichier_id || null,
       });
+      if (program.planning_fichier_id) {
+        setPlanningFileName(`Fichier ID #${program.planning_fichier_id} (existant)`);
+      }
     } catch (error) {
       console.error("Erreur lors du chargement du programme:", error);
       Swal.fire({
@@ -149,6 +159,21 @@ export default function CreateProgramContent() {
       ...formData,
       speaker_committee_ids: formData.speaker_committee_ids.filter(id => id !== speakerIdToRemove)
     });
+  };
+
+  const handlePlanningChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) {
+      Swal.fire({ icon: 'warning', title: 'Fichier trop lourd', text: 'Le fichier ne doit pas dépasser 10MB.' });
+      return;
+    }
+    setPlanningFileName(file.name);
+    setPlanningUploading(true);
+    fichierService.upload(file, 'planning')
+      .then(fichier => setFormData(prev => ({ ...prev, planning_fichier_id: fichier.id })))
+      .catch(() => Swal.fire({ icon: 'error', title: 'Erreur', text: "Impossible d'uploader le fichier planning." }))
+      .finally(() => setPlanningUploading(false));
   };
 
   const handleSubmit = async () => {
@@ -357,6 +382,37 @@ export default function CreateProgramContent() {
                     {errors.date_fin && <p className="text-xs text-red-500">{errors.date_fin}</p>}
                   </div>
                 </div>
+              </div>
+
+              {/* Fichier planning */}
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">
+                  Fichier planning (optionnel)
+                </h2>
+                <div className="flex items-center gap-4">
+                  <label className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-dashed border-gray-300 bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors">
+                    <Icon d={ICONS.upload} size={16} className="text-gray-500" />
+                    <span className="text-sm text-gray-600">
+                      {planningUploading ? 'Upload en cours…' : 'Choisir un fichier PDF ou image'}
+                    </span>
+                    <input
+                      type="file"
+                      accept=".pdf,image/*"
+                      onChange={handlePlanningChange}
+                      className="hidden"
+                    />
+                  </label>
+                  {planningFileName && !planningUploading && (
+                    <div className="flex items-center gap-2 text-sm text-gray-700">
+                      <Icon d={ICONS.file} size={14} className="text-[#1a7a3c]" />
+                      <span>{planningFileName}</span>
+                      {formData.planning_fichier_id && (
+                        <span className="text-xs text-gray-400">(ID #{formData.planning_fichier_id})</span>
+                      )}
+                    </div>
+                  )}
+                </div>
+                <p className="text-xs text-gray-400 mt-2">Format : PDF, PNG, JPG. Taille max : 10MB</p>
               </div>
 
               {/* Intervenants */}

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
+import api from "../services/api";
 import { pageService } from "../services/pageService";
 import menuService from "../services/menuService";
 import { speakerService }  from "../services/speakerService";
@@ -71,7 +72,7 @@ function InsertSection({ title, count, children }) {
   );
 }
 
-/* Generic insert widget: select + button */
+/* Generic insert widget: select + button (used for Programme) */
 function InsertWidget({ items, labelKey, onInsert, placeholder = "Choisir…" }) {
   const [selected, setSelected] = useState("");
   const safeItems = Array.isArray(items) ? items : [];
@@ -109,6 +110,177 @@ function InsertWidget({ items, labelKey, onInsert, placeholder = "Choisir…" })
   );
 }
 
+const FILE_ICON = "M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7ZM14 2v4a2 2 0 0 0 2 2h4";
+
+/* Avatar : tente de charger l'image ; si échec → icône fichier */
+function ItemAvatar({ src }) {
+  const [failed, setFailed] = useState(false);
+  if (src && !failed) {
+    return (
+      <img src={src} alt="" onError={() => setFailed(true)}
+        className="w-8 h-8 object-cover rounded flex-shrink-0 border border-gray-100" />
+    );
+  }
+  return (
+    <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"
+      className="text-gray-300 flex-shrink-0 mt-0.5">
+      <path d={FILE_ICON} />
+    </svg>
+  );
+}
+
+/* Dynamic block widget: multi-checkbox → inserts data-cari-block placeholder */
+function BlockInsertWidget({ items, labelKey, blockType, onInsert, typeFilters, fichierIdKey, linkKey, linkType = 'url' }) {
+  const [selected, setSelected] = useState(new Set());
+  const [activeFilter, setActiveFilter] = useState("");
+  const safeItems = Array.isArray(items) ? items : [];
+
+  const displayed = activeFilter
+    ? safeItems.filter(it => it.type === activeFilter)
+    : safeItems;
+
+  const toggleItem = (id) => {
+    setSelected(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  const toggleAll = () => {
+    if (selected.size === displayed.length && displayed.length > 0) {
+      setSelected(new Set());
+    } else {
+      setSelected(new Set(displayed.map(it => it.id)));
+    }
+  };
+
+  const handleInsert = () => {
+    const ids = [...selected];
+    const targets = ids.length > 0
+      ? displayed.filter(it => selected.has(it.id))
+      : displayed;
+
+    let html = `<div data-cari-block="${blockType}"`;
+    if (ids.length > 0) html += ` data-ids="${ids.join(',')}"`;
+    if (activeFilter)   html += ` data-filter="${activeFilter}"`;
+    html += ` style="margin:24px 0;">`;
+
+    for (const item of targets) {
+      const fichierId  = fichierIdKey ? item[fichierIdKey] : null;
+      const fichierUrl = fichierId ? `${apiBase}/public/fichiers/${fichierId}` : null;
+      const label      = item[labelKey] || '';
+      const link       = linkKey ? item[linkKey] : null;
+      const href       = link ? (linkType === 'email' ? `mailto:${link}` : link) : null;
+
+      let inner = '';
+      if (fichierUrl) {
+        inner += `<a href="${fichierUrl}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;color:#dc2626;text-decoration:underline;font-weight:500">${_FILE_DOWN} ${label}</a>`;
+      } else {
+        inner += `<span>${label}</span>`;
+      }
+      if (href) {
+        inner += ` · <a href="${href}" target="_blank" style="color:#2563eb;">${link}</a>`;
+      }
+      html += `<p data-id="${item.id}">${inner}</p>`;
+    }
+
+    html += `</div>`;
+    onInsert(html);
+    setSelected(new Set());
+  };
+
+  if (safeItems.length === 0) {
+    return <p className="text-xs text-gray-400 italic text-center py-1">Aucun élément disponible</p>;
+  }
+
+  const allChecked = displayed.length > 0 && selected.size === displayed.length;
+  const apiBase = import.meta.env.VITE_API_URL ?? '';
+
+  return (
+    <div className="flex flex-col gap-2">
+      {typeFilters && (
+        <div className="flex flex-wrap gap-1">
+          <button
+            onClick={() => { setActiveFilter(""); setSelected(new Set()); }}
+            className={`px-2 py-0.5 rounded text-xs font-medium transition-colors ${!activeFilter ? 'bg-[#1a7a3c] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
+            Tous
+          </button>
+          {typeFilters.map(f => (
+            <button key={f.value}
+              onClick={() => { setActiveFilter(f.value); setSelected(new Set()); }}
+              className={`px-2 py-0.5 rounded text-xs font-medium transition-colors ${activeFilter === f.value ? 'bg-[#1a7a3c] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
+              {f.label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      <div className="flex items-center justify-between">
+        <label className="flex items-center gap-1.5 cursor-pointer">
+          <input type="checkbox" checked={allChecked} onChange={toggleAll}
+            className="accent-[#1a7a3c] w-3 h-3" />
+          <span className="text-xs text-gray-500">Tout sélectionner</span>
+        </label>
+        <span className="text-xs text-gray-400">{selected.size}/{displayed.length}</span>
+      </div>
+
+      <div className="flex flex-col gap-1.5 max-h-52 overflow-y-auto pr-0.5">
+        {displayed.map((item, i) => {
+          const fichierId = fichierIdKey ? item[fichierIdKey] : null;
+          const fichierUrl = fichierId ? `${apiBase}/public/fichiers/${fichierId}` : null;
+          const link = linkKey ? item[linkKey] : null;
+          const href = link ? (linkType === 'email' ? `mailto:${link}` : link) : null;
+
+          return (
+            <label key={item.id ?? i}
+              className="flex items-start gap-2 cursor-pointer p-2 rounded-lg border border-gray-100 hover:bg-gray-50 transition-colors">
+              <input type="checkbox" checked={selected.has(item.id)} onChange={() => toggleItem(item.id)}
+                className="mt-0.5 accent-[#1a7a3c] w-3 h-3 flex-shrink-0" />
+
+              <ItemAvatar src={fichierUrl} />
+
+              <div className="flex flex-col min-w-0 flex-1 gap-0.5">
+                {/* 1 — Nom */}
+                <span className="text-xs font-semibold text-gray-800 truncate">
+                  {item[labelKey] || `— ${item.id} —`}
+                </span>
+                {/* 2 — Lien d'accès au fichier en base de données */}
+                {fichierUrl ? (
+                  <a href={fichierUrl} target="_blank" rel="noopener noreferrer"
+                    onClick={e => e.stopPropagation()}
+                    title={fichierUrl}
+                    className="text-[10px] text-gray-400 hover:text-blue-500 hover:underline truncate leading-tight font-mono">
+                    /public/fichiers/{fichierId}
+                  </a>
+                ) : fichierIdKey ? (
+                  <span className="text-[10px] text-gray-300 italic leading-tight">Aucun fichier</span>
+                ) : null}
+                {/* 3 — URL du lien ou du mail associé */}
+                {href && (
+                  <a href={href} target="_blank" rel="noopener noreferrer"
+                    onClick={e => e.stopPropagation()}
+                    className="text-[10px] text-blue-500 hover:underline truncate leading-tight">
+                    {link}
+                  </a>
+                )}
+              </div>
+            </label>
+          );
+        })}
+      </div>
+
+      <button
+        onClick={handleInsert}
+        className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#1a7a3c] text-white text-xs font-semibold hover:bg-[#155f2f] transition-colors">
+        <Icon d={ICONS.insert} size={12} />
+        {selected.size > 0 ? `Insérer (${selected.size})` : 'Insérer tous'}
+      </button>
+    </div>
+  );
+}
+
 /* HTML snippet generators — champs alignés sur les Resources Laravel réels */
 const snippets = {
   speaker: (s) => `<div style="background:#f3f4f6;padding:1rem;border-radius:0.5rem;margin-bottom:0.75rem;">
@@ -135,12 +307,89 @@ const snippets = {
 </div>`,
 };
 
+/* ── Résolution preview data-cari-block ── */
+
+const _PREVIEW_BASE = import.meta.env.VITE_API_URL ?? '';
+const _pFileUrl = (id) => id ? `${_PREVIEW_BASE}/public/fichiers/${id}` : null;
+const _FILE_DOWN = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle;"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M12 18v-6"/><path d="m9 15 3 3 3-3"/></svg>`;
+
+const _renderSponsors = (items) => {
+  if (!items.length) return '<p style="color:#6b7280;font-style:italic;">Aucun sponsor disponible.</p>';
+  const cards = items.map(s => {
+    const logo = _pFileUrl(s.logo_fichier_id);
+    return `<div style="display:flex;flex-direction:column;align-items:center;gap:0.75rem;padding:1.25rem;background:#f9fafb;border:1px solid #e5e7eb;border-radius:0.75rem;text-align:center;">
+      ${logo ? `<img src="${logo}" alt="${s.nom}" style="max-width:120px;max-height:80px;object-fit:contain;" onerror="this.style.display='none'" />` : `<div style="width:80px;height:60px;background:#e5e7eb;border-radius:0.5rem;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:0.75rem;">Logo</div>`}
+      ${s.url ? `<a href="${s.url}" target="_blank" rel="noopener noreferrer" style="font-weight:600;color:#111827;text-decoration:none;font-size:0.95rem;">${s.nom}</a>` : `<span style="font-weight:600;color:#111827;font-size:0.95rem;">${s.nom}</span>`}
+      ${s.type ? `<span style="color:#6b7280;font-size:0.8rem;">${s.type}</span>` : ''}
+    </div>`;
+  }).join('');
+  return `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:1rem;">${cards}</div>`;
+};
+
+const _renderSpeakers = (items) => {
+  if (!items.length) return '<p style="color:#6b7280;font-style:italic;">Aucun intervenant disponible.</p>';
+  const cards = items.map(s => {
+    const photo = _pFileUrl(s.photo_fichier_id);
+    return `<div style="display:flex;flex-direction:column;align-items:center;gap:0.75rem;padding:1.25rem;background:#f9fafb;border:1px solid #e5e7eb;border-radius:0.75rem;text-align:center;">
+      ${photo ? `<img src="${photo}" alt="${s.prenom ?? ''} ${s.nom ?? ''}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid #e5e7eb;" onerror="this.style.display='none'" />` : `<div style="width:80px;height:80px;border-radius:50%;background:#e5e7eb;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:1.5rem;">&#128100;</div>`}
+      <div>
+        <p style="font-weight:600;color:#111827;margin:0 0 0.25rem;">${s.prenom ?? ''} ${s.nom ?? ''}</p>
+        ${s.affiliation ? `<p style="color:#6b7280;font-size:0.8rem;margin:0 0 0.25rem;">${s.affiliation}</p>` : ''}
+        ${s.email ? `<a href="mailto:${s.email}" style="color:#2563eb;font-size:0.8rem;text-decoration:none;">${s.email}</a>` : ''}
+        ${s.website ? `<br><a href="${s.website}" target="_blank" rel="noopener noreferrer" style="color:#16a34a;font-size:0.8rem;">Site web</a>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+  return `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:1rem;">${cards}</div>`;
+};
+
+const _renderDocuments = (items) => {
+  if (!items.length) return '<p style="color:#6b7280;font-style:italic;">Aucun document disponible.</p>';
+  const rows = items.map(d => {
+    const href = _pFileUrl(d.fichier_id) || d.lien || '#';
+    return `<p style="margin:0 0 0.5rem;"><a href="${href}" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;color:#dc2626;text-decoration:underline;font-weight:500;font-size:0.9rem;">${_FILE_DOWN}${d.nom_document ?? 'Document'}</a></p>`;
+  }).join('');
+  return `<div style="display:flex;flex-direction:column;">${rows}</div>`;
+};
+
+const resolvePreviewBlocks = async (container) => {
+  if (!container) return;
+  const blocks = container.querySelectorAll('[data-cari-block]');
+  if (!blocks.length) return;
+  for (const block of blocks) {
+    const type   = block.getAttribute('data-cari-block');
+    const ids    = (block.getAttribute('data-ids') ?? '').split(',').map(Number).filter(Boolean);
+    const filter = block.getAttribute('data-filter');
+    block.innerHTML = '<p style="color:#9ca3af;font-style:italic;font-size:0.8rem;padding:0.5rem 0;">Chargement…</p>';
+    try {
+      if (type === 'sponsors') {
+        const res = await api.get('/public/sponsors');
+        const all = res.data?.data ?? res.data ?? [];
+        block.innerHTML = _renderSponsors(ids.length ? all.filter(s => ids.includes(s.id)) : all);
+      } else if (type === 'speakers') {
+        const res = await api.get('/public/speakers');
+        const all = res.data?.data ?? res.data ?? [];
+        let items = ids.length ? all.filter(s => ids.includes(s.id)) : all;
+        if (filter) items = items.filter(s => s.type === filter);
+        block.innerHTML = _renderSpeakers(items);
+      } else if (type === 'documents') {
+        const res = await api.get('/public/documents');
+        const all = res.data?.data ?? res.data ?? [];
+        block.innerHTML = _renderDocuments(ids.length ? all.filter(d => ids.includes(d.id)) : all);
+      }
+    } catch (_) {
+      block.innerHTML = '<p style="color:#ef4444;font-size:0.8rem;padding:0.5rem 0;">Erreur de chargement</p>';
+    }
+  }
+};
+
 /* ── Main component ── */
 export default function CreatePageContent() {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEditing = !!id;
   const textareaRef = useRef(null);
+  const previewRef  = useRef(null);
 
   const [formData, setFormData] = useState({
     titre: "", slug: "", contexte: "", description: "", url_frontend: "",
@@ -203,6 +452,14 @@ export default function CreatePageContent() {
         .catch(() => Swal.fire({ icon: 'error', title: 'Erreur', text: 'Impossible de charger la page.' }));
     }
   }, [id, isEditing]);
+
+  /* Résoudre les blocs data-cari-block quand le tab Aperçu est actif */
+  useEffect(() => {
+    if (tab !== 'preview' || !previewRef.current) return;
+    previewRef.current.innerHTML = formData.contenu_html
+      || "<p style='color:#9ca3af;font-style:italic'>Aucun contenu à afficher.</p>";
+    resolvePreviewBlocks(previewRef.current);
+  }, [tab, formData.contenu_html]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleMenuParentChange = (value) => {
     setFormData(prev => ({ ...prev, menu_parent_id: value, menu_sub_id: "" }));
@@ -435,9 +692,8 @@ export default function CreatePageContent() {
                 style={{ minHeight: "420px" }}
               />
             ) : (
-              <div className="flex-1 p-5 text-sm text-gray-700 overflow-auto"
-                dangerouslySetInnerHTML={{ __html: formData.contenu_html || "<p style='color:#9ca3af;font-style:italic'>Aucun contenu à afficher.</p>" }}
-              />
+              <div ref={previewRef}
+                className="flex-1 p-5 text-sm text-gray-700 overflow-auto" />
             )}
           </div>
 
@@ -453,29 +709,43 @@ export default function CreatePageContent() {
           <p className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Insérer</p>
 
           <InsertSection title="Speakers / Committees" count={speakers.length}>
-            <InsertWidget
+            <BlockInsertWidget
               items={speakers}
               labelKey="nom_complet"
-              placeholder="Choisir un speaker…"
-              onInsert={s => insertAtCursor(textareaRef, '\n' + snippets.speaker(s) + '\n')}
+              blockType="speakers"
+              onInsert={html => insertAtCursor(textareaRef, '\n' + html + '\n')}
+              fichierIdKey="photo_fichier_id"
+              linkKey="email"
+              linkType="email"
+              typeFilters={[
+                { value: 'speaker',              label: 'Speakers' },
+                { value: 'program_committee',    label: 'Prog.' },
+                { value: 'organizing_committee', label: 'Org.' },
+              ]}
             />
           </InsertSection>
 
           <InsertSection title="Sponsors / Partners" count={sponsors.length}>
-            <InsertWidget
+            <BlockInsertWidget
               items={sponsors}
               labelKey="nom"
-              placeholder="Choisir un sponsor…"
-              onInsert={s => insertAtCursor(textareaRef, '\n' + snippets.sponsor(s) + '\n')}
+              blockType="sponsors"
+              onInsert={html => insertAtCursor(textareaRef, '\n' + html + '\n')}
+              fichierIdKey="logo_fichier_id"
+              linkKey="url"
+              linkType="url"
             />
           </InsertSection>
 
           <InsertSection title="Documents" count={documents.length}>
-            <InsertWidget
+            <BlockInsertWidget
               items={documents}
               labelKey="nom_document"
-              placeholder="Choisir un document…"
-              onInsert={d => insertAtCursor(textareaRef, '\n' + snippets.document(d) + '\n')}
+              blockType="documents"
+              onInsert={html => insertAtCursor(textareaRef, '\n' + html + '\n')}
+              fichierIdKey="fichier_id"
+              linkKey="lien"
+              linkType="url"
             />
           </InsertSection>
 
