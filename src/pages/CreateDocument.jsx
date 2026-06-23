@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import { documentService } from "../services/documentService";
+import fichierService from "../services/fichierService";
 
 const Icon = ({ d, size = 18, className = "" }) => (
   <svg
@@ -77,6 +78,7 @@ export default function CreateDocument() {
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
+  const [fileUploading, setFileUploading] = useState(false);
 
   useEffect(() => {
     if (isEditing) {
@@ -115,24 +117,20 @@ export default function CreateDocument() {
   };
 
   const handleFileChange = (file) => {
-    if (file) {
-      if (file.size > 10 * 1024 * 1024) {
-        alert("Le fichier ne doit pas dépasser 10MB");
-        return;
-      }
-      
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData({
-          ...formData,
-          file: reader.result,
-          fileType: getFileTypeFromName(file.name),
-          fileSize: file.size,
-          fileName: file.name,
-        });
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) {
+      Swal.fire({ icon: 'warning', title: 'Fichier trop lourd', text: 'Max 10MB.' });
+      return;
     }
+    setFormData(prev => ({ ...prev, fileName: file.name, fileType: getFileTypeFromName(file.name) }));
+    setFileUploading(true);
+    fichierService.upload(file, 'document_public')
+      .then(fichier => {
+        const url = `${import.meta.env.VITE_API_URL}/public/fichiers/${fichier.id}`;
+        setFormData(prev => ({ ...prev, fichier_id: fichier.id, fichierUrl: url }));
+      })
+      .catch(() => Swal.fire({ icon: 'error', title: 'Erreur', text: "Impossible d'uploader le fichier." }))
+      .finally(() => setFileUploading(false));
   };
 
   const handleDrop = (e) => {
@@ -276,6 +274,18 @@ export default function CreateDocument() {
                     <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 bg-green-50 text-green-700 rounded-lg text-sm">
                       <Icon d={ICONS.check} size={14} />
                       <span>Fichier sélectionné : {formData.fileName}</span>
+                    </div>
+                  )}
+                  {fileUploading && (
+                    <p className="text-xs text-[#1a7a3c] mt-2">Upload en cours…</p>
+                  )}
+                  {formData.fichierUrl && !fileUploading && (
+                    <div className="mt-2 px-3 py-2 bg-blue-50 rounded-lg text-left">
+                      <p className="text-xs text-gray-500 mb-0.5">URL backend :</p>
+                      <a href={formData.fichierUrl} target="_blank" rel="noopener noreferrer"
+                         className="text-xs text-blue-600 underline break-all font-mono">
+                        {formData.fichierUrl}
+                      </a>
                     </div>
                   )}
                 </div>

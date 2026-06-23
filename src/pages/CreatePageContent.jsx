@@ -131,7 +131,7 @@ function ItemAvatar({ src }) {
 }
 
 /* Dynamic block widget: multi-checkbox → inserts data-cari-block placeholder */
-function BlockInsertWidget({ items, labelKey, blockType, onInsert, typeFilters, fichierIdKey, linkKey, linkType = 'url' }) {
+function BlockInsertWidget({ items, labelKey, blockType, onInsert, typeFilters, fichierIdKey, linkKey, linkType = 'url', extraFields = [], smartFileTag = false }) {
   const [selected, setSelected] = useState(new Set());
   const [activeFilter, setActiveFilter] = useState("");
   const safeItems = Array.isArray(items) ? items : [];
@@ -174,16 +174,34 @@ function BlockInsertWidget({ items, labelKey, blockType, onInsert, typeFilters, 
       const link       = linkKey ? item[linkKey] : null;
       const href       = link ? (linkType === 'email' ? `mailto:${link}` : link) : null;
 
-      let inner = '';
+      const IMAGE_EXT = ['jpg','jpeg','png','gif','svg','webp','bmp'];
+      const isImage = smartFileTag && IMAGE_EXT.includes((item.fichier_extension || '').toLowerCase());
+
+      let block = `<p data-id="${item.id}" style="font-weight:600;margin:0 0 0.25rem;">`;
       if (fichierUrl) {
-        inner += `<a href="${fichierUrl}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;color:#dc2626;text-decoration:underline;font-weight:500">${_FILE_DOWN} ${label}</a>`;
+        if (isImage) {
+          block += `<img src="${fichierUrl}" alt="${label}" style="max-width:100%;height:auto;border-radius:0.5rem;" />`;
+          block += `<br><span style="font-size:0.8rem;color:#6b7280;">${fichierUrl}</span>`;
+        } else {
+          block += `<a href="${fichierUrl}" target="_blank" download style="display:inline-flex;align-items:center;gap:6px;color:#dc2626;text-decoration:underline;font-weight:500">${_FILE_DOWN} ${label}</a>`;
+          block += `<br><span style="font-size:0.75rem;color:#9ca3af;font-family:monospace;">${fichierUrl}</span>`;
+        }
       } else {
-        inner += `<span>${label}</span>`;
+        block += `<span>${label}</span>`;
       }
+      block += `</p>`;
       if (href) {
-        inner += ` · <a href="${href}" target="_blank" style="color:#2563eb;">${link}</a>`;
+        block += `<p style="margin:0 0 0.2rem;font-size:0.875rem;"><a href="${href}" style="color:#2563eb;">${link}</a></p>`;
       }
-      html += `<p data-id="${item.id}">${inner}</p>`;
+      for (const field of extraFields) {
+        const val = item[field.key];
+        if (!val) continue;
+        let content = val;
+        if (field.type === 'email') content = `<a href="mailto:${val}" style="color:#2563eb;">${val}</a>`;
+        else if (field.type === 'url') content = `<a href="${val}" target="_blank" rel="noopener noreferrer" style="color:#16a34a;">${val}</a>`;
+        block += `<p style="margin:0 0 0.2rem;font-size:0.875rem;color:#374151;">${content}</p>`;
+      }
+      html += `<div style="margin-bottom:0.75rem;padding:0.75rem;border:1px solid #e5e7eb;border-radius:0.5rem;background:#fafafa;">${block}</div>`;
     }
 
     html += `</div>`;
@@ -331,12 +349,16 @@ const _renderSpeakers = (items) => {
   const cards = items.map(s => {
     const photo = _pFileUrl(s.photo_fichier_id);
     return `<div style="display:flex;flex-direction:column;align-items:center;gap:0.75rem;padding:1.25rem;background:#f9fafb;border:1px solid #e5e7eb;border-radius:0.75rem;text-align:center;">
-      ${photo ? `<img src="${photo}" alt="${s.prenom ?? ''} ${s.nom ?? ''}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid #e5e7eb;" onerror="this.style.display='none'" />` : `<div style="width:80px;height:80px;border-radius:50%;background:#e5e7eb;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:1.5rem;">&#128100;</div>`}
+      ${photo
+        ? `<img src="${photo}" alt="${s.prenom ?? ''} ${s.nom ?? ''}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid #e5e7eb;" onerror="this.style.display='none'" />`
+        : `<div style="width:80px;height:80px;border-radius:50%;background:#e5e7eb;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:1.5rem;">&#128100;</div>`}
       <div>
         <p style="font-weight:600;color:#111827;margin:0 0 0.25rem;">${s.prenom ?? ''} ${s.nom ?? ''}</p>
         ${s.affiliation ? `<p style="color:#6b7280;font-size:0.8rem;margin:0 0 0.25rem;">${s.affiliation}</p>` : ''}
-        ${s.email ? `<a href="mailto:${s.email}" style="color:#2563eb;font-size:0.8rem;text-decoration:none;">${s.email}</a>` : ''}
-        ${s.website ? `<br><a href="${s.website}" target="_blank" rel="noopener noreferrer" style="color:#16a34a;font-size:0.8rem;">Site web</a>` : ''}
+        ${s.bio        ? `<p style="color:#374151;font-size:0.78rem;margin:0 0 0.5rem;font-style:italic;line-height:1.4;">${s.bio}</p>` : ''}
+        ${s.email      ? `<p style="margin:0 0 0.2rem;"><a href="mailto:${s.email}" style="color:#2563eb;font-size:0.8rem;text-decoration:none;">${s.email}</a></p>` : ''}
+        ${s.telephone  ? `<p style="color:#374151;font-size:0.8rem;margin:0 0 0.2rem;">${s.telephone}</p>` : ''}
+        ${s.website    ? `<p style="margin:0;"><a href="${s.website}" target="_blank" rel="noopener noreferrer" style="color:#16a34a;font-size:0.8rem;">Site web</a></p>` : ''}
       </div>
     </div>`;
   }).join('');
@@ -345,9 +367,22 @@ const _renderSpeakers = (items) => {
 
 const _renderDocuments = (items) => {
   if (!items.length) return '<p style="color:#6b7280;font-style:italic;">Aucun document disponible.</p>';
+  const IMAGE_EXT = ['jpg','jpeg','png','gif','svg','webp','bmp'];
   const rows = items.map(d => {
     const href = _pFileUrl(d.fichier_id) || d.lien || '#';
-    return `<p style="margin:0 0 0.5rem;"><a href="${href}" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;color:#dc2626;text-decoration:underline;font-weight:500;font-size:0.9rem;">${_FILE_DOWN}${d.nom_document ?? 'Document'}</a></p>`;
+    const ext  = (d.fichier_extension || '').toLowerCase();
+    const isImage = IMAGE_EXT.includes(ext);
+    if (isImage) {
+      return `<figure style="margin:0 0 0.75rem;">
+        <img src="${href}" alt="${d.nom_document ?? ''}" style="max-width:100%;height:auto;border-radius:0.5rem;" />
+        <figcaption style="font-size:0.8rem;color:#6b7280;margin-top:0.25rem;">${d.nom_document ?? ''}</figcaption>
+        ${d.description ? `<p style="font-size:0.8rem;color:#374151;margin:0.25rem 0 0;">${d.description}</p>` : ''}
+      </figure>`;
+    }
+    return `<p style="margin:0 0 0.5rem;">
+      <a href="${href}" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;color:#dc2626;text-decoration:underline;font-weight:500;font-size:0.9rem;">${_FILE_DOWN}${d.nom_document ?? 'Document'}</a>
+      ${d.description ? `<span style="display:block;font-size:0.8rem;color:#6b7280;margin-top:0.2rem;">${d.description}</span>` : ''}
+    </p>`;
   }).join('');
   return `<div style="display:flex;flex-direction:column;">${rows}</div>`;
 };
@@ -722,6 +757,12 @@ export default function CreatePageContent() {
                 { value: 'program_committee',    label: 'Prog.' },
                 { value: 'organizing_committee', label: 'Org.' },
               ]}
+              extraFields={[
+                { key: 'affiliation' },
+                { key: 'bio' },
+                { key: 'telephone' },
+                { key: 'website', type: 'url' },
+              ]}
             />
           </InsertSection>
 
@@ -746,6 +787,12 @@ export default function CreatePageContent() {
               fichierIdKey="fichier_id"
               linkKey="lien"
               linkType="url"
+              smartFileTag={true}
+              extraFields={[
+                { key: 'description' },
+                { key: 'id_public' },
+                { key: 'lien', type: 'url' },
+              ]}
             />
           </InsertSection>
 

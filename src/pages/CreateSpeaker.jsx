@@ -30,6 +30,8 @@ const ICONS = {
   bio:      "M4 4h16v16H4zM9 9h6M9 13h6M9 17h4",
   camera:   "M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2zM12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8z",
   upload:   "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12",
+  phone:    "M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.99 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.9 1.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9a16 16 0 0 0 6.29 6.29l1.86-1.86a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z",
+  link:     "M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71",
 };
 
 const MEMBER_TYPES = [
@@ -205,7 +207,7 @@ export default function CreateSpeaker() {
               {/* Photo */}
               <div>
                 <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">
-                  Photo
+                  Photo <span className="text-gray-400 font-normal text-xs">(optionnel)</span>
                 </h2>
                 <div className="flex items-center gap-6">
                   <div className="relative">
@@ -279,7 +281,7 @@ export default function CreateSpeaker() {
 
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Email
+                      Email <span className="text-gray-400 font-normal text-xs">(optionnel)</span>
                     </label>
                     <div className="relative">
                       <Icon d={ICONS.mail} size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -298,7 +300,7 @@ export default function CreateSpeaker() {
 
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Affiliation
+                      Affiliation <span className="text-gray-400 font-normal text-xs">(optionnel)</span>
                     </label>
                     <div className="relative">
                       <Icon d={ICONS.building} size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -334,10 +336,10 @@ export default function CreateSpeaker() {
 
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Téléphone
+                      Téléphone <span className="text-gray-400 font-normal text-xs">(optionnel)</span>
                     </label>
                     <div className="relative">
-                      <Icon d={ICONS.type} size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                      <Icon d={ICONS.phone} size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                       <input
                         type="text"
                         value={formData.telephone}
@@ -350,7 +352,7 @@ export default function CreateSpeaker() {
 
                   <div className="col-span-2 flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Bio
+                      Bio <span className="text-gray-400 font-normal text-xs">(optionnel)</span>
                     </label>
                     <div className="relative">
                       <Icon d={ICONS.bio} size={16} className="absolute left-3 top-3 text-gray-400" />
@@ -366,10 +368,10 @@ export default function CreateSpeaker() {
 
                   <div className="col-span-2 flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Site web
+                      Site web <span className="text-gray-400 font-normal text-xs">(optionnel)</span>
                     </label>
                     <div className="relative">
-                      <Icon d={ICONS.type} size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                      <Icon d={ICONS.link} size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                       <input
                         type="url"
                         value={formData.website}
