@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import { userService } from "../services/userService";
+import { useAuth } from "../contexts/AuthContext";
 
 const Icon = ({ d, size = 18, className = "" }) => (
   <svg
@@ -42,9 +43,11 @@ export default function CreateUser() {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEditing = !!id;
+  const { user: currentUser } = useAuth();
 
   const [formData, setFormData] = useState({
-    nom_prenoms: "",
+    nom: "",
+    prenom: "",
     email: "",
     role_admin_id: "",
     password: "",
@@ -59,20 +62,44 @@ export default function CreateUser() {
   const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
-    loadRoles();
+    if (currentUser) {
+      loadRoles();
+    }
     if (isEditing) {
       loadUser();
     }
-  }, [id, isEditing]);
+  }, [id, isEditing, currentUser]);
+
+  useEffect(() => {
+    if (currentUser) {
+      const hasAccess = 
+        currentUser.role_admin?.code === 'SUPER_ADMIN' || 
+        currentUser.role_admin?.code === 'ADMIN' || 
+        (isEditing && Number(id) === Number(currentUser.id));
+        
+      if (!hasAccess) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Accès refusé',
+          text: "Vous n'avez pas la permission d'accéder à cette page."
+        });
+        navigate("/dashboard");
+      }
+    }
+  }, [currentUser, id, isEditing, navigate]);
 
   const loadRoles = async () => {
     try {
-      // Pour l'instant, on utilise des rôles statiques car il n'y a pas d'API pour les rôles
-      setRoles([
+      const allRoles = [
         { id: 1, libelle: "Super Admin", code: "SUPER_ADMIN" },
         { id: 2, libelle: "Admin", code: "ADMIN" },
         { id: 3, libelle: "Editor", code: "EDITOR" },
-      ]);
+      ];
+      if (currentUser?.role_admin?.code === 'ADMIN') {
+        setRoles(allRoles.filter(r => r.code !== 'SUPER_ADMIN'));
+      } else {
+        setRoles(allRoles);
+      }
     } catch (error) {
       console.error("Erreur lors du chargement des rôles:", error);
     }
@@ -81,10 +108,20 @@ export default function CreateUser() {
   const loadUser = async () => {
     try {
       const user = await userService.getById(id);
+      
+      let prenom = user.prenom;
+      let nom = user.nom;
+      if (!prenom && !nom && user.nom_prenoms) {
+        const parts = user.nom_prenoms.split(' ');
+        prenom = parts[0] || "";
+        nom = parts.slice(1).join(' ') || "";
+      }
+
       setFormData({
-        nom_prenoms: user.nom_prenoms || "",
+        nom: nom || "",
+        prenom: prenom || "",
         email: user.email || "",
-        role_admin_id: user.role_admin_id || "",
+        role_admin_id: user.role_admin_id || user.role?.id || "",
         password: "",
         password_confirmation: "",
         statut_compte: user.statut_compte || "ACTIF",
@@ -102,7 +139,7 @@ export default function CreateUser() {
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.nom_prenoms.trim()) newErrors.nom_prenoms = "Le nom est requis";
+    if (!formData.nom.trim()) newErrors.nom = "Le nom est requis";
     if (!formData.email.trim()) newErrors.email = "L'email est requis";
     else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = "Email invalide";
     if (!formData.role_admin_id) newErrors.role_admin_id = "Le rôle est requis";
@@ -130,7 +167,7 @@ export default function CreateUser() {
 
       try {
         // Séparer nom et prénom
-        const nameParts = formData.nom_prenoms.split(' ');
+        const nameParts = formData.nom.split(' ');
         const prenom = nameParts[0] || "";
         const nom = nameParts.slice(1).join(' ') || "";
 
@@ -138,8 +175,8 @@ export default function CreateUser() {
           email: formData.email,
           password: formData.password,
           password_confirmation: formData.password_confirmation,
-          prenom: prenom,
-          nom: nom,
+          prenom: formData.prenom,
+          nom: formData.nom,
           role_id: parseInt(formData.role_admin_id),
           statut_compte: formData.statut_compte,
           activated: formData.activated,
@@ -201,7 +238,7 @@ export default function CreateUser() {
         </div>
         <div className="flex items-center gap-3">
           <button
-            onClick={() => navigate("/users")}
+            onClick={() => navigate("/roles")}
             className="px-4 py-2 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
           >
             Annuler
@@ -231,21 +268,38 @@ export default function CreateUser() {
                   {/* Nom complet */}
                   <div className="col-span-2 flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Nom & Prénoms <span className="text-red-500">*</span>
+                      Nom <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
                       <Icon d={ICONS.user} size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                       <input
                         type="text"
-                        value={formData.nom_prenoms}
-                        onChange={(e) => setFormData({...formData, nom_prenoms: e.target.value})}
+                        value={formData.nom}
+                        onChange={(e) => setFormData({...formData, nom: e.target.value})}
                         placeholder="Ex: Jean Dupont"
                         className={`w-full pl-10 pr-3 py-2.5 rounded-lg border ${
-                          errors.nom_prenoms ? 'border-red-400' : 'border-gray-200'
+                          errors.nom ? 'border-red-400' : 'border-gray-200'
                         } text-sm text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30 focus:border-[#1a7a3c] transition`}
                       />
                     </div>
-                    {errors.nom_prenoms && <p className="text-xs text-red-500">{errors.nom_prenoms}</p>}
+                    {errors.nom && <p className="text-xs text-red-500">{errors.nom}</p>}
+
+                    <label className="text-sm font-semibold text-gray-700">
+                      Prénoms <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <Icon d={ICONS.user} size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                      <input
+                        type="text"
+                        value={formData.prenom}
+                        onChange={(e) => setFormData({...formData, prenom: e.target.value})}
+                        placeholder="Ex: Jean Dupont"
+                        className={`w-full pl-10 pr-3 py-2.5 rounded-lg border ${
+                          errors.prenom ? 'border-red-400' : 'border-gray-200'
+                        } text-sm text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30 focus:border-[#1a7a3c] transition`}
+                      />
+                    </div>
+                    {errors.prenom && <p className="text-xs text-red-500">{errors.prenom}</p>}
                   </div>
 
                   {/* Email */}
@@ -278,7 +332,10 @@ export default function CreateUser() {
                       <select
                         value={formData.role_admin_id}
                         onChange={(e) => setFormData({...formData, role_admin_id: e.target.value})}
-                        className="w-full pl-10 pr-3 py-2.5 rounded-lg border border-gray-200 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30 focus:border-[#1a7a3c] transition appearance-none"
+                        disabled={currentUser?.role_admin?.code !== 'SUPER_ADMIN'}
+                        className={`w-full pl-10 pr-3 py-2.5 rounded-lg border border-gray-200 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30 focus:border-[#1a7a3c] transition appearance-none ${
+                          currentUser?.role_admin?.code !== 'SUPER_ADMIN' ? 'bg-gray-100 cursor-not-allowed opacity-80' : 'bg-white'
+                        }`}
                       >
                         <option value="">Sélectionner un rôle</option>
                         {roles.map(role => (

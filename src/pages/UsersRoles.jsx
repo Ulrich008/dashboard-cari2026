@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { userService } from "../services/userService";
+import { useAuth } from "../contexts/AuthContext";
 
 const Icon = ({ d, size = 18, className = "" }) => (
   <svg
@@ -44,6 +45,7 @@ const USER_ROLES = [
 
 export default function UsersRoles() {
   const navigate = useNavigate();
+  const { user: currentUser } = useAuth();
   const [search, setSearch] = useState("");
   const [users, setUsers] = useState([]);
   const [selectedRole, setSelectedRole] = useState("");
@@ -243,13 +245,15 @@ export default function UsersRoles() {
               <Icon d={ICONS.filter} size={16} />
             </button>
 
-            <button
-              onClick={() => navigate("/roles/create")}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#1a7a3c] text-white text-sm font-semibold hover:bg-[#155f2f] transition-colors shadow-sm shrink-0"
-            >
-              <Icon d={ICONS.plus} size={15} />
-              Ajouter un utilisateur
-            </button>
+            {(currentUser?.role_admin?.code === 'SUPER_ADMIN' || currentUser?.role_admin?.code === 'ADMIN') && (
+              <button
+                onClick={() => navigate("/roles/create")}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#1a7a3c] text-white text-sm font-semibold hover:bg-[#155f2f] transition-colors shadow-sm shrink-0"
+              >
+                <Icon d={ICONS.plus} size={15} />
+                Ajouter un utilisateur
+              </button>
+            )}
           </div>
 
           {showFilters && (
@@ -352,23 +356,31 @@ export default function UsersRoles() {
                         >
                           <Icon d={ICONS.eye} size={16} />
                         </button>
-                        <button
-                          onClick={() => navigate(`/roles/edit/${user.id}`)}
-                          className="text-gray-400 hover:text-[#1a7a3c] transition-colors"
-                          title="Modifier"
-                        >
-                          <Icon d={ICONS.edit} size={16} />
-                        </button>
-                        <button
-                          onClick={() => toggleOnline(user.id)}
-                          className={`transition-colors ${
-                            user.activated !== undefined ? (user.activated ? "text-green-600 hover:text-red-400" : "text-gray-300 hover:text-green-600") : (user.online ? "text-green-600 hover:text-red-400" : "text-gray-300 hover:text-green-600")
-                          }`}
-                          title={user.activated !== undefined ? (user.activated ? "Désactiver" : "Activer") : (user.online ? "Désactiver" : "Activer")}
-                        >
-                          <Icon d={ICONS.power} size={16} />
-                        </button>
-                        {!(user.role_admin && user.role_admin.code === 'SUPER_ADMIN') && (
+                        {(currentUser?.role_admin?.code === 'SUPER_ADMIN' || 
+                          currentUser?.role_admin?.code === 'ADMIN' || 
+                          currentUser?.id === user.id) && (
+                          <button
+                            onClick={() => navigate(`/roles/edit/${user.id}`)}
+                            className="text-gray-400 hover:text-[#1a7a3c] transition-colors"
+                            title="Modifier"
+                          >
+                            <Icon d={ICONS.edit} size={16} />
+                          </button>
+                        )}
+                        {(currentUser?.role_admin?.code === 'SUPER_ADMIN' || 
+                          currentUser?.role_admin?.code === 'ADMIN') && 
+                          currentUser?.id !== user.id && (
+                          <button
+                            onClick={() => toggleOnline(user.id)}
+                            className={`transition-colors ${
+                              user.activated !== undefined ? (user.activated ? "text-green-600 hover:text-red-400" : "text-gray-300 hover:text-green-600") : (user.online ? "text-green-600 hover:text-red-400" : "text-gray-300 hover:text-green-600")
+                            }`}
+                            title={user.activated !== undefined ? (user.activated ? "Désactiver" : "Activer") : (user.online ? "Désactiver" : "Activer")}
+                          >
+                            <Icon d={ICONS.power} size={16} />
+                          </button>
+                        )}
+                        {currentUser?.role_admin?.code === 'SUPER_ADMIN' && currentUser?.id !== user.id && (
                           <button
                             onClick={() => deleteUser(user.id)}
                             className="text-gray-400 hover:text-red-500 transition-colors"
