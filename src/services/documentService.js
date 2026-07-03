@@ -4,6 +4,9 @@ export const documentService = {
   // Récupérer tous les documents
   getAll: async (params = {}) => {
     const response = await api.get('/admin/documents', { params });
+    if (params.page || params.paginated) {
+      return response.data;
+    }
     return response.data.data || response.data;
   },
 

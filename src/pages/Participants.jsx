@@ -65,16 +65,57 @@ export default function Participants() {
   const [selectedParticipants, setSelectedParticipants] = useState([]);
   const [showBulkActions, setShowBulkActions] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState(null);
+  const [perPage, setPerPage] = useState(10);
+  const [stats, setStats] = useState({ total: 0, active: 0, inactive: 0, authors: 0 });
 
   useEffect(() => {
-    loadParticipants();
+    loadStats();
   }, []);
 
-  const loadParticipants = async () => {
+  // Reset page to 1 when filters or perPage change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, selectedType, selectedStatus, perPage]);
+
+  // Load data when page, search, filters, or perPage change
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      loadParticipants(currentPage);
+    }, 150);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [currentPage, search, selectedType, selectedStatus, perPage]);
+
+  const loadStats = async () => {
+    try {
+      const res = await participantService.getStats();
+      if (res) {
+        setStats(res);
+      }
+    } catch (error) {
+      console.error("Erreur lors du chargement des statistiques:", error);
+    }
+  };
+
+  const loadParticipants = async (page = 1) => {
     try {
       setLoading(true);
-      const data = await participantService.getAll();
-      setParticipants(data);
+      const res = await participantService.getAll({
+        page,
+        search,
+        type: selectedType,
+        statut: selectedStatus,
+        per_page: perPage
+      });
+      if (res && res.meta) {
+        setParticipants(res.data);
+        setPagination(res.meta);
+      } else {
+        setParticipants(Array.isArray(res) ? res : []);
+        setPagination(null);
+      }
     } catch (error) {
       console.error("Erreur lors du chargement des participants:", error);
     } finally {
@@ -82,15 +123,7 @@ export default function Participants() {
     }
   };
 
-  const filtered = participants.filter((p) => {
-    const matchesSearch = p.email?.toLowerCase().includes(search.toLowerCase()) ||
-                          p.prenom?.toLowerCase().includes(search.toLowerCase()) ||
-                          p.nom?.toLowerCase().includes(search.toLowerCase()) ||
-                          p.affiliation?.toLowerCase().includes(search.toLowerCase());
-    const matchesType = !selectedType || p.type_participant === selectedType;
-    const matchesStatus = !selectedStatus || p.statut_compte === selectedStatus;
-    return matchesSearch && matchesType && matchesStatus;
-  });
+  const filtered = participants;
 
   const toggleSelectAll = () => {
     if (selectedParticipants.length === filtered.length) {
@@ -120,7 +153,8 @@ export default function Participants() {
         statut_compte: newStatus,
       };
       await participantService.update(id, updatedData);
-      await loadParticipants();
+      await loadParticipants(currentPage);
+      await loadStats();
       Swal.fire({
         icon: 'success',
         title: 'Succès',
@@ -153,7 +187,8 @@ export default function Participants() {
     if (result.isConfirmed) {
       try {
         await participantService.delete(id);
-        await loadParticipants();
+        await loadParticipants(currentPage);
+        await loadStats();
         setSelectedParticipants(selectedParticipants.filter(i => i !== id));
         Swal.fire({
           icon: 'success',
@@ -322,12 +357,7 @@ export default function Participants() {
     });
   };
 
-  const stats = {
-    total: participants.length,
-    active: participants.filter(p => p.statut_compte === "ACTIF").length,
-    inactive: participants.filter(p => p.statut_compte === "DESACTIVE").length,
-    authors: participants.filter(p => p.est_auteur).length,
-  };
+
 
   return (
     <div className="flex-1 flex flex-col min-h-screen bg-[#f5f6f8]">
@@ -512,6 +542,7 @@ export default function Participants() {
                     className="w-4 h-4 rounded border-gray-300 text-[#1a7a3c] focus:ring-[#1a7a3c]"
                   />
                 </th>
+                <th className="text-left px-4 py-3 text-gray-500 font-medium">ID</th>
                 <th className="text-left px-4 py-3 text-gray-500 font-medium">Nom</th>
                 <th className="text-left px-4 py-3 text-gray-500 font-medium">Email</th>
                 <th className="text-left px-4 py-3 text-gray-500 font-medium">Type</th>
@@ -525,7 +556,7 @@ export default function Participants() {
             <tbody>
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="px-6 py-10 text-center text-gray-400">
+                  <td colSpan={10} className="px-6 py-10 text-center text-gray-400">
                     Aucun participant trouvé.
                   </td>
                 </tr>
@@ -545,6 +576,7 @@ export default function Participants() {
                         className="w-4 h-4 rounded border-gray-300 text-[#1a7a3c] focus:ring-[#1a7a3c]"
                       />
                     </td>
+                    <td className="px-4 py-4 font-mono text-xs text-gray-400">#{participant.id}</td>
                     <td className="px-4 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#1a7a3c] to-[#2d5a3f] flex items-center justify-center text-white text-xs font-semibold">
@@ -623,14 +655,85 @@ export default function Participants() {
           </table>
         </div>
 
+        {pagination && pagination.last_page > 1 && (
+          <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-white">
+            <div className="flex items-center gap-4 flex-wrap">
+              <span className="text-sm text-gray-500">
+                Affichage de <span className="font-semibold">{pagination.from || 0}</span> à{" "}
+                <span className="font-semibold">{pagination.to || 0}</span> sur{" "}
+                <span className="font-semibold">{pagination.total || 0}</span> participants
+              </span>
+              <div className="flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded border border-gray-200/50">
+                <span>Afficher</span>
+                <select
+                  value={perPage}
+                  onChange={(e) => setPerPage(Number(e.target.value))}
+                  className="px-1 py-0.5 rounded border border-gray-200 bg-white text-gray-700 focus:outline-none focus:ring-1 focus:ring-[#1a7a3c]/30 font-medium cursor-pointer"
+                >
+                  <option value={5}>5</option>
+                  <option value={10}>10</option>
+                  <option value={20}>20</option>
+                  <option value={50}>50</option>
+                  <option value={100}>100</option>
+                </select>
+                <span>par page</span>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setCurrentPage(pagination.current_page - 1)}
+                disabled={pagination.current_page === 1}
+                className="px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                Précédent
+              </button>
+              {Array.from({ length: pagination.last_page }, (_, index) => {
+                const pageNum = index + 1;
+                const isVisible =
+                  pageNum === 1 ||
+                  pageNum === pagination.last_page ||
+                  Math.abs(pageNum - pagination.current_page) <= 1;
+
+                if (!isVisible) {
+                  if (pageNum === 2 || pageNum === pagination.last_page - 1) {
+                    return <span key={pageNum} className="px-2 text-gray-400">...</span>;
+                  }
+                  return null;
+                }
+
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => setCurrentPage(pageNum)}
+                    className={`w-9 h-9 rounded-lg text-sm font-semibold transition-colors ${
+                      pagination.current_page === pageNum
+                        ? "bg-[#1a7a3c] text-white font-bold"
+                        : "border border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+              <button
+                onClick={() => setCurrentPage(pagination.current_page + 1)}
+                disabled={pagination.current_page === pagination.last_page}
+                className="px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                Suivant
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Footer */}
         <div className="px-6 py-3 border-t border-gray-100 bg-gray-50/50">
           <div className="flex items-center justify-between text-xs text-gray-500">
-            <span>Total : {filtered.length} participant(s)</span>
+            <span>Total : {pagination ? pagination.total : filtered.length} participant(s)</span>
             <div className="flex gap-4">
-              <span>Actifs : {filtered.filter(p => p.statut_compte === "ACTIF").length}</span>
-              <span>Désactivés : {filtered.filter(p => p.statut_compte === "DESACTIVE").length}</span>
-              <span>Auteurs : {filtered.filter(p => p.est_auteur).length}</span>
+              <span>Actifs : {stats.active}</span>
+              <span>Désactivés : {stats.inactive}</span>
+              <span>Auteurs : {stats.authors}</span>
             </div>
           </div>
         </div>

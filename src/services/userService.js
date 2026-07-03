@@ -4,6 +4,9 @@ export const userService = {
   // Récupérer tous les utilisateurs
   getAll: async (params = {}) => {
     const response = await api.get('/admin/admins', { params });
+    if (params.page || params.paginated) {
+      return response.data;
+    }
     return response.data.data || response.data;
   },
 

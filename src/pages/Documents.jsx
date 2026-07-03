@@ -65,16 +65,35 @@ export default function Documents() {
   const [selectedType, setSelectedType] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState(null);
+  const [perPage, setPerPage] = useState(10);
 
+  // Reset page to 1 when filters or perPage change
   useEffect(() => {
-    loadDocuments();
-  }, []);
+    setCurrentPage(1);
+  }, [search, selectedType, perPage]);
 
-  const loadDocuments = async () => {
+  // Load data when page, search, filters, or perPage change
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      loadDocuments(currentPage);
+    }, 150);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [currentPage, search, selectedType, perPage]);
+
+  const loadDocuments = async (page = 1) => {
     try {
       setLoading(true);
-      const data = await documentService.getAll();
-      setDocuments(data);
+      const res = await documentService.getAll({ page, search, type: selectedType, per_page: perPage });
+      if (res && res.meta) {
+        setDocuments(res.data);
+        setPagination(res.meta);
+      } else {
+        setDocuments(Array.isArray(res) ? res : []);
+        setPagination(null);
+      }
     } catch (error) {
       console.error("Erreur lors du chargement des documents:", error);
       Swal.fire({
@@ -87,13 +106,7 @@ export default function Documents() {
     }
   };
 
-  const filtered = documents.filter((doc) => {
-    const matchesSearch = (doc.nom_document || doc.name || "").toLowerCase().includes(search.toLowerCase()) ||
-                          (doc.id_public || doc.publicId || "").toLowerCase().includes(search.toLowerCase()) ||
-                          (doc.description && doc.description.toLowerCase().includes(search.toLowerCase()));
-    const matchesType = !selectedType || doc.fileType === selectedType;
-    return matchesSearch && matchesType;
-  });
+  const filtered = documents;
 
   const toggleOnline = async (id) => {
     try {
@@ -314,7 +327,8 @@ export default function Documents() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-100 bg-gray-50/50">
-                <th className="text-left px-6 py-3 text-gray-500 font-medium">ID Public</th>
+                <th className="text-left px-6 py-3 text-gray-500 font-medium">ID</th>
+                <th className="text-left px-4 py-3 text-gray-500 font-medium">ID Public</th>
                 <th className="text-left px-4 py-3 text-gray-500 font-medium">Nom du document</th>
                 <th className="text-left px-4 py-3 text-gray-500 font-medium">Téléch.</th>
                 <th className="text-left px-4 py-3 text-gray-500 font-medium">Statut</th>
@@ -324,7 +338,7 @@ export default function Documents() {
             <tbody>
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-10 text-center text-gray-400">
+                  <td colSpan={6} className="px-6 py-10 text-center text-gray-400">
                     Aucun document trouvé.
                   </td>
                 </tr>
@@ -336,7 +350,8 @@ export default function Documents() {
                       i === filtered.length - 1 ? "border-b-0" : ""
                     } ${!doc.activated ? "opacity-60" : ""}`}
                   >
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-4 font-mono text-xs text-gray-400">#{doc.id}</td>
+                    <td className="px-4 py-4">
                       <span className="font-mono text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
                         {doc.id_public || doc.publicId}
                       </span>
@@ -409,9 +424,80 @@ export default function Documents() {
           </table>
         </div>
 
+        {pagination && pagination.last_page > 1 && (
+          <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-white">
+            <div className="flex items-center gap-4 flex-wrap">
+              <span className="text-sm text-gray-500">
+                Affichage de <span className="font-semibold">{pagination.from || 0}</span> à{" "}
+                <span className="font-semibold">{pagination.to || 0}</span> sur{" "}
+                <span className="font-semibold">{pagination.total || 0}</span> documents
+              </span>
+              <div className="flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded border border-gray-200/50">
+                <span>Afficher</span>
+                <select
+                  value={perPage}
+                  onChange={(e) => setPerPage(Number(e.target.value))}
+                  className="px-1 py-0.5 rounded border border-gray-200 bg-white text-gray-700 focus:outline-none focus:ring-1 focus:ring-[#1a7a3c]/30 font-medium cursor-pointer"
+                >
+                  <option value={5}>5</option>
+                  <option value={10}>10</option>
+                  <option value={20}>20</option>
+                  <option value={50}>50</option>
+                  <option value={100}>100</option>
+                </select>
+                <span>par page</span>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setCurrentPage(pagination.current_page - 1)}
+                disabled={pagination.current_page === 1}
+                className="px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                Précédent
+              </button>
+              {Array.from({ length: pagination.last_page }, (_, index) => {
+                const pageNum = index + 1;
+                const isVisible =
+                  pageNum === 1 ||
+                  pageNum === pagination.last_page ||
+                  Math.abs(pageNum - pagination.current_page) <= 1;
+
+                if (!isVisible) {
+                  if (pageNum === 2 || pageNum === pagination.last_page - 1) {
+                    return <span key={pageNum} className="px-2 text-gray-400">...</span>;
+                  }
+                  return null;
+                }
+
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => setCurrentPage(pageNum)}
+                    className={`w-9 h-9 rounded-lg text-sm font-semibold transition-colors ${
+                      pagination.current_page === pageNum
+                        ? "bg-[#1a7a3c] text-white font-bold"
+                        : "border border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+              <button
+                onClick={() => setCurrentPage(pagination.current_page + 1)}
+                disabled={pagination.current_page === pagination.last_page}
+                className="px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                Suivant
+              </button>
+            </div>
+          </div>
+        )}
+
         <div className="px-6 py-3 border-t border-gray-100 bg-gray-50/50">
           <div className="flex items-center justify-between text-xs text-gray-500">
-            <span>Total : {filtered.length} document(s)</span>
+            <span>Total : {pagination ? pagination.total : filtered.length} document(s)</span>
             <span>
               Actifs : {filtered.filter(d => d.activated !== undefined ? d.activated : d.online).length} | 
               Inactifs : {filtered.filter(d => d.activated !== undefined ? !d.activated : !d.online).length}

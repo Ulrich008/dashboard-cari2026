@@ -2,8 +2,11 @@ import api from './api';
 
 export const programService = {
   // Récupérer tout le programme
-  getAll: async () => {
-    const response = await api.get('/admin/programme');
+  getAll: async (params = {}) => {
+    const response = await api.get('/admin/programme', { params });
+    if (params.page || params.paginated) {
+      return response.data;
+    }
     return response.data.data || response.data;
   },
 

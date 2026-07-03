@@ -4,6 +4,9 @@ export const sponsorService = {
   // Récupérer tous les sponsors
   getAll: async (params = {}) => {
     const response = await api.get('/admin/sponsors', { params });
+    if (params.page || params.paginated) {
+      return response.data;
+    }
     return response.data.data || response.data;
   },
 

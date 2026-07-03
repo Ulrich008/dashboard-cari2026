@@ -4,6 +4,9 @@ export const pageService = {
   // Récupérer toutes les pages
   getAll: async (params = {}) => {
     const response = await api.get('/admin/pages', { params });
+    if (params.page || params.paginated) {
+      return response.data;
+    }
     return response.data.data || response.data;
   },
 

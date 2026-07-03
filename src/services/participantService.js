@@ -2,9 +2,17 @@ import api from './api';
 
 export const participantService = {
   // Récupérer tous les participants
-  getAll: async () => {
-    const response = await api.get('/admin/participants');
+  getAll: async (params) => {
+    const response = await api.get('/admin/participants', { params });
+    if (params && (params.page || params.per_page)) {
+      return response.data;
+    }
     return response.data.data || response.data;
+  },
+
+  getStats: async () => {
+    const response = await api.get('/admin/participants/stats');
+    return response.data;
   },
 
   // Récupérer un participant par ID

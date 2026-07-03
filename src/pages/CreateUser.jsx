@@ -77,7 +77,8 @@ export default function CreateUser() {
 
   useEffect(() => {
     if (currentUser) {
-      const hasAccess = isSuperAdmin(currentUser);
+      const isSelf = isEditing && String(id) === String(currentUser.id);
+      const hasAccess = isSuperAdmin(currentUser) || isSelf;
         
       if (!hasAccess) {
         Swal.fire({
@@ -175,14 +176,17 @@ export default function CreateUser() {
 
         const userData = {
           email: formData.email,
-          password: formData.password,
-          password_confirmation: formData.password_confirmation,
           prenom: formData.prenom,
           nom: formData.nom,
           role_id: parseInt(formData.role_admin_id),
           statut_compte: formData.statut_compte,
           activated: formData.activated,
         };
+
+        if (formData.password) {
+          userData.password = formData.password;
+          userData.password_confirmation = formData.password_confirmation;
+        }
 
         if (isEditing) {
           await userService.update(id, userData);
@@ -334,9 +338,9 @@ export default function CreateUser() {
                       <select
                         value={formData.role_admin_id}
                         onChange={(e) => setFormData({...formData, role_admin_id: e.target.value})}
-                        disabled={currentUser?.role_admin?.code !== 'SUPER_ADMIN'}
+                        disabled={!isSuperAdmin(currentUser)}
                         className={`w-full pl-10 pr-3 py-2.5 rounded-lg border border-gray-200 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30 focus:border-[#1a7a3c] transition appearance-none ${
-                          currentUser?.role_admin?.code !== 'SUPER_ADMIN' ? 'bg-gray-100 cursor-not-allowed opacity-80' : 'bg-white'
+                          !isSuperAdmin(currentUser) ? 'bg-gray-100 cursor-not-allowed opacity-80' : 'bg-white'
                         }`}
                       >
                         <option value="">Sélectionner un rôle</option>

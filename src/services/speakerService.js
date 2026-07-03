@@ -4,6 +4,9 @@ export const speakerService = {
   // Récupérer tous les speakers
   getAll: async (params = {}) => {
     const response = await api.get('/admin/speakers', { params });
+    if (params.page || params.paginated) {
+      return response.data;
+    }
     return response.data.data || response.data;
   },
 

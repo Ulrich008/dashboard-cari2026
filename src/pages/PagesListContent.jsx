@@ -44,16 +44,35 @@ export default function PagesListContent() {
   const [search, setSearch] = useState("");
   const [pages, setPages]   = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState(null);
+  const [perPage, setPerPage] = useState(10);
 
+  // Reset page to 1 when filters or perPage change
   useEffect(() => {
-    loadPages();
-  }, []);
+    setCurrentPage(1);
+  }, [search, perPage]);
 
-  const loadPages = async () => {
+  // Load data when page, search, or perPage changes
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      loadPages(currentPage);
+    }, 150);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [currentPage, search, perPage]);
+
+  const loadPages = async (page = 1) => {
     try {
       setLoading(true);
-      const data = await pageService.getAll();
-      setPages(data);
+      const res = await pageService.getAll({ page, search, per_page: perPage });
+      if (res && res.meta) {
+        setPages(res.data);
+        setPagination(res.meta);
+      } else {
+        setPages(Array.isArray(res) ? res : []);
+        setPagination(null);
+      }
     } catch (error) {
       console.error("Erreur lors du chargement des pages:", error);
       Swal.fire({
@@ -66,11 +85,7 @@ export default function PagesListContent() {
     }
   };
 
-  const filtered = pages.filter(
-    (p) =>
-      (p.titre || p.title || "").toLowerCase().includes(search.toLowerCase()) ||
-      (p.slug || "").toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = pages;
 
   const toggleOnline = async (id) => {
     try {
@@ -212,7 +227,8 @@ export default function PagesListContent() {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-100">
-              <th className="text-left px-6 py-3 text-gray-500 font-medium">Titre</th>
+              <th className="text-left px-6 py-3 text-gray-500 font-medium">ID</th>
+              <th className="text-left px-4 py-3 text-gray-500 font-medium">Titre</th>
               <th className="text-left px-4 py-3 text-gray-400 font-normal italic">slug</th>
               <th className="text-left px-4 py-3 text-gray-500 font-medium">contexte</th>
               <th className="text-left px-4 py-3 text-gray-500 font-medium">Dernière modif.</th>
@@ -223,7 +239,7 @@ export default function PagesListContent() {
           <tbody>
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-6 py-10 text-center text-gray-400">
+                <td colSpan={7} className="px-6 py-10 text-center text-gray-400">
                   Aucune page trouvée.
                 </td>
               </tr>
@@ -235,7 +251,8 @@ export default function PagesListContent() {
                     i === filtered.length - 1 ? "border-b-0" : ""
                   }`}
                 >
-                  <td className="px-6 py-4 font-medium text-gray-800">{page.titre || page.title}</td>
+                  <td className="px-6 py-4 font-mono text-xs text-gray-400">#{page.id}</td>
+                  <td className="px-4 py-4 font-medium text-gray-800">{page.titre || page.title}</td>
                   <td className="px-4 py-4 text-gray-500 font-mono text-xs">{page.slug}</td>
                   <td className="px-4 py-4">
                     <span className="px-2 py-0.5 rounded bg-gray-100 text-gray-600 text-xs font-semibold tracking-wide">
@@ -293,6 +310,77 @@ export default function PagesListContent() {
             )}
           </tbody>
         </table>
+
+        {pagination && pagination.last_page > 1 && (
+          <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-white">
+            <div className="flex items-center gap-4 flex-wrap">
+              <span className="text-sm text-gray-500">
+                Affichage de <span className="font-semibold">{pagination.from || 0}</span> à{" "}
+                <span className="font-semibold">{pagination.to || 0}</span> sur{" "}
+                <span className="font-semibold">{pagination.total || 0}</span> pages
+              </span>
+              <div className="flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded border border-gray-200/50">
+                <span>Afficher</span>
+                <select
+                  value={perPage}
+                  onChange={(e) => setPerPage(Number(e.target.value))}
+                  className="px-1 py-0.5 rounded border border-gray-200 bg-white text-gray-700 focus:outline-none focus:ring-1 focus:ring-[#1a7a3c]/30 font-medium cursor-pointer"
+                >
+                  <option value={5}>5</option>
+                  <option value={10}>10</option>
+                  <option value={20}>20</option>
+                  <option value={50}>50</option>
+                  <option value={100}>100</option>
+                </select>
+                <span>par page</span>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setCurrentPage(pagination.current_page - 1)}
+                disabled={pagination.current_page === 1}
+                className="px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                Précédent
+              </button>
+              {Array.from({ length: pagination.last_page }, (_, index) => {
+                const pageNum = index + 1;
+                const isVisible =
+                  pageNum === 1 ||
+                  pageNum === pagination.last_page ||
+                  Math.abs(pageNum - pagination.current_page) <= 1;
+
+                if (!isVisible) {
+                  if (pageNum === 2 || pageNum === pagination.last_page - 1) {
+                    return <span key={pageNum} className="px-2 text-gray-400">...</span>;
+                  }
+                  return null;
+                }
+
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => setCurrentPage(pageNum)}
+                    className={`w-9 h-9 rounded-lg text-sm font-semibold transition-colors ${
+                      pagination.current_page === pageNum
+                        ? "bg-[#1a7a3c] text-white font-bold"
+                        : "border border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+              <button
+                onClick={() => setCurrentPage(pagination.current_page + 1)}
+                disabled={pagination.current_page === pagination.last_page}
+                className="px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                Suivant
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

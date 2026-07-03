@@ -56,17 +56,35 @@ export default function UsersRoles() {
   const [selectedRole, setSelectedRole] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState(null);
+  const [perPage, setPerPage] = useState(10);
 
+  // Reset page to 1 when filters or perPage change
   useEffect(() => {
-    loadUsers();
-  }, []);
+    setCurrentPage(1);
+  }, [search, selectedRole, perPage]);
 
-  const loadUsers = async () => {
+  // Load data when page, search, filters, or perPage change
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      loadUsers(currentPage);
+    }, 150);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [currentPage, search, selectedRole, perPage]);
+
+  const loadUsers = async (page = 1) => {
     try {
       setLoading(true);
-      const data = await userService.getAll();
-      console.log("Users loaded:", data);
-      setUsers(data);
+      const res = await userService.getAll({ page, search, role: selectedRole, per_page: perPage });
+      if (res && res.meta) {
+        setUsers(res.data);
+        setPagination(res.meta);
+      } else {
+        setUsers(Array.isArray(res) ? res : []);
+        setPagination(null);
+      }
     } catch (error) {
       console.error("Erreur lors du chargement des utilisateurs:", error);
       Swal.fire({
@@ -79,12 +97,7 @@ export default function UsersRoles() {
     }
   };
 
-  const filtered = users.filter((user) => {
-    const matchesSearch = (user.nom_prenoms || user.name || "").toLowerCase().includes(search.toLowerCase()) ||
-                          (user.email || "").toLowerCase().includes(search.toLowerCase());
-    const matchesRole = !selectedRole || (user.role_admin && user.role_admin.libelle === selectedRole);
-    return matchesSearch && matchesRole;
-  });
+  const filtered = users;
 
   const toggleOnline = async (id) => {
     try {
@@ -297,7 +310,8 @@ export default function UsersRoles() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-100 bg-gray-50/50">
-                <th className="text-left px-6 py-3 text-gray-500 font-medium">Nom</th>
+                <th className="text-left px-6 py-3 text-gray-500 font-medium">ID</th>
+                <th className="text-left px-4 py-3 text-gray-500 font-medium">Nom</th>
                 <th className="text-left px-4 py-3 text-gray-500 font-medium">Email</th>
                 <th className="text-left px-4 py-3 text-gray-500 font-medium">Rôle</th>
                 <th className="text-left px-4 py-3 text-gray-500 font-medium">Dernière connexion</th>
@@ -308,7 +322,7 @@ export default function UsersRoles() {
             <tbody>
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-10 text-center text-gray-400">
+                  <td colSpan={7} className="px-6 py-10 text-center text-gray-400">
                     Aucun utilisateur trouvé.
                   </td>
                 </tr>
@@ -320,7 +334,8 @@ export default function UsersRoles() {
                       i === filtered.length - 1 ? "border-b-0" : ""
                     } ${!user.activated ? "opacity-60" : ""}`}
                   >
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-4 font-mono text-xs text-gray-400">#{user.id}</td>
+                    <td className="px-4 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#1a7a3c] to-[#2d5a3f] flex items-center justify-center text-white font-semibold text-sm">
                           {getInitials(user.nom_prenoms || user.name)}
@@ -399,12 +414,83 @@ export default function UsersRoles() {
           </table>
         </div>
 
+        {pagination && pagination.last_page > 1 && (
+          <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-white">
+            <div className="flex items-center gap-4 flex-wrap">
+              <span className="text-sm text-gray-500">
+                Affichage de <span className="font-semibold">{pagination.from || 0}</span> à{" "}
+                <span className="font-semibold">{pagination.to || 0}</span> sur{" "}
+                <span className="font-semibold">{pagination.total || 0}</span> utilisateurs
+              </span>
+              <div className="flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded border border-gray-200/50">
+                <span>Afficher</span>
+                <select
+                  value={perPage}
+                  onChange={(e) => setPerPage(Number(e.target.value))}
+                  className="px-1 py-0.5 rounded border border-gray-200 bg-white text-gray-700 focus:outline-none focus:ring-1 focus:ring-[#1a7a3c]/30 font-medium cursor-pointer"
+                >
+                  <option value={5}>5</option>
+                  <option value={10}>10</option>
+                  <option value={20}>20</option>
+                  <option value={50}>50</option>
+                  <option value={100}>100</option>
+                </select>
+                <span>par page</span>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setCurrentPage(pagination.current_page - 1)}
+                disabled={pagination.current_page === 1}
+                className="px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                Précédent
+              </button>
+              {Array.from({ length: pagination.last_page }, (_, index) => {
+                const pageNum = index + 1;
+                const isVisible =
+                  pageNum === 1 ||
+                  pageNum === pagination.last_page ||
+                  Math.abs(pageNum - pagination.current_page) <= 1;
+
+                if (!isVisible) {
+                  if (pageNum === 2 || pageNum === pagination.last_page - 1) {
+                    return <span key={pageNum} className="px-2 text-gray-400">...</span>;
+                  }
+                  return null;
+                }
+
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => setCurrentPage(pageNum)}
+                    className={`w-9 h-9 rounded-lg text-sm font-semibold transition-colors ${
+                      pagination.current_page === pageNum
+                        ? "bg-[#1a7a3c] text-white font-bold"
+                        : "border border-gray-200 bg-white text-gray-600 hover:bg-gray-50"
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+              <button
+                onClick={() => setCurrentPage(pagination.current_page + 1)}
+                disabled={pagination.current_page === pagination.last_page}
+                className="px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                Suivant
+              </button>
+            </div>
+          </div>
+        )}
+
         <div className="px-6 py-3 border-t border-gray-100 bg-gray-50/50">
           <div className="flex items-center justify-between text-xs text-gray-500">
-            <span>Total : {filtered.length} utilisateur(s)</span>
+            <span>Total : {pagination ? pagination.total : filtered.length} utilisateur(s)</span>
             <span>
-              Actifs : {filtered.filter(u => u.online).length} | 
-              Inactifs : {filtered.filter(u => !u.online).length}
+              Actifs : {filtered.filter(u => u.activated !== undefined ? u.activated : u.online).length} | 
+              Inactifs : {filtered.filter(u => u.activated !== undefined ? !u.activated : !u.online).length}
             </span>
           </div>
         </div>
