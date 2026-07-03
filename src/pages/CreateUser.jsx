@@ -39,6 +39,11 @@ const USER_ROLES = [
   { value: "Contributor", label: "Contributor", description: "Peut soumettre du contenu", permissions: ["read", "submit"] },
 ];
 
+const isSuperAdmin = (usr) => {
+  const code = usr?.role_admin?.code || usr?.role?.code;
+  return typeof code === 'string' && code.toUpperCase() === 'SUPER_ADMIN';
+};
+
 export default function CreateUser() {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -72,10 +77,7 @@ export default function CreateUser() {
 
   useEffect(() => {
     if (currentUser) {
-      const hasAccess = 
-        currentUser.role_admin?.code === 'SUPER_ADMIN' || 
-        currentUser.role_admin?.code === 'ADMIN' || 
-        (isEditing && Number(id) === Number(currentUser.id));
+      const hasAccess = isSuperAdmin(currentUser);
         
       if (!hasAccess) {
         Swal.fire({

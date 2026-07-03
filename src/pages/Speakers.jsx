@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { speakerService } from "../services/speakerService";
+import { useAuth } from "../contexts/AuthContext";
 
 const Icon = ({ d, size = 18, className = "" }) => (
   <svg
@@ -40,6 +41,13 @@ const MEMBER_TYPES = [
 
 export default function Speakers() {
   const navigate = useNavigate();
+  const { user: currentUser } = useAuth();
+  
+  const isEditor = (usr) => {
+    const code = usr?.role_admin?.code || usr?.role?.code;
+    return typeof code === 'string' && code.toUpperCase() === 'EDITOR';
+  };
+
   const [search, setSearch] = useState("");
   const [members, setMembers] = useState([]);
   const [selectedType, setSelectedType] = useState("");
@@ -340,13 +348,15 @@ export default function Speakers() {
                         >
                           <Icon d={ICONS.speaker} size={16} />
                         </button>
-                        <button
-                          onClick={() => deleteMember(member.id)}
-                          className="text-gray-400 hover:text-red-500 transition-colors"
-                          title="Supprimer"
-                        >
-                          <Icon d={ICONS.delete} size={16} />
-                        </button>
+                        {!isEditor(currentUser) && (
+                          <button
+                            onClick={() => deleteMember(member.id)}
+                            className="text-gray-400 hover:text-red-500 transition-colors"
+                            title="Supprimer"
+                          >
+                            <Icon d={ICONS.delete} size={16} />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>

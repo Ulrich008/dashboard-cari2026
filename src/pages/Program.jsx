@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { programmeService } from "../services/programmeService";
+import { useAuth } from "../contexts/AuthContext";
 
 /* ── Inline SVG icon ── */
 const Icon = ({ d, size = 18, className = "" }) => (
@@ -224,6 +225,13 @@ const ScheduleView = ({ programs }) => {
 ══════════════════════════════════════════════════════════════ */
 export default function Program() {
   const navigate = useNavigate();
+  const { user: currentUser } = useAuth();
+  
+  const isEditor = (usr) => {
+    const code = usr?.role_admin?.code || usr?.role?.code;
+    return typeof code === 'string' && code.toUpperCase() === 'EDITOR';
+  };
+
   const [search, setSearch] = useState("");
   const [programs, setPrograms] = useState([]);
   const [selectedType, setSelectedType] = useState("");
@@ -514,9 +522,11 @@ export default function Program() {
                             >
                               <Icon d={ICONS.power} size={16} />
                             </button>
-                            <button onClick={() => deleteProgram(program.id)} className="text-gray-400 hover:text-red-500 transition-colors" title="Supprimer">
-                              <Icon d={ICONS.delete} size={16} />
-                            </button>
+                            {!isEditor(currentUser) && (
+                              <button onClick={() => deleteProgram(program.id)} className="text-gray-400 hover:text-red-500 transition-colors" title="Supprimer">
+                                <Icon d={ICONS.delete} size={16} />
+                              </button>
+                            )}
                           </div>
                         </td>
                       </tr>

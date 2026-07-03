@@ -43,6 +43,11 @@ const USER_ROLES = [
   { value: "Contributor", label: "Contributor", description: "Peut soumettre du contenu", color: "orange" },
 ];
 
+const isSuperAdmin = (usr) => {
+  const code = usr?.role_admin?.code || usr?.role?.code;
+  return typeof code === 'string' && code.toUpperCase() === 'SUPER_ADMIN';
+};
+
 export default function UsersRoles() {
   const navigate = useNavigate();
   const { user: currentUser } = useAuth();
@@ -245,7 +250,7 @@ export default function UsersRoles() {
               <Icon d={ICONS.filter} size={16} />
             </button>
 
-            {(currentUser?.role_admin?.code === 'SUPER_ADMIN' || currentUser?.role_admin?.code === 'ADMIN') && (
+            {isSuperAdmin(currentUser) && (
               <button
                 onClick={() => navigate("/roles/create")}
                 className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#1a7a3c] text-white text-sm font-semibold hover:bg-[#155f2f] transition-colors shadow-sm shrink-0"
@@ -356,9 +361,7 @@ export default function UsersRoles() {
                         >
                           <Icon d={ICONS.eye} size={16} />
                         </button>
-                        {(currentUser?.role_admin?.code === 'SUPER_ADMIN' || 
-                          currentUser?.role_admin?.code === 'ADMIN' || 
-                          currentUser?.id === user.id) && (
+                        {isSuperAdmin(currentUser) && (
                           <button
                             onClick={() => navigate(`/roles/edit/${user.id}`)}
                             className="text-gray-400 hover:text-[#1a7a3c] transition-colors"
@@ -367,9 +370,7 @@ export default function UsersRoles() {
                             <Icon d={ICONS.edit} size={16} />
                           </button>
                         )}
-                        {(currentUser?.role_admin?.code === 'SUPER_ADMIN' || 
-                          currentUser?.role_admin?.code === 'ADMIN') && 
-                          currentUser?.id !== user.id && (
+                        {isSuperAdmin(currentUser) && currentUser?.id !== user.id && (
                           <button
                             onClick={() => toggleOnline(user.id)}
                             className={`transition-colors ${
@@ -380,7 +381,7 @@ export default function UsersRoles() {
                             <Icon d={ICONS.power} size={16} />
                           </button>
                         )}
-                        {currentUser?.role_admin?.code === 'SUPER_ADMIN' && currentUser?.id !== user.id && (
+                        {isSuperAdmin(currentUser) && currentUser?.id !== user.id && (
                           <button
                             onClick={() => deleteUser(user.id)}
                             className="text-gray-400 hover:text-red-500 transition-colors"

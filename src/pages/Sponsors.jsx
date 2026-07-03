@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { sponsorService } from "../services/sponsorService";
+import { useAuth } from "../contexts/AuthContext";
 
 const Icon = ({ d, size = 18, className = "" }) => (
   <svg
@@ -43,6 +44,13 @@ const SPONSOR_TYPES = [
 
 export default function Sponsors() {
   const navigate = useNavigate();
+  const { user: currentUser } = useAuth();
+  
+  const isEditor = (usr) => {
+    const code = usr?.role_admin?.code || usr?.role?.code;
+    return typeof code === 'string' && code.toUpperCase() === 'EDITOR';
+  };
+
   const [search, setSearch] = useState("");
   const [sponsors, setSponsors] = useState([]);
   const [selectedType, setSelectedType] = useState("");
@@ -351,13 +359,15 @@ export default function Sponsors() {
                         >
                           <Icon d={ICONS.power} size={16} />
                         </button>
-                        <button
-                          onClick={() => deleteSponsor(sponsor.id)}
-                          className="text-gray-400 hover:text-red-500 transition-colors"
-                          title="Supprimer"
-                        >
-                          <Icon d={ICONS.delete} size={16} />
-                        </button>
+                        {!isEditor(currentUser) && (
+                          <button
+                            onClick={() => deleteSponsor(sponsor.id)}
+                            className="text-gray-400 hover:text-red-500 transition-colors"
+                            title="Supprimer"
+                          >
+                            <Icon d={ICONS.delete} size={16} />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>
