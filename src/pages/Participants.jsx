@@ -31,6 +31,7 @@ const ICONS = {
   calendar: "M8 2v4M16 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01",
   eye:      "M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8zM12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6z",
   download: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3",
+  upload:   "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12",
   check:    "M20 6L9 17l-5-5",
   clock:    "M12 6v6l4 2M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z",
   ticket:   "M20 12v-2a2 2 0 0 0-2-2h-2M4 12v-2a2 2 0 0 1 2-2h2M20 12v4a2 2 0 0 1-2 2h-2M4 12v4a2 2 0 0 0 2 2h2M8 8h8M8 16h8",
@@ -428,6 +429,14 @@ export default function Participants() {
             >
               <Icon d={ICONS.download} size={15} />
               Exporter CSV
+            </button>
+
+            <button
+              onClick={() => navigate("/participants/import-papiers")}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 text-gray-600 text-sm font-medium hover:bg-gray-50 transition-colors shrink-0 bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
+            >
+              <Icon d={ICONS.upload} size={15} className="text-green-700" />
+              Charger Papiers Acceptés
             </button>
           </div>
 

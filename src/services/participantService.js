@@ -44,4 +44,14 @@ export const participantService = {
     const response = await api.post('/admin/participants/import-authors', data);
     return response.data.data || response.data;
   },
+
+  // Importer des papiers acceptés depuis un fichier markdown/texte
+  importMarkdownPapers: async (formData) => {
+    const response = await api.post('/admin/papiers/import-markdown', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
 };

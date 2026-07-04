@@ -19,6 +19,7 @@ import CreateUser from "./pages/CreateUser";
 import SiteInfo from "./pages/SiteInfo";
 import Participants from "./pages/Participants";
 import CreateParticipant from "./pages/CreateParticipant";
+import ImportPapiers from "./pages/ImportPapiers";
 import MenusPage from "./pages/MenusPage";
 import CreateMenuContent from "./pages/CreateMenuContent";
 import Login from "./pages/Login";
@@ -32,6 +33,7 @@ const PATH_TO_LABEL = {
   "/participants":        "Participants",
   "/participants/create": "Participants",
   "/participants/edit":   "Participants",
+  "/participants/import-papiers": "Importation de papiers",
   "/program":             "Program",
   "/program/create":      "Program",
   "/program/edit":        "Program",
@@ -135,6 +137,7 @@ function Layout() {
           <Route path="/participants" element={<Participants />} />
           <Route path="/participants/create" element={<CreateParticipant />} />
           <Route path="/participants/edit/:id" element={<CreateParticipant />} />
+          <Route path="/participants/import-papiers" element={<ImportPapiers />} />
 
           {/* Menus de navigation */}
           <Route path="/menus" element={<MenusPage />} />
