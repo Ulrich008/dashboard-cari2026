@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import SuperAdminRoute from "./components/SuperAdminRoute";
 import Sidebar from "./components/Sidebar";
 import Dashboard from "./pages/Dashboard";
 import PagesListContent from "./pages/PagesListContent";
@@ -22,6 +23,7 @@ import CreateParticipant from "./pages/CreateParticipant";
 import ImportPapiers from "./pages/ImportPapiers";
 import MenusPage from "./pages/MenusPage";
 import CreateMenuContent from "./pages/CreateMenuContent";
+import Backup from "./pages/Backup";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 
@@ -53,6 +55,7 @@ const PATH_TO_LABEL = {
   "/menus/create":        "Menus",
   "/menus/edit":          "Menus",
   "/site":                "Site Info",
+  "/backup":              "Sauvegarde",
 };
 
 function Layout() {
@@ -146,6 +149,9 @@ function Layout() {
 
           {/* Site Info */}
           <Route path="/site" element={<SiteInfo />} />
+
+          {/* Sauvegarde (super-admin uniquement) */}
+          <Route path="/backup" element={<SuperAdminRoute><Backup /></SuperAdminRoute>} />
 
           <Route path="*" element={<RedirectToPages />} />
         </Routes>

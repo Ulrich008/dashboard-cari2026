@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { sponsorService } from "../services/sponsorService";
 import { useAuth } from "../contexts/AuthContext";
+import { isEditor } from "../utils/roles";
 
 const Icon = ({ d, size = 18, className = "" }) => (
   <svg
@@ -45,11 +46,6 @@ const SPONSOR_TYPES = [
 export default function Sponsors() {
   const navigate = useNavigate();
   const { user: currentUser } = useAuth();
-  
-  const isEditor = (usr) => {
-    const code = usr?.role_admin?.code || usr?.role?.code;
-    return typeof code === 'string' && code.toUpperCase() === 'EDITOR';
-  };
 
   const [search, setSearch] = useState("");
   const [sponsors, setSponsors] = useState([]);

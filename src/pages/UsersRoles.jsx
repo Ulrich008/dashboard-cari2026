@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { userService } from "../services/userService";
 import { useAuth } from "../contexts/AuthContext";
+import { isSuperAdmin } from "../utils/roles";
 
 const Icon = ({ d, size = 18, className = "" }) => (
   <svg
@@ -42,11 +43,6 @@ const USER_ROLES = [
   { value: "Viewer", label: "Viewer", description: "Lecture seule", color: "gray" },
   { value: "Contributor", label: "Contributor", description: "Peut soumettre du contenu", color: "orange" },
 ];
-
-const isSuperAdmin = (usr) => {
-  const code = usr?.role_admin?.code || usr?.role?.code;
-  return typeof code === 'string' && code.toUpperCase() === 'SUPER_ADMIN';
-};
 
 export default function UsersRoles() {
   const navigate = useNavigate();
