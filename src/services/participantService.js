@@ -54,4 +54,12 @@ export const participantService = {
     });
     return response.data;
   },
+
+  // Importer des papiers acceptés depuis un fichier CSV ou Excel (même format que le Markdown)
+  importTableurPapers: async (formData) => {
+    const response = await api.post('/admin/papiers/import-tableur', formData, {
+      headers: { 'Content-Type': undefined }, // Axios génère le boundary multipart automatiquement
+    });
+    return response.data;
+  },
 };

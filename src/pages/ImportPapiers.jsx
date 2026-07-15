@@ -32,6 +32,7 @@ export default function ImportPapiers() {
   const navigate = useNavigate();
   const [evenements, setEvenements] = useState([]);
   const [selectedEvenementId, setSelectedEvenementId] = useState("");
+  const [format, setFormat] = useState("markdown"); // 'markdown' | 'tableur'
   const [file, setFile] = useState(null);
   const [dragActive, setDragActive] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -80,6 +81,12 @@ export default function ImportPapiers() {
     }
   };
 
+  const handleFormatChange = (nextFormat) => {
+    setFormat(nextFormat);
+    setFile(null);
+    setImportErrors([]);
+  };
+
   const handleImport = async (e) => {
     e.preventDefault();
     if (!file) {
@@ -99,7 +106,9 @@ export default function ImportPapiers() {
     formData.append("evenement_id", selectedEvenementId);
 
     try {
-      const res = await participantService.importMarkdownPapers(formData);
+      const res = format === "tableur"
+        ? await participantService.importTableurPapers(formData)
+        : await participantService.importMarkdownPapers(formData);
       setIsLoading(false);
       setFile(null);
       
@@ -159,6 +168,23 @@ export default function ImportPapiers() {
 }
 \`\`\``;
 
+  const tableurColonnes = [
+    { nom: "submission_id", obligatoire: true, note: "entier" },
+    { nom: "evenement_id", obligatoire: false, note: "vide ou <a_definir> = événement par défaut" },
+    { nom: "titre", obligatoire: true, note: "" },
+    { nom: "track", obligatoire: false, note: "" },
+    { nom: "keywords", obligatoire: false, note: "liste séparée par ;" },
+    { nom: "description", obligatoire: false, note: "" },
+    { nom: "decision", obligatoire: false, note: "accepted (défaut) ou rejected" },
+    { nom: "type_presentation", obligatoire: false, note: "oral (défaut) ou poster" },
+    { nom: "date_submission", obligatoire: false, note: "" },
+    { nom: "date_last_update", obligatoire: false, note: "" },
+    { nom: "activated", obligatoire: false, note: "true (défaut) ou false" },
+    { nom: "domain_track", obligatoire: false, note: "" },
+    { nom: "conditional_acceptance", obligatoire: false, note: "true ou false (défaut)" },
+    { nom: "auteurs", obligatoire: false, note: "noms complets séparés par ; (ex: Jean Dupont;Marie Curie)" },
+  ];
+
   return (
     <div className="flex-1 flex flex-col min-h-screen bg-[#f5f6f8]">
       {/* En-tête */}
@@ -176,7 +202,7 @@ export default function ImportPapiers() {
               Importer les Papiers Acceptés
             </h1>
             <p className="text-xs text-gray-500 mt-0.5">
-              Chargez vos soumissions acceptées depuis un fichier texte formaté en Markdown
+              Chargez vos soumissions acceptées depuis un fichier Markdown, CSV ou Excel
             </p>
           </div>
         </div>
@@ -191,21 +217,60 @@ export default function ImportPapiers() {
             <h2 className="text-base font-bold text-gray-900">Format de fichier requis</h2>
           </div>
           
-          <div className="text-sm text-gray-600 space-y-2">
-            <p>
-              Le fichier importé doit être au format texte brut (<code>.txt</code> ou <code>.md</code>) et contenir
-              les soumissions présentées sous forme de blocs Markdown. Chaque bloc doit commencer par la ligne 
-              <strong className="text-gray-900"><code>## Submission #ID</code></strong>.
-            </p>
-            <p className="text-xs text-gray-500">
-              * Note : Si la clé <code>evenement_id</code> vaut <code>&lt;a_definir&gt;</code>, elle sera remplacée 
-              automatiquement par l'événement sélectionné dans le formulaire.
-            </p>
-          </div>
+          {format === "markdown" ? (
+            <>
+              <div className="text-sm text-gray-600 space-y-2">
+                <p>
+                  Le fichier importé doit être au format texte brut (<code>.txt</code> ou <code>.md</code>) et contenir
+                  les soumissions présentées sous forme de blocs Markdown. Chaque bloc doit commencer par la ligne
+                  <strong className="text-gray-900"><code>## Submission #ID</code></strong>.
+                </p>
+                <p className="text-xs text-gray-500">
+                  * Note : Si la clé <code>evenement_id</code> vaut <code>&lt;a_definir&gt;</code>, elle sera remplacée
+                  automatiquement par l'événement sélectionné dans le formulaire.
+                </p>
+              </div>
 
-          <div className="relative rounded-lg bg-gray-900 p-4 font-mono text-xs text-gray-300 overflow-x-auto leading-relaxed border border-gray-800 shadow-inner">
-            <pre className="whitespace-pre-wrap select-all">{sampleFormat}</pre>
-          </div>
+              <div className="relative rounded-lg bg-gray-900 p-4 font-mono text-xs text-gray-300 overflow-x-auto leading-relaxed border border-gray-800 shadow-inner">
+                <pre className="whitespace-pre-wrap select-all">{sampleFormat}</pre>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="text-sm text-gray-600 space-y-2">
+                <p>
+                  Le fichier importé (<code>.csv</code>, <code>.xlsx</code> ou <code>.xls</code>) doit contenir une ligne
+                  d'en-tête avec les colonnes ci-dessous, puis une ligne par soumission — mêmes informations que le
+                  format Markdown.
+                </p>
+                <p className="text-xs text-gray-500">
+                  * Note : Si <code>evenement_id</code> est vide ou vaut <code>&lt;a_definir&gt;</code>, il sera remplacé
+                  automatiquement par l'événement sélectionné dans le formulaire.
+                </p>
+              </div>
+
+              <div className="border border-gray-100 rounded-lg overflow-hidden overflow-x-auto">
+                <table className="w-full text-xs text-left">
+                  <thead className="bg-gray-50 text-gray-700 font-semibold border-b border-gray-100">
+                    <tr>
+                      <th className="px-3 py-2">Colonne</th>
+                      <th className="px-3 py-2">Obligatoire</th>
+                      <th className="px-3 py-2">Note</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-50">
+                    {tableurColonnes.map((col) => (
+                      <tr key={col.nom}>
+                        <td className="px-3 py-2 font-mono text-gray-800">{col.nom}</td>
+                        <td className="px-3 py-2 text-gray-500">{col.obligatoire ? "Oui" : "Non"}</td>
+                        <td className="px-3 py-2 text-gray-500">{col.note}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Colonne 2 : Importation */}
@@ -215,6 +280,31 @@ export default function ImportPapiers() {
             <div className="flex items-center gap-2 border-b border-gray-100 pb-3">
               <Icon d={ICONS.upload} size={20} className="text-[#1a7a3c]" />
               <h2 className="text-base font-bold text-gray-900">Formulaire de chargement</h2>
+            </div>
+
+            {/* Format du fichier */}
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-semibold text-gray-700">Format du fichier</label>
+              <div className="flex rounded-lg border border-gray-200 p-1 gap-1">
+                <button
+                  type="button"
+                  onClick={() => handleFormatChange("markdown")}
+                  className={`flex-1 py-1.5 rounded-md text-sm font-medium transition ${
+                    format === "markdown" ? "bg-[#1a7a3c] text-white" : "text-gray-600 hover:bg-gray-50"
+                  }`}
+                >
+                  Markdown (.txt, .md)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleFormatChange("tableur")}
+                  className={`flex-1 py-1.5 rounded-md text-sm font-medium transition ${
+                    format === "tableur" ? "bg-[#1a7a3c] text-white" : "text-gray-600 hover:bg-gray-50"
+                  }`}
+                >
+                  CSV / Excel
+                </button>
+              </div>
             </div>
 
             {/* Événement par défaut */}
@@ -242,7 +332,9 @@ export default function ImportPapiers() {
 
             {/* Drag and Drop Zone */}
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-semibold text-gray-700">Fichier à importer (.txt, .md)</label>
+              <label className="text-sm font-semibold text-gray-700">
+                Fichier à importer ({format === "markdown" ? ".txt, .md" : ".csv, .xlsx, .xls"})
+              </label>
               <div
                 className={`relative border-2 border-dashed rounded-xl p-8 flex flex-col items-center justify-center gap-3 transition-colors cursor-pointer ${
                   dragActive ? "border-[#1a7a3c] bg-green-50/50" : "border-gray-200 hover:border-[#1a7a3c]/50 hover:bg-gray-50/50"
@@ -256,7 +348,7 @@ export default function ImportPapiers() {
                 <input
                   id="fileInput"
                   type="file"
-                  accept=".txt,.md"
+                  accept={format === "markdown" ? ".txt,.md" : ".csv,.xlsx,.xls"}
                   onChange={handleFileChange}
                   className="hidden"
                 />
