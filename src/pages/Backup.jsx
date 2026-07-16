@@ -58,6 +58,13 @@ function formatBytes(bytes) {
   return `${(bytes / Math.pow(1024, i)).toFixed(i === 0 ? 0 : 1)} ${units[i]}`;
 }
 
+function formatModules(modules) {
+  if (!modules || modules.length === 0) return "Complète";
+  return modules
+    .map((key) => BACKUP_MODULES.find((m) => m.key === key)?.label ?? key)
+    .join(", ");
+}
+
 function formatDate(value) {
   if (!value) return "-";
   return new Date(value).toLocaleString("fr-FR", {
@@ -150,17 +157,40 @@ export default function Backup() {
   }, [restoringId]);
 
   const triggerBackup = async () => {
-    const inputOptions = {
-      "": "Sauvegarde complète",
-      ...Object.fromEntries(BACKUP_MODULES.map((m) => [m.key, m.label])),
-    };
-
     const result = await Swal.fire({
       title: "Lancer une sauvegarde",
-      text: "Choisissez ce qui doit être sauvegardé.",
-      input: "select",
-      inputOptions,
-      inputValue: "",
+      html: `
+        <div style="text-align:left;">
+          <label style="display:flex; align-items:center; gap:8px; padding:6px 0; font-weight:600; cursor:pointer;">
+            <input type="checkbox" id="backup-full" checked />
+            Sauvegarde complète
+          </label>
+          <div id="backup-module-list" style="display:none; padding-left:24px; margin-top:4px; border-left:2px solid #eee; max-height:240px; overflow-y:auto;">
+            ${BACKUP_MODULES.map((m) => `
+              <label style="display:flex; align-items:center; gap:8px; padding:4px 0; cursor:pointer;">
+                <input type="checkbox" class="backup-module" value="${m.key}" />
+                ${m.label}
+              </label>
+            `).join("")}
+          </div>
+        </div>
+      `,
+      didOpen: () => {
+        const fullCheckbox = document.getElementById("backup-full");
+        const list = document.getElementById("backup-module-list");
+        fullCheckbox.addEventListener("change", () => {
+          list.style.display = fullCheckbox.checked ? "none" : "block";
+        });
+      },
+      preConfirm: () => {
+        if (document.getElementById("backup-full").checked) return [];
+        const selected = Array.from(document.querySelectorAll(".backup-module:checked")).map((el) => el.value);
+        if (selected.length === 0) {
+          Swal.showValidationMessage('Sélectionnez au moins un module, ou cochez "Sauvegarde complète".');
+          return false;
+        }
+        return selected;
+      },
       icon: "question",
       showCancelButton: true,
       confirmButtonColor: "#1a7a3c",
@@ -173,7 +203,7 @@ export default function Backup() {
 
     try {
       setTriggering(true);
-      await backupService.create(result.value || null);
+      await backupService.create(result.value?.length ? result.value : null);
       Swal.fire({
         icon: "success",
         title: "Sauvegarde lancée",
@@ -330,7 +360,7 @@ export default function Backup() {
               <tr className="border-b border-gray-100 text-xs uppercase text-gray-400 font-semibold">
                 <th className="px-4 py-3">Date</th>
                 <th className="px-4 py-3">Déclenchement</th>
-                <th className="px-4 py-3">Module</th>
+                <th className="px-4 py-3">Modules</th>
                 <th className="px-4 py-3">Déclenché par</th>
                 <th className="px-4 py-3">Taille</th>
                 <th className="px-4 py-3">Statut</th>
@@ -351,7 +381,7 @@ export default function Backup() {
                   <tr key={backup.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
                     <td className="px-4 py-4 text-sm text-gray-700">{formatDate(backup.created_at)}</td>
                     <td className="px-4 py-4 text-sm text-gray-700">{TRIGGER_LABELS[backup.trigger_type] ?? backup.trigger_type}</td>
-                    <td className="px-4 py-4 text-sm text-gray-500">{backup.module ?? "-"}</td>
+                    <td className="px-4 py-4 text-sm text-gray-500">{formatModules(backup.modules)}</td>
                     <td className="px-4 py-4 text-sm text-gray-500">{backup.triggered_by_nom ?? "-"}</td>
                     <td className="px-4 py-4 text-sm text-gray-500">{formatBytes(backup.size_bytes)}</td>
                     <td className="px-4 py-4">

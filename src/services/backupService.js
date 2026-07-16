@@ -8,9 +8,10 @@ export const backupService = {
   },
 
   // Déclencher une sauvegarde manuelle (super-admin uniquement).
-  // module: clé de config('backup.modules') pour cibler un seul module, ou null/omis pour une sauvegarde complète.
-  create: async (module = null) => {
-    const response = await api.post('/admin/backups', { module });
+  // modules: tableau de clés de config('backup.modules') pour cibler un ou plusieurs
+  // modules, ou null/vide/omis pour une sauvegarde complète.
+  create: async (modules = null) => {
+    const response = await api.post('/admin/backups', { modules });
     return response.data;
   },
 
