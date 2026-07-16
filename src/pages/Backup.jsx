@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import Swal from "sweetalert2";
 import { backupService } from "../services/backupService";
 import RestoreBackupModal from "../components/RestoreBackupModal";
+import { BACKUP_MODULES } from "../constants/backupModules";
 
 const Icon = ({ d, size = 18, className = "" }) => (
   <svg
@@ -149,14 +150,22 @@ export default function Backup() {
   }, [restoringId]);
 
   const triggerBackup = async () => {
+    const inputOptions = {
+      "": "Sauvegarde complète",
+      ...Object.fromEntries(BACKUP_MODULES.map((m) => [m.key, m.label])),
+    };
+
     const result = await Swal.fire({
-      title: "Lancer une sauvegarde ?",
-      text: "Un pg_dump complet de la base sera exécuté en arrière-plan.",
+      title: "Lancer une sauvegarde",
+      text: "Choisissez ce qui doit être sauvegardé.",
+      input: "select",
+      inputOptions,
+      inputValue: "",
       icon: "question",
       showCancelButton: true,
       confirmButtonColor: "#1a7a3c",
       cancelButtonColor: "#6b7280",
-      confirmButtonText: "Oui, lancer",
+      confirmButtonText: "Lancer",
       cancelButtonText: "Annuler",
     });
 
@@ -164,7 +173,7 @@ export default function Backup() {
 
     try {
       setTriggering(true);
-      await backupService.create();
+      await backupService.create(result.value || null);
       Swal.fire({
         icon: "success",
         title: "Sauvegarde lancée",
@@ -264,8 +273,8 @@ export default function Backup() {
       <div className="px-8 pt-8 pb-6">
         <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Sauvegarde</h1>
         <p className="text-sm text-gray-500 mt-1">
-          Historique des sauvegardes de la base de données (automatiques sur modification des
-          contenus, ou manuelles). Réservé aux super-administrateurs.
+          Historique des sauvegardes de la base de données (automatique chaque jour, ou
+          manuelle — complète ou par module). Réservé aux super-administrateurs.
         </p>
       </div>
 
@@ -363,10 +372,11 @@ export default function Backup() {
                         <button
                           onClick={() => setRestoreTarget(backup)}
                           disabled={backup.status !== "success" || !!restoringId}
-                          className="text-gray-400 hover:text-red-500 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                          title="Restaurer"
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-red-200 text-red-600 text-xs font-semibold hover:bg-red-50 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                          title="Restaurer cette sauvegarde"
                         >
-                          <Icon d={ICONS.restore} size={16} />
+                          <Icon d={ICONS.restore} size={14} />
+                          Restaurer
                         </button>
                       </div>
                     </td>
