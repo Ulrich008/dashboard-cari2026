@@ -31,6 +31,8 @@ const ICONS = {
   logout:    "M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9",
   menu:      "M3 12h18M3 6h18M3 18h18",
   close:     "M6 18L18 6M6 6l12 12",
+  payment:   "M3 10h18M5 6h14M7 14h10M9 18h6M12 2v20",
+  promo:     "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z",
 };
 
 const NAV_ITEMS = [
@@ -42,8 +44,10 @@ const NAV_ITEMS = [
   { label: "Speakers / Committees", icon: "speakers",  path: "/speakers" },
   { label: "Sponsors / Partners",   icon: "sponsors",  path: "/sponsors" },
   { label: "Documents",             icon: "docs",      path: "/documents" },
+  { label: "Payments",              icon: "payment",   path: "/payments" },
+  { label: "Code promo",            icon: "promo",     path: "/promo-codes" },
   { label: "Users & Roles",         icon: "roles",     path: "/roles" },
-  { label: "Site Info",             icon: "site",      path: "/site" },
+  // { label: "Site Info",             icon: "site",      path: "/site" },
 ];
 
 export default function Sidebar({ activeItem = "Pages", onNavigate }) {

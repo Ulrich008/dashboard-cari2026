@@ -22,6 +22,9 @@ import CreateParticipant from "./pages/CreateParticipant";
 import ImportPapiers from "./pages/ImportPapiers";
 import MenusPage from "./pages/MenusPage";
 import CreateMenuContent from "./pages/CreateMenuContent";
+import Payments from "./pages/Payments";
+import PromoCodes from "./pages/PromoCodes";
+import CreatePromoCode from "./pages/CreatePromoCode";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 
@@ -46,6 +49,10 @@ const PATH_TO_LABEL = {
   "/documents":           "Documents",
   "/documents/create":    "Documents",
   "/documents/edit":      "Documents",
+  "/payments":            "Payments",
+  "/promo-codes":         "Code promo",
+  "/promo-codes/create":  "Code promo",
+  "/promo-codes/edit":    "Code promo",
   "/roles":               "Users & Roles",
   "/roles/create":        "Users & Roles",
   "/roles/edit":          "Users & Roles",
@@ -76,6 +83,8 @@ function Layout() {
      location.pathname.startsWith("/speakers") ? "Speakers / Committees" :
      location.pathname.startsWith("/sponsors") ? "Sponsors / Partners" :
      location.pathname.startsWith("/documents") ? "Documents" :
+     location.pathname.startsWith("/payments") ? "Payments" :
+     location.pathname.startsWith("/promo-codes") ? "Code promo" :
      location.pathname.startsWith("/roles") ? "Users & Roles" :
      location.pathname.startsWith("/participants") ? "Participants" :
      location.pathname.startsWith("/menus") ? "Menus" : "Tableau de bord");
@@ -128,6 +137,14 @@ function Layout() {
           <Route path="/documents/create" element={<CreateDocument />} />
           <Route path="/documents/edit/:id" element={<CreateDocument />} />
 
+          {/* Payments */}
+          <Route path="/payments" element={<Payments />} />
+
+          {/* Promo Codes */}
+          <Route path="/promo-codes" element={<PromoCodes />} />
+          <Route path="/promo-codes/create" element={<CreatePromoCode />} />
+          <Route path="/promo-codes/edit/:id" element={<CreatePromoCode />} />
+
           {/* Users & Roles */}
           <Route path="/roles" element={<UsersRoles />} />
           <Route path="/roles/create" element={<CreateUser />} />
@@ -167,6 +184,7 @@ export default function App() {
         <Routes>
           {/* Auth routes */}
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
 
           {/* Protected routes */}
           <Route
