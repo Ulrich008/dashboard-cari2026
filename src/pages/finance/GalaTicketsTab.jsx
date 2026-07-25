@@ -111,8 +111,9 @@ export default function GalaTicketsTab() {
           <div style="margin-bottom: 12px;">
             <strong style="color: #1a7a3c;">Commande</strong>
             <div style="margin-top: 4px; color: #666;">
+              <div><strong>Option:</strong> ${ticket.categorie_label ?? "-"}</div>
               <div><strong>Quantité:</strong> ${ticket.quantite}</div>
-              <div><strong>Prix unitaire:</strong> ${ticket.prix_unitaire_usd} ${ticket.devise}</div>
+              <div><strong>Prix unitaire:</strong> ${ticket.prix_unitaire} ${ticket.devise}</div>
               <div><strong>Montant total:</strong> ${ticket.montant_total} ${ticket.devise}</div>
               <div><strong>Montant réduit:</strong> ${ticket.montant_reduit ?? "-"}</div>
               <div><strong>Code promo appliqué:</strong> ${ticket.discount_code_id ? `#${ticket.discount_code_id}` : "Aucun"}</div>
@@ -196,6 +197,7 @@ export default function GalaTicketsTab() {
             <tr>
               <th className="text-left px-6 py-3 text-gray-500 font-medium">Acheteur</th>
               <th className="text-left px-4 py-3 text-gray-500 font-medium">Source</th>
+              <th className="text-left px-4 py-3 text-gray-500 font-medium">Catégorie</th>
               <th className="text-left px-4 py-3 text-gray-500 font-medium">Quantité</th>
               <th className="text-left px-4 py-3 text-gray-500 font-medium">Montant</th>
               <th className="text-left px-4 py-3 text-gray-500 font-medium">Statut</th>
@@ -205,11 +207,11 @@ export default function GalaTicketsTab() {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={6} className="px-6 py-10 text-center text-gray-400">Chargement...</td>
+                <td colSpan={7} className="px-6 py-10 text-center text-gray-400">Chargement...</td>
               </tr>
             ) : tickets.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-6 py-10 text-center text-gray-400">Aucun ticket gala trouvé.</td>
+                <td colSpan={7} className="px-6 py-10 text-center text-gray-400">Aucun ticket gala trouvé.</td>
               </tr>
             ) : (
               tickets.map((ticket) => (
@@ -223,6 +225,7 @@ export default function GalaTicketsTab() {
                       {ticket.source === "with_account" ? "Compte" : "Standalone"}
                     </span>
                   </td>
+                  <td className="px-4 py-4 text-gray-600">{ticket.categorie_label ?? "-"}</td>
                   <td className="px-4 py-4 text-gray-600">{ticket.quantite}</td>
                   <td className="px-4 py-4">
                     <p className="font-semibold text-gray-900">{ticket.montant_reduit ?? ticket.montant_total} {ticket.devise}</p>
