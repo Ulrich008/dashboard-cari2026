@@ -114,6 +114,8 @@ export default function GalaTicketsTab() {
               <div><strong>Quantité:</strong> ${ticket.quantite}</div>
               <div><strong>Prix unitaire:</strong> ${ticket.prix_unitaire_usd} ${ticket.devise}</div>
               <div><strong>Montant total:</strong> ${ticket.montant_total} ${ticket.devise}</div>
+              <div><strong>Montant réduit:</strong> ${ticket.montant_reduit ?? "-"}</div>
+              <div><strong>Code promo appliqué:</strong> ${ticket.discount_code_id ? `#${ticket.discount_code_id}` : "Aucun"}</div>
               <div><strong>Statut paiement:</strong> ${ticket.statut_paiement}</div>
               <div><strong>Méthode:</strong> ${ticket.payment_method ?? "-"}</div>
               <div><strong>Date paiement:</strong> ${ticket.date_paiement ?? "-"}</div>
@@ -222,7 +224,12 @@ export default function GalaTicketsTab() {
                     </span>
                   </td>
                   <td className="px-4 py-4 text-gray-600">{ticket.quantite}</td>
-                  <td className="px-4 py-4 font-semibold text-gray-900">{ticket.montant_total} {ticket.devise}</td>
+                  <td className="px-4 py-4">
+                    <p className="font-semibold text-gray-900">{ticket.montant_reduit ?? ticket.montant_total} {ticket.devise}</p>
+                    {ticket.montant_reduit && ticket.montant_total && (
+                      <p className="text-xs text-gray-400 line-through">{ticket.montant_total}</p>
+                    )}
+                  </td>
                   <td className="px-4 py-4">
                     <span className={`px-2 py-1 rounded-full text-xs font-semibold ${PAYMENT_STATUS_STYLE[ticket.statut_paiement] ?? "bg-gray-100 text-gray-600"}`}>
                       {ticket.statut_paiement}
