@@ -39,6 +39,12 @@ export const participantService = {
     return response.data.data || response.data;
   },
 
+  // Déverrouiller / reverrouiller manuellement la page MyInfo (motif obligatoire)
+  toggleMyInfoUnlock: async (id, unlocked, motif) => {
+    const response = await api.put(`/admin/participants/${id}/myinfo-unlock`, { unlocked, motif });
+    return response.data.data || response.data;
+  },
+
   // Importer des auteurs
   importAuthors: async (data) => {
     const response = await api.post('/admin/participants/import-authors', data);

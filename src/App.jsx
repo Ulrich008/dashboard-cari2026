@@ -22,8 +22,7 @@ import CreateParticipant from "./pages/CreateParticipant";
 import ImportPapiers from "./pages/ImportPapiers";
 import MenusPage from "./pages/MenusPage";
 import CreateMenuContent from "./pages/CreateMenuContent";
-import Payments from "./pages/Payments";
-import PromoCodes from "./pages/PromoCodes";
+import Finance from "./pages/Finance";
 import CreatePromoCode from "./pages/CreatePromoCode";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -49,10 +48,9 @@ const PATH_TO_LABEL = {
   "/documents":           "Documents",
   "/documents/create":    "Documents",
   "/documents/edit":      "Documents",
-  "/payments":            "Payments",
-  "/promo-codes":         "Code promo",
-  "/promo-codes/create":  "Code promo",
-  "/promo-codes/edit":    "Code promo",
+  "/finance":             "Finance",
+  "/promo-codes/create":  "Finance",
+  "/promo-codes/edit":    "Finance",
   "/roles":               "Users & Roles",
   "/roles/create":        "Users & Roles",
   "/roles/edit":          "Users & Roles",
@@ -83,8 +81,8 @@ function Layout() {
      location.pathname.startsWith("/speakers") ? "Speakers / Committees" :
      location.pathname.startsWith("/sponsors") ? "Sponsors / Partners" :
      location.pathname.startsWith("/documents") ? "Documents" :
-     location.pathname.startsWith("/payments") ? "Payments" :
-     location.pathname.startsWith("/promo-codes") ? "Code promo" :
+     location.pathname.startsWith("/finance") ? "Finance" :
+     location.pathname.startsWith("/promo-codes") ? "Finance" :
      location.pathname.startsWith("/roles") ? "Users & Roles" :
      location.pathname.startsWith("/participants") ? "Participants" :
      location.pathname.startsWith("/menus") ? "Menus" : "Tableau de bord");
@@ -137,11 +135,11 @@ function Layout() {
           <Route path="/documents/create" element={<CreateDocument />} />
           <Route path="/documents/edit/:id" element={<CreateDocument />} />
 
-          {/* Payments */}
-          <Route path="/payments" element={<Payments />} />
+          {/* Finance (Registrations & Paiements / Codes promo / Gala Dinner) */}
+          <Route path="/finance" element={<Finance />} />
 
-          {/* Promo Codes */}
-          <Route path="/promo-codes" element={<PromoCodes />} />
+          {/* Promo Codes — liste repliée dans l'onglet "Codes promo" de Finance */}
+          <Route path="/promo-codes" element={<RedirectTo path="/finance" />} />
           <Route path="/promo-codes/create" element={<CreatePromoCode />} />
           <Route path="/promo-codes/edit/:id" element={<CreatePromoCode />} />
 
@@ -174,6 +172,12 @@ function Layout() {
 function RedirectToPages() {
   const navigate = useNavigate();
   useEffect(() => { navigate("/dashboard", { replace: true }); }, [navigate]);
+  return null;
+}
+
+function RedirectTo({ path }) {
+  const navigate = useNavigate();
+  useEffect(() => { navigate(path, { replace: true }); }, [navigate, path]);
   return null;
 }
 

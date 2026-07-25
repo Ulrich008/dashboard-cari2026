@@ -35,6 +35,20 @@ const ICONS = {
   check:    "M20 6L9 17l-5-5",
   clock:    "M12 6v6l4 2M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z",
   ticket:   "M20 12v-2a2 2 0 0 0-2-2h-2M4 12v-2a2 2 0 0 1 2-2h2M20 12v4a2 2 0 0 1-2 2h-2M4 12v4a2 2 0 0 0 2 2h2M8 8h8M8 16h8",
+  lock:     "M19 11H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2zM7 11V7a5 5 0 0 1 10 0v4",
+  unlock:   "M19 11H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2zM7 11V7a5 5 0 0 1 9.9-1",
+};
+
+const PAYMENT_STATUS_OPTIONS = [
+  { value: "pending", label: "Pending" },
+  { value: "paid", label: "Paid" },
+  { value: "cancelled", label: "Cancelled" },
+];
+
+const PAYMENT_STATUS_STYLE = {
+  pending: "bg-yellow-100 text-yellow-700",
+  paid: "bg-green-100 text-green-700",
+  cancelled: "bg-red-100 text-red-700",
 };
 
 const PARTICIPANT_TYPES = [
@@ -62,6 +76,7 @@ export default function Participants() {
   const [participants, setParticipants] = useState([]);
   const [selectedType, setSelectedType] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
+  const [selectedPaymentStatus, setSelectedPaymentStatus] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [selectedParticipants, setSelectedParticipants] = useState([]);
   const [showBulkActions, setShowBulkActions] = useState(false);
@@ -78,7 +93,7 @@ export default function Participants() {
   // Reset page to 1 when filters or perPage change
   useEffect(() => {
     setCurrentPage(1);
-  }, [search, selectedType, selectedStatus, perPage]);
+  }, [search, selectedType, selectedStatus, selectedPaymentStatus, perPage]);
 
   // Load data when page, search, filters, or perPage change
   useEffect(() => {
@@ -87,7 +102,7 @@ export default function Participants() {
     }, 150);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [currentPage, search, selectedType, selectedStatus, perPage]);
+  }, [currentPage, search, selectedType, selectedStatus, selectedPaymentStatus, perPage]);
 
   const loadStats = async () => {
     try {
@@ -108,6 +123,7 @@ export default function Participants() {
         search,
         type: selectedType,
         statut: selectedStatus,
+        statut_paiement: selectedPaymentStatus,
         per_page: perPage
       });
       if (res && res.meta) {
@@ -170,6 +186,41 @@ export default function Participants() {
         title: 'Erreur',
         text: 'Erreur lors de la mise à jour du statut'
       });
+    }
+  };
+
+  const toggleMyInfoUnlock = async (participant) => {
+    const nextUnlocked = !participant.myinfo_deverrouille_par_admin;
+    const { value: motif } = await Swal.fire({
+      title: nextUnlocked ? "Déverrouiller MyInfo ?" : "Reverrouiller MyInfo ?",
+      input: "textarea",
+      inputLabel: "Motif (obligatoire)",
+      inputPlaceholder: nextUnlocked
+        ? "Ex : demande de correction d'informations après paiement..."
+        : "Ex : erreur de manipulation...",
+      showCancelButton: true,
+      confirmButtonColor: "#1a7a3c",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: nextUnlocked ? "Déverrouiller" : "Reverrouiller",
+      cancelButtonText: "Annuler",
+      inputValidator: (value) => (!value || !value.trim() ? "Le motif est obligatoire." : undefined),
+    });
+
+    if (!motif) return;
+
+    try {
+      await participantService.toggleMyInfoUnlock(participant.id, nextUnlocked, motif);
+      await loadParticipants(currentPage);
+      Swal.fire({
+        icon: "success",
+        title: "Succès",
+        text: nextUnlocked ? "Profil déverrouillé." : "Profil reverrouillé.",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      console.error("Erreur lors du changement de verrouillage MyInfo:", error);
+      Swal.fire("Erreur", error.response?.data?.message ?? "Une erreur est survenue.", "error");
     }
   };
 
@@ -469,9 +520,22 @@ export default function Participants() {
                   ))}
                 </select>
               </div>
-              {(selectedType || selectedStatus) && (
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-gray-500">Statut paiement :</span>
+                <select
+                  value={selectedPaymentStatus}
+                  onChange={(e) => setSelectedPaymentStatus(e.target.value)}
+                  className="px-2 py-1 rounded-lg border border-gray-200 text-xs focus:outline-none"
+                >
+                  <option value="">Tous</option>
+                  {PAYMENT_STATUS_OPTIONS.map(status => (
+                    <option key={status.value} value={status.value}>{status.label}</option>
+                  ))}
+                </select>
+              </div>
+              {(selectedType || selectedStatus || selectedPaymentStatus) && (
                 <button
-                  onClick={() => { setSelectedType(""); setSelectedStatus(""); }}
+                  onClick={() => { setSelectedType(""); setSelectedStatus(""); setSelectedPaymentStatus(""); }}
                   className="text-xs text-red-500 hover:underline"
                 >
                   Réinitialiser
@@ -558,6 +622,7 @@ export default function Participants() {
                 <th className="text-left px-4 py-3 text-gray-500 font-medium">Affiliation</th>
                 <th className="text-left px-4 py-3 text-gray-500 font-medium">Pays</th>
                 <th className="text-left px-4 py-3 text-gray-500 font-medium">Statut</th>
+                <th className="text-left px-4 py-3 text-gray-500 font-medium">Statut paiement</th>
                 <th className="text-left px-4 py-3 text-gray-500 font-medium">Auteur</th>
                 <th className="text-left px-4 py-3 text-gray-500 font-medium">Action</th>
               </tr>
@@ -565,7 +630,7 @@ export default function Participants() {
             <tbody>
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={10} className="px-6 py-10 text-center text-gray-400">
+                  <td colSpan={11} className="px-6 py-10 text-center text-gray-400">
                     Aucun participant trouvé.
                   </td>
                 </tr>
@@ -626,6 +691,15 @@ export default function Participants() {
                       </select>
                     </td>
                     <td className="px-4 py-4">
+                      {participant.statut_paiement ? (
+                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${PAYMENT_STATUS_STYLE[participant.statut_paiement] ?? "bg-gray-100 text-gray-600"}`}>
+                          {participant.statut_paiement}
+                        </span>
+                      ) : (
+                        <span className="text-xs text-gray-300">—</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-4">
                       <span className={`px-2 py-1 rounded-full text-xs font-semibold ${participant.est_auteur ? "bg-purple-100 text-purple-700" : "bg-gray-100 text-gray-700"}`}>
                         {participant.est_auteur ? "Oui" : "Non"}
                       </span>
@@ -645,6 +719,17 @@ export default function Participants() {
                           title="Modifier"
                         >
                           <Icon d={ICONS.edit} size={16} />
+                        </button>
+                        <button
+                          onClick={() => toggleMyInfoUnlock(participant)}
+                          className={`transition-colors ${participant.myinfo_deverrouille_par_admin ? "text-amber-500 hover:text-gray-500" : "text-gray-400 hover:text-amber-500"}`}
+                          title={participant.myinfo_locked
+                            ? "Profil verrouillé (payé) — cliquer pour déverrouiller"
+                            : participant.myinfo_deverrouille_par_admin
+                              ? "Déverrouillage admin actif — cliquer pour reverrouiller"
+                              : "Profil non verrouillé — cliquer pour déverrouiller par anticipation"}
+                        >
+                          <Icon d={participant.myinfo_deverrouille_par_admin ? ICONS.unlock : ICONS.lock} size={16} />
                         </button>
                         {!isEditor(currentUser) && (
                           <button
