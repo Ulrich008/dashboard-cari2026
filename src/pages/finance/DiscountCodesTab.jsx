@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { discountCodeService } from "../../services/discountCodeService";
@@ -25,6 +25,14 @@ const ICONS = {
   edit: "M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z",
   power: "M18.36 6.64A9 9 0 1 1 5.64 6.64M12 2v10",
   history: "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 6v6l4 2",
+  chevronDown: "M6 9l6 6 6-6",
+};
+
+const formatDateTime = (value) => {
+  if (!value) return "En attente";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "En attente";
+  return date.toLocaleString("fr-FR", { dateStyle: "medium", timeStyle: "short" });
 };
 
 export default function DiscountCodesTab() {
@@ -33,6 +41,9 @@ export default function DiscountCodesTab() {
   const [typeUsage, setTypeUsage] = useState("");
   const [codes, setCodes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [expandedId, setExpandedId] = useState(null);
+  const [historyData, setHistoryData] = useState({});
+  const [historyLoadingId, setHistoryLoadingId] = useState(null);
 
   useEffect(() => {
     const delay = setTimeout(() => {
@@ -85,31 +96,27 @@ export default function DiscountCodesTab() {
     }
   };
 
-  const viewHistory = async (code) => {
+  const toggleHistory = async (code) => {
+    if (expandedId === code.id) {
+      setExpandedId(null);
+      return;
+    }
+
+    setExpandedId(code.id);
+
+    if (historyData[code.id]) return;
+
     try {
+      setHistoryLoadingId(code.id);
       const res = await discountCodeService.getUsageHistory(code.id);
       const rows = res?.data ?? [];
-      const html = rows.length
-        ? `<div style="text-align:left; font-size:13px; max-height:400px; overflow-y:auto;">${rows
-            .map(
-              (r) => `<div style="padding:8px 0; border-bottom:1px solid #eee;">
-                <div><strong>${r.participant_nom || "Participant #" + r.participant_id}</strong> (${r.participant_email ?? "-"})</div>
-                <div style="color:#666;">Registration #${r.registration_id ?? "-"} — ${r.date_usage ?? ""}</div>
-              </div>`
-            )
-            .join("")}</div>`
-        : `<p style="color:#999;">Ce code n'a pas encore été utilisé.</p>`;
-
-      Swal.fire({
-        title: `Historique — ${code.code}`,
-        html,
-        width: "600px",
-        confirmButtonText: "Fermer",
-        confirmButtonColor: "#1a7a3c",
-      });
+      setHistoryData((prev) => ({ ...prev, [code.id]: rows }));
     } catch (error) {
       console.error("Erreur lors du chargement de l'historique:", error);
       Swal.fire("Erreur", "Impossible de charger l'historique.", "error");
+      setExpandedId(null);
+    } finally {
+      setHistoryLoadingId(null);
     }
   };
 
@@ -153,7 +160,7 @@ export default function DiscountCodesTab() {
               <th className="text-left px-4 py-3 text-gray-500 font-medium">Réduction</th>
               <th className="text-left px-4 py-3 text-gray-500 font-medium">Utilisations</th>
               <th className="text-left px-4 py-3 text-gray-500 font-medium">Statut</th>
-              <th className="text-left px-4 py-3 text-gray-500 font-medium">Action</th>
+              <th className="text-left px-24 py-3 text-gray-500 font-medium">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -167,44 +174,91 @@ export default function DiscountCodesTab() {
               </tr>
             ) : (
               codes.map((code) => (
-                <tr key={code.id} className={`border-b border-gray-50 hover:bg-gray-50/60 transition-colors ${!code.activated ? "opacity-60" : ""}`}>
-                  <td className="px-6 py-4 font-mono text-sm font-semibold text-gray-800">{code.code}</td>
-                  <td className="px-4 py-4 text-gray-600">
-                    {code.type_usage === "unique" ? "Usage unique" : "Usage massif"}
-                  </td>
-                  <td className="px-4 py-4 font-semibold text-gray-900">{code.pourcentage}%</td>
-                  <td className="px-4 py-4 text-gray-600">{code.nombre_utilisations ?? 0}</td>
-                  <td className="px-4 py-4">
-                    <span className={`px-2 py-1 rounded-full text-xs font-semibold ${code.activated ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
-                      {code.activated ? "Actif" : "Désactivé"}
-                    </span>
-                  </td>
-                  <td className="px-4 py-4">
-                    <div className="flex items-center gap-3">
-                      <button
-                        onClick={() => navigate(`/promo-codes/edit/${code.id}`)}
-                        className="text-gray-400 hover:text-[#1a7a3c] transition-colors"
-                        title="Modifier"
-                      >
-                        <Icon d={ICONS.edit} size={16} />
-                      </button>
-                      <button
-                        onClick={() => toggleStatus(code)}
-                        className={`transition-colors ${code.activated ? "text-green-600 hover:text-red-400" : "text-gray-300 hover:text-green-600"}`}
-                        title={code.activated ? "Désactiver" : "Réactiver"}
-                      >
-                        <Icon d={ICONS.power} size={16} />
-                      </button>
-                      <button
-                        onClick={() => viewHistory(code)}
-                        className="text-gray-400 hover:text-[#1a7a3c] transition-colors"
-                        title="Historique d'utilisation"
-                      >
-                        <Icon d={ICONS.history} size={16} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
+                <React.Fragment key={code.id}>
+                  <tr className={`border-b border-gray-50 hover:bg-gray-50/60 transition-colors ${!code.activated ? "opacity-60" : ""}`}>
+                    <td className="px-6 py-4 font-mono text-sm font-semibold text-gray-800">{code.code}</td>
+                    <td className="px-4 py-4 text-gray-600">
+                      {code.type_usage === "unique" ? "Usage unique" : "Usage massif"}
+                    </td>
+                    <td className="px-4 py-4 font-semibold text-gray-900">{code.pourcentage}%</td>
+                    <td className="px-4 py-4 text-gray-600">{code.nombre_utilisations ?? 0}</td>
+                    <td className="px-4 py-4">
+                      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${code.activated ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
+                        {code.activated ? "Actif" : "Désactivé"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-4">
+                      <div className="flex items-center gap-3">
+                        <button
+                          onClick={() => navigate(`/promo-codes/edit/${code.id}`)}
+                          className="text-gray-400 hover:text-[#1a7a3c] transition-colors"
+                          title="Modifier"
+                        >
+                          <Icon d={ICONS.edit} size={16} />
+                        </button>
+                        <button
+                          onClick={() => toggleStatus(code)}
+                          className={`transition-colors ${code.activated ? "text-green-600 hover:text-red-400" : "text-gray-300 hover:text-green-600"}`}
+                          title={code.activated ? "Désactiver" : "Réactiver"}
+                        >
+                          <Icon d={ICONS.power} size={16} />
+                        </button>
+                        <button
+                          onClick={() => toggleHistory(code)}
+                          className={`transition-colors ${expandedId === code.id ? "text-[#1a7a3c]" : "text-gray-400 hover:text-[#1a7a3c]"}`}
+                          title="Historique d'utilisation"
+                        > 
+                        <div className="flex items-center gap-1">
+                          <p>Historique d'utilisation </p>
+                          <Icon
+                            d={ICONS.chevronDown}
+                            size={16}
+                            className={`transition-transform ${expandedId === code.id ? "rotate-180" : ""}`}
+                          />
+                        </div>
+                          
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  {expandedId === code.id && (
+                    <tr className="border-b border-gray-100 bg-gray-50/50">
+                      <td colSpan={6} className="px-6 py-4">
+                        {historyLoadingId === code.id ? (
+                          <p className="text-sm text-gray-400">Chargement de l'historique...</p>
+                        ) : (historyData[code.id] ?? []).length === 0 ? (
+                          <p className="text-sm text-gray-400">Ce code n'a pas encore été utilisé.</p>
+                        ) : (
+                          <div className="space-y-2">
+                            {(historyData[code.id] ?? []).map((r) => (
+                              <div
+                                key={r.id}
+                                className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 bg-white border border-gray-100 rounded-lg px-4 py-2 text-sm"
+                              >
+                                <div className="flex items-center gap-2">
+                                  <span
+                                    className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
+                                      r.source === "gala_ticket" ? "bg-amber-100 text-amber-700" : "bg-blue-100 text-blue-700"
+                                    }`}
+                                  >
+                                    {r.source === "gala_ticket" ? "Gala Dinner" : "Registration"}
+                                  </span>
+                                  <span className="text-gray-700">{r.email ?? "-"}</span>
+                                </div>
+                                <div className="flex items-center gap-4 text-gray-500">
+                                  <span>
+                                    Réduction : <strong className="text-gray-800">{r.montant_reduction ?? "-"} {r.montant_reduction != null ? r.devise ?? "" : ""}</strong>
+                                  </span>
+                                  <span>Paiement : {formatDateTime(r.date_paiement)}</span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
               ))
             )}
           </tbody>
