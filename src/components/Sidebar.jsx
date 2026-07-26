@@ -44,8 +44,7 @@ const NAV_ITEMS = [
   { label: "Speakers / Committees", icon: "speakers",  path: "/speakers" },
   { label: "Sponsors / Partners",   icon: "sponsors",  path: "/sponsors" },
   { label: "Documents",             icon: "docs",      path: "/documents" },
-  { label: "Payments",              icon: "payment",   path: "/payments" },
-  { label: "Code promo",            icon: "promo",     path: "/promo-codes" },
+  { label: "Finance",               icon: "payment",   path: "/finance" },
   { label: "Users & Roles",         icon: "roles",     path: "/roles" },
   // { label: "Site Info",             icon: "site",      path: "/site" },
 ];
