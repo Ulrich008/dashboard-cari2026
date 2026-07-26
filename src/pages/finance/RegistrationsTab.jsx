@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import { registrationService } from "../../services/registrationService";
 import Modal from "../../components/Modal";
+import { downloadBlobResponse } from "../../utils/downloadFile";
 
 const Icon = ({ d, size = 18, className = "" }) => (
   <svg
@@ -28,6 +29,7 @@ const ICONS = {
   percent: "M19 5L5 19M6.5 9a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zM17.5 20a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z",
   clock:   "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 6v6l4 2",
   xcircle: "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM15 9l-6 6M9 9l6 6",
+  download: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3",
 };
 
 const PAYMENT_STATUS_STYLE = {
@@ -169,6 +171,16 @@ export default function RegistrationsTab() {
       Swal.fire("Erreur", error.response?.data?.message ?? "Une erreur est survenue.", "error");
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const downloadReceipt = async (registration) => {
+    try {
+      const response = await registrationService.downloadReceipt(registration.id);
+      downloadBlobResponse(response, `CARI2026_Receipt_INV-2026-${registration.id}.pdf`);
+    } catch (error) {
+      console.error("Erreur lors du téléchargement du reçu:", error);
+      Swal.fire("Erreur", "Impossible de télécharger le reçu.", "error");
     }
   };
 
@@ -379,6 +391,11 @@ export default function RegistrationsTab() {
                         {registration.statut_registration === "checked_in" && (
                           <button onClick={() => openModal("cancel-checkin", registration)} className="text-gray-400 hover:text-red-500 transition-colors" title="Annuler le check-in">
                             <Icon d={ICONS.xcircle} size={16} />
+                          </button>
+                        )}
+                        {registration.statut_paiement === "paid" && (
+                          <button onClick={() => downloadReceipt(registration)} className="text-gray-400 hover:text-[#1a7a3c] transition-colors" title="Télécharger le reçu">
+                            <Icon d={ICONS.download} size={16} />
                           </button>
                         )}
                         <button onClick={() => viewHistory(registration)} className="text-gray-400 hover:text-[#1a7a3c] transition-colors" title="Historique">

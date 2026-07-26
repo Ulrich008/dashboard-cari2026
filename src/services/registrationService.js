@@ -49,6 +49,8 @@ export const registrationService = {
     return response.data.data || response.data;
   },
 
+  downloadReceipt: (id) => api.get(`/admin/registrations/${id}/receipt`, { responseType: 'blob' }),
+
   getAuditHistory: async (id) => {
     const response = await api.get('/admin/logs/audit', { params: { entity_type: 'registration', entity_id: id } });
     return response.data.data || response.data;

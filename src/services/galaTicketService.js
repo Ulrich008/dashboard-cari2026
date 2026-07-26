@@ -18,4 +18,6 @@ export const galaTicketService = {
     const response = await api.post(`/admin/gala-tickets/${id}/mark-paid`, { motif });
     return response.data.data || response.data;
   },
+
+  downloadReceipt: (id) => api.get(`/admin/gala-tickets/${id}/receipt`, { responseType: 'blob' }),
 };

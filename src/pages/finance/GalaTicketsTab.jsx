@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import { galaTicketService } from "../../services/galaTicketService";
 import Modal from "../../components/Modal";
+import { downloadBlobResponse } from "../../utils/downloadFile";
 
 const Icon = ({ d, size = 18, className = "" }) => (
   <svg
@@ -24,6 +25,7 @@ const ICONS = {
   filter: "M4 6h16M7 12h10M10 18h4",
   eye: "M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8zM12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6z",
   check: "M20 6L9 17l-5-5",
+  download: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3",
 };
 
 const SOURCE_STYLE = {
@@ -92,6 +94,16 @@ export default function GalaTicketsTab() {
       Swal.fire("Erreur", error.response?.data?.message ?? "Une erreur est survenue.", "error");
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const downloadReceipt = async (ticket) => {
+    try {
+      const response = await galaTicketService.downloadReceipt(ticket.id);
+      downloadBlobResponse(response, `CARI2026_Gala_Receipt_${ticket.id}.pdf`);
+    } catch (error) {
+      console.error("Erreur lors du téléchargement du reçu:", error);
+      Swal.fire("Erreur", "Impossible de télécharger le reçu.", "error");
     }
   };
 
@@ -246,6 +258,11 @@ export default function GalaTicketsTab() {
                       {ticket.statut_paiement !== "paid" && (
                         <button onClick={() => openMarkPaid(ticket)} className="text-gray-400 hover:text-green-600 transition-colors" title="Marquer comme payé">
                           <Icon d={ICONS.check} size={16} />
+                        </button>
+                      )}
+                      {ticket.statut_paiement === "paid" && (
+                        <button onClick={() => downloadReceipt(ticket)} className="text-gray-400 hover:text-[#1a7a3c] transition-colors" title="Télécharger le reçu">
+                          <Icon d={ICONS.download} size={16} />
                         </button>
                       )}
                     </div>
