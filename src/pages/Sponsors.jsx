@@ -86,11 +86,11 @@ export default function Sponsors() {
         setPagination(null);
       }
     } catch (error) {
-      console.error("Erreur lors du chargement des sponsors:", error);
+      console.error("Error loading sponsors:", error);
       Swal.fire({
         icon: 'error',
-        title: 'Erreur',
-        text: 'Erreur lors du chargement des sponsors'
+        title: 'Error',
+        text: 'Error loading sponsors'
       });
     } finally {
       setLoading(false);
@@ -110,31 +110,31 @@ export default function Sponsors() {
       await loadSponsors();
       Swal.fire({
         icon: 'success',
-        title: 'Succès',
-        text: 'Statut mis à jour avec succès',
+        title: 'Success',
+        text: 'Status updated successfully',
         timer: 1500,
         showConfirmButton: false
       });
     } catch (error) {
-      console.error("Erreur lors de la mise à jour du statut:", error);
+      console.error("Error updating status:", error);
       Swal.fire({
         icon: 'error',
-        title: 'Erreur',
-        text: 'Erreur lors de la mise à jour du statut'
+        title: 'Error',
+        text: 'Error updating status'
       });
     }
   };
 
   const deleteSponsor = async (id) => {
     const result = await Swal.fire({
-      title: 'Êtes-vous sûr ?',
-      text: "Vous ne pourrez pas récupérer ce sponsor !",
+      title: 'Are you sure?',
+      text: "You won't be able to recover this sponsor!",
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#d33',
       cancelButtonColor: '#3085d6',
-      confirmButtonText: 'Oui, supprimer !',
-      cancelButtonText: 'Annuler'
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel'
     });
 
     if (result.isConfirmed) {
@@ -143,17 +143,17 @@ export default function Sponsors() {
         await loadSponsors();
         Swal.fire({
           icon: 'success',
-          title: 'Supprimé !',
-          text: 'Le sponsor a été supprimé.',
+          title: 'Deleted!',
+          text: 'The sponsor has been deleted.',
           timer: 1500,
           showConfirmButton: false
         });
       } catch (error) {
-        console.error("Erreur lors de la suppression:", error);
+        console.error("Error deleting:", error);
         Swal.fire({
           icon: 'error',
-          title: 'Erreur',
-          text: 'Erreur lors de la suppression'
+          title: 'Error',
+          text: 'Error deleting'
         });
       }
     }
@@ -178,20 +178,20 @@ export default function Sponsors() {
       html: `
         <div class="text-left" style="font-size: 14px;">
           <div style="margin-bottom: 12px;">
-            <strong style="color: #1a7a3c;">Informations générales</strong>
+            <strong style="color: #1a7a3c;">General information</strong>
             <div style="margin-top: 4px; color: #666;">
               <div><strong>Type:</strong> ${sponsor.type}</div>
-              <div><strong>Statut:</strong> ${sponsor.activated ? 'Actif' : 'Inactif'}</div>
-              <div><strong>Affiché sur site public:</strong> ${sponsor.affiche_site_public ? 'Oui' : 'Non'}</div>
-              <div><strong>Ordre d'affichage:</strong> ${sponsor.ordre_affichage || 0}</div>
+              <div><strong>Status:</strong> ${sponsor.activated ? 'Active' : 'Inactive'}</div>
+              <div><strong>Shown on public site:</strong> ${sponsor.affiche_site_public ? 'Yes' : 'No'}</div>
+              <div><strong>Display order:</strong> ${sponsor.ordre_affichage || 0}</div>
             </div>
           </div>
           <div style="margin-bottom: 12px;">
             <strong style="color: #1a7a3c;">Contact</strong>
             <div style="margin-top: 4px; color: #666;">
               <div><strong>Email:</strong> ${sponsor.email || '-'}</div>
-              <div><strong>Téléphone:</strong> ${sponsor.telephone || '-'}</div>
-              <div><strong>Site web:</strong> ${sponsor.url ? `<a href="${sponsor.url}" target="_blank">${sponsor.url}</a>` : '-'}</div>
+              <div><strong>Phone:</strong> ${sponsor.telephone || '-'}</div>
+              <div><strong>Website:</strong> ${sponsor.url ? `<a href="${sponsor.url}" target="_blank">${sponsor.url}</a>` : '-'}</div>
             </div>
           </div>
           <div style="margin-bottom: 12px;">
@@ -204,7 +204,7 @@ export default function Sponsors() {
       `,
       width: '600px',
       showConfirmButton: true,
-      confirmButtonText: 'Fermer',
+      confirmButtonText: 'Close',
       confirmButtonColor: '#1a7a3c',
     });
   };
@@ -213,10 +213,10 @@ export default function Sponsors() {
     <div className="flex-1 flex flex-col min-h-screen bg-[#f5f6f8]">
       <div className="px-8 pt-8 pb-6">
         <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
-          Gestion des Sponsors / Partners
+          Sponsors / Partners management
         </h1>
         <p className="text-sm text-gray-500 mt-1">
-          Gérez les sponsors et partenaires de la conférence
+          Manage the conference sponsors and partners
         </p>
       </div>
 
@@ -237,7 +237,7 @@ export default function Sponsors() {
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Rechercher par nom, ID public ou type..."
+                placeholder="Search by name, public ID or type..."
                 className="w-full pl-9 pr-4 py-2 rounded-lg border border-gray-200 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30 focus:border-[#1a7a3c] transition"
               />
             </div>
@@ -256,13 +256,13 @@ export default function Sponsors() {
               className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#1a7a3c] text-white text-sm font-semibold hover:bg-[#155f2f] transition-colors shadow-sm shrink-0"
             >
               <Icon d={ICONS.plus} size={15} />
-              Ajouter un sponsor/partner
+              Add a sponsor/partner
             </button>
           </div>
 
           {showFilters && (
             <div className="flex items-center gap-3 pt-2 border-t border-gray-100 flex-wrap">
-              <span className="text-xs font-medium text-gray-500">Filtrer par type :</span>
+              <span className="text-xs font-medium text-gray-500">Filter by type:</span>
               <div className="flex gap-2 flex-wrap">
                 <button
                   onClick={() => setSelectedType("")}
@@ -272,7 +272,7 @@ export default function Sponsors() {
                       : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                   }`}
                 >
-                  Tous
+                  All
                 </button>
                 {SPONSOR_TYPES.map((type) => (
                   <button
@@ -297,10 +297,10 @@ export default function Sponsors() {
             <thead>
               <tr className="border-b border-gray-100 bg-gray-50/50">
                 <th className="text-left px-6 py-3 text-gray-500 font-medium">ID</th>
-                <th className="text-left px-4 py-3 text-gray-500 font-medium">Nom</th>
+                <th className="text-left px-4 py-3 text-gray-500 font-medium">Name</th>
                 <th className="text-left px-4 py-3 text-gray-500 font-medium">Type</th>
-                <th className="text-left px-4 py-3 text-gray-500 font-medium">Lien</th>
-                <th className="text-left px-4 py-3 text-gray-500 font-medium">Statut</th>
+                <th className="text-left px-4 py-3 text-gray-500 font-medium">Link</th>
+                <th className="text-left px-4 py-3 text-gray-500 font-medium">Status</th>
                 <th className="text-left px-4 py-3 text-gray-500 font-medium">Action</th>
               </tr>
             </thead>
@@ -308,7 +308,7 @@ export default function Sponsors() {
               {filtered.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-6 py-10 text-center text-gray-400">
-                    Aucun sponsor trouvé.
+                    No sponsors found.
                   </td>
                 </tr>
               ) : (
@@ -345,12 +345,12 @@ export default function Sponsors() {
                         className="flex items-center gap-1.5 text-[#1a7a3c] hover:underline text-sm"
                       >
                         <Icon d={ICONS.link} size={14} />
-                        <span>Site web</span>
+                        <span>Website</span>
                       </a>
                     </td>
                     <td className="px-4 py-4">
                       <span className={`font-semibold ${sponsor.affiche_site_public !== undefined ? (sponsor.affiche_site_public ? "text-green-600" : "text-gray-400") : (sponsor.online ? "text-green-600" : "text-gray-400")}`}>
-                        {sponsor.affiche_site_public !== undefined ? (sponsor.affiche_site_public ? "Visible" : "Masqué") : (sponsor.online ? "Actif" : "Inactif")}
+                        {sponsor.affiche_site_public !== undefined ? (sponsor.affiche_site_public ? "Visible" : "Hidden") : (sponsor.online ? "Active" : "Inactive")}
                       </span>
                     </td>
                     <td className="px-4 py-4">
@@ -358,14 +358,14 @@ export default function Sponsors() {
                         <button
                           onClick={() => viewSponsor(sponsor)}
                           className="text-gray-400 hover:text-blue-500 transition-colors"
-                          title="Voir les détails"
+                          title="View details"
                         >
                           <Icon d={ICONS.eye} size={16} />
                         </button>
                         <button
                           onClick={() => navigate(`/sponsors/edit/${sponsor.id}`)}
                           className="text-gray-400 hover:text-[#1a7a3c] transition-colors"
-                          title="Modifier"
+                          title="Edit"
                         >
                           <Icon d={ICONS.edit} size={16} />
                         </button>
@@ -374,7 +374,7 @@ export default function Sponsors() {
                           className={`transition-colors ${
                             sponsor.affiche_site_public !== undefined ? (sponsor.affiche_site_public ? "text-green-600 hover:text-red-400" : "text-gray-300 hover:text-green-600") : (sponsor.online ? "text-green-600 hover:text-red-400" : "text-gray-300 hover:text-green-600")
                           }`}
-                          title={sponsor.affiche_site_public !== undefined ? (sponsor.affiche_site_public ? "Masquer" : "Afficher") : (sponsor.online ? "Désactiver" : "Activer")}
+                          title={sponsor.affiche_site_public !== undefined ? (sponsor.affiche_site_public ? "Hide" : "Show") : (sponsor.online ? "Disable" : "Enable")}
                         >
                           <Icon d={ICONS.power} size={16} />
                         </button>
@@ -382,7 +382,7 @@ export default function Sponsors() {
                           <button
                             onClick={() => deleteSponsor(sponsor.id)}
                             className="text-gray-400 hover:text-red-500 transition-colors"
-                            title="Supprimer"
+                            title="Delete"
                           >
                             <Icon d={ICONS.delete} size={16} />
                           </button>
@@ -400,12 +400,12 @@ export default function Sponsors() {
           <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-white">
             <div className="flex items-center gap-4 flex-wrap">
               <span className="text-sm text-gray-500">
-                Affichage de <span className="font-semibold">{pagination.from || 0}</span> à{" "}
-                <span className="font-semibold">{pagination.to || 0}</span> sur{" "}
+                Showing <span className="font-semibold">{pagination.from || 0}</span> to{" "}
+                <span className="font-semibold">{pagination.to || 0}</span> of{" "}
                 <span className="font-semibold">{pagination.total || 0}</span> sponsors
               </span>
               <div className="flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded border border-gray-200/50">
-                <span>Afficher</span>
+                <span>Show</span>
                 <select
                   value={perPage}
                   onChange={(e) => setPerPage(Number(e.target.value))}
@@ -417,7 +417,7 @@ export default function Sponsors() {
                   <option value={50}>50</option>
                   <option value={100}>100</option>
                 </select>
-                <span>par page</span>
+                <span>per page</span>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -426,7 +426,7 @@ export default function Sponsors() {
                 disabled={pagination.current_page === 1}
                 className="px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                Précédent
+                Previous
               </button>
               {Array.from({ length: pagination.last_page }, (_, index) => {
                 const pageNum = index + 1;
@@ -461,7 +461,7 @@ export default function Sponsors() {
                 disabled={pagination.current_page === pagination.last_page}
                 className="px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                Suivant
+                Next
               </button>
             </div>
           </div>
@@ -469,10 +469,10 @@ export default function Sponsors() {
 
         <div className="px-6 py-3 border-t border-gray-100 bg-gray-50/50">
           <div className="flex items-center justify-between text-xs text-gray-500">
-            <span>Total : {pagination ? pagination.total : filtered.length} sponsor(s)</span>
+            <span>Total: {pagination ? pagination.total : filtered.length} sponsor(s)</span>
             <span>
-              Actifs : {filtered.filter(s => s.affiche_site_public || s.online).length} | 
-              Inactifs : {filtered.filter(s => !s.affiche_site_public && !s.online).length}
+              Active: {filtered.filter(s => s.affiche_site_public || s.online).length} |
+              Inactive: {filtered.filter(s => !s.affiche_site_public && !s.online).length}
             </span>
           </div>
         </div>

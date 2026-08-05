@@ -90,7 +90,7 @@ export default function CreateMenuContent() {
             return next;
           });
         })
-        .catch(() => Swal.fire('Erreur', 'Impossible de charger le menu.', 'error'));
+        .catch(() => Swal.fire('Error', 'Unable to load the menu.', 'error'));
     }
   }, [id, isEditing]);
 
@@ -103,7 +103,7 @@ export default function CreateMenuContent() {
 
   const handleSave = async () => {
     if (!formData.label.trim()) {
-      Swal.fire({ icon: 'warning', title: 'Attention', text: 'Le libellé est requis.' });
+      Swal.fire({ icon: 'warning', title: 'Warning', text: 'The label is required.' });
       return;
     }
     setIsLoading(true);
@@ -118,14 +118,14 @@ export default function CreateMenuContent() {
     try {
       if (isEditing) {
         await menuService.update(id, payload);
-        Swal.fire({ icon: 'success', title: 'Menu mis à jour', timer: 1500, showConfirmButton: false });
+        Swal.fire({ icon: 'success', title: 'Menu updated', timer: 1500, showConfirmButton: false });
       } else {
         await menuService.create(payload);
-        Swal.fire({ icon: 'success', title: 'Menu créé', timer: 1500, showConfirmButton: false });
+        Swal.fire({ icon: 'success', title: 'Menu created', timer: 1500, showConfirmButton: false });
       }
       navigate('/menus');
     } catch (err) {
-      Swal.fire('Erreur', err?.response?.data?.message ?? 'Erreur lors de la sauvegarde.', 'error');
+      Swal.fire('Error', err?.response?.data?.message ?? 'Error while saving.', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -147,14 +147,14 @@ export default function CreateMenuContent() {
       {/* Top bar */}
       <div className="flex items-center justify-between px-8 pt-8 pb-6">
         <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
-          {isEditing ? "Modifier un menu" : "Créer un menu"}
+          {isEditing ? "Edit menu" : "Create menu"}
         </h1>
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigate('/menus')}
             className="px-4 py-2 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
           >
-            Annuler
+            Cancel
           </button>
           <button
             onClick={handleSave}
@@ -162,7 +162,7 @@ export default function CreateMenuContent() {
             className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#1a7a3c] text-white text-sm font-semibold hover:bg-[#155f2f] transition-colors shadow-sm disabled:opacity-50"
           >
             <Icon d={ICONS.save} size={15} />
-            {isLoading ? "En cours..." : (isEditing ? "Mettre à jour" : "Enregistrer")}
+            {isLoading ? "In progress..." : (isEditing ? "Update" : "Save")}
           </button>
         </div>
       </div>
@@ -170,39 +170,39 @@ export default function CreateMenuContent() {
       {/* Form */}
       <div className="px-8 pb-8">
         <div className="max-w-xl bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col gap-5">
-          {field("Libellé du menu", true,
+          {field("Menu label", true,
             <input type="text" value={formData.label}
               onChange={e => setFormData({ ...formData, label: e.target.value })}
-              placeholder="Ex: CALLS, Call for Papers…" className={inputClass} />
+              placeholder="E.g.: CALLS, Call for Papers…" className={inputClass} />
           )}
 
-          {field("URL (lien de navigation)", false,
+          {field("URL (navigation link)", false,
             <>
               <input type="text" value={formData.url}
                 onChange={e => setFormData({ ...formData, url: e.target.value })}
-                placeholder="Ex: /calls/papers (vide pour menu parent sans lien)" className={inputClass} />
-              <p className="text-xs text-gray-400">Laisser vide pour les menus parents sans lien direct.</p>
+                placeholder="E.g.: /calls/papers (leave empty for a parent menu without a link)" className={inputClass} />
+              <p className="text-xs text-gray-400">Leave empty for parent menus without a direct link.</p>
             </>
           )}
 
-          {field("Menu parent (sous-menu de…)", false,
+          {field("Parent menu (submenu of…)", false,
             <select value={formData.parent_id}
               onChange={e => setFormData({ ...formData, parent_id: e.target.value })}
               className={inputClass}>
-              <option value="">— Aucun (menu racine) —</option>
+              <option value="">— None (root menu) —</option>
               {rootMenus.map(m => (
                 <option key={m.id} value={m.id}>{m.label}</option>
               ))}
             </select>
           )}
 
-          {field("Ordre d'affichage", false,
+          {field("Display order", false,
             <input type="number" min={0} value={formData.ordre}
               onChange={e => setFormData({ ...formData, ordre: e.target.value })}
               className={inputClass} />
           )}
 
-          {field("Slug de la page associée (optionnel)", false,
+          {field("Associated page slug (optional)", false,
             <>
               <div className="relative">
                 <input
@@ -211,7 +211,7 @@ export default function CreateMenuContent() {
                   onChange={e => setFormData({ ...formData, page_slug: e.target.value })}
                   onFocus={() => setShowSuggestions(true)}
                   onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
-                  placeholder="Ex: calls-papers"
+                  placeholder="E.g.: calls-papers"
                   className={`${inputClass} font-mono`}
                   autoComplete="off"
                 />
@@ -233,14 +233,14 @@ export default function CreateMenuContent() {
                 )}
               </div>
               <p className="text-xs text-gray-400">
-                Relier ce menu à une page existante. Tapez pour filtrer les slugs disponibles.
+                Link this menu to an existing page. Type to filter available slugs.
                 {formData.page_slug && (
                   <button
                     type="button"
                     onClick={() => setFormData(prev => ({ ...prev, page_slug: "" }))}
                     className="ml-2 text-red-400 hover:text-red-600"
                   >
-                    Effacer
+                    Clear
                   </button>
                 )}
               </p>
@@ -250,11 +250,11 @@ export default function CreateMenuContent() {
           <div className="border-t border-gray-100" />
 
           <div className="flex items-center justify-between">
-            <span className="text-sm font-semibold text-gray-700">Activé</span>
+            <span className="text-sm font-semibold text-gray-700">Enabled</span>
             <div className="flex flex-col items-end gap-1">
               <Toggle checked={formData.activated} onChange={v => setFormData({ ...formData, activated: v })} />
               <span className={`text-xs font-medium ${formData.activated ? "text-[#1a7a3c]" : "text-gray-400"}`}>
-                {formData.activated ? "Actif" : "Inactif"}
+                {formData.activated ? "Active" : "Inactive"}
               </span>
             </div>
           </div>

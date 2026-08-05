@@ -102,8 +102,8 @@ export default function RegistrationsTab() {
         setPagination(null);
       }
     } catch (error) {
-      console.error("Erreur lors du chargement des registrations:", error);
-      Swal.fire("Erreur", "Impossible de charger les registrations.", "error");
+      console.error("Error loading registrations:", error);
+      Swal.fire("Error", "Unable to load registrations.", "error");
     } finally {
       setLoading(false);
     }
@@ -127,7 +127,7 @@ export default function RegistrationsTab() {
 
   const submitModal = async () => {
     if (!form.motif || !form.motif.trim()) {
-      Swal.fire("Motif requis", "Merci de préciser un motif pour cette action.", "warning");
+      Swal.fire("Reason required", "Please specify a reason for this action.", "warning");
       return;
     }
 
@@ -147,7 +147,7 @@ export default function RegistrationsTab() {
           break;
         case "apply-discount":
           if (!form.discount_code || !form.discount_code.trim()) {
-            Swal.fire("Code requis", "Merci de saisir un code promo.", "warning");
+            Swal.fire("Code required", "Please enter a promo code.", "warning");
             setSubmitting(false);
             return;
           }
@@ -165,10 +165,10 @@ export default function RegistrationsTab() {
 
       closeModal();
       await loadRegistrations(currentPage);
-      Swal.fire({ icon: "success", title: "Succès", text: "Action effectuée avec succès.", timer: 1500, showConfirmButton: false });
+      Swal.fire({ icon: "success", title: "Success", text: "Action completed successfully.", timer: 1500, showConfirmButton: false });
     } catch (error) {
-      console.error("Erreur lors de l'action Finance:", error);
-      Swal.fire("Erreur", error.response?.data?.message ?? "Une erreur est survenue.", "error");
+      console.error("Error performing Finance action:", error);
+      Swal.fire("Error", error.response?.data?.message ?? "An error occurred.", "error");
     } finally {
       setSubmitting(false);
     }
@@ -179,8 +179,8 @@ export default function RegistrationsTab() {
       const response = await registrationService.downloadReceipt(registration.id);
       downloadBlobResponse(response, `CARI2026_Receipt_INV-2026-${registration.id}.pdf`);
     } catch (error) {
-      console.error("Erreur lors du téléchargement du reçu:", error);
-      Swal.fire("Erreur", "Impossible de télécharger le reçu.", "error");
+      console.error("Error downloading receipt:", error);
+      Swal.fire("Error", "Unable to download the receipt.", "error");
     }
   };
 
@@ -191,34 +191,34 @@ export default function RegistrationsTab() {
       html: `
         <div class="text-left" style="font-size: 14px;">
           <div style="margin-bottom: 12px;">
-            <strong style="color: #1a7a3c;">Inscription</strong>
+            <strong style="color: #1a7a3c;">Registration</strong>
             <div style="margin-top: 4px; color: #666;">
               <div><strong>Type:</strong> ${registration.type_registration ?? "-"}</div>
               <div><strong>Email:</strong> ${p?.email ?? "-"}</div>
-              <div><strong>Statut paiement:</strong> ${registration.statut_paiement ?? "-"}</div>
-              <div><strong>Statut inscription:</strong> ${registration.statut_registration ?? "-"}</div>
+              <div><strong>Payment status:</strong> ${registration.statut_paiement ?? "-"}</div>
+              <div><strong>Registration status:</strong> ${registration.statut_registration ?? "-"}</div>
             </div>
           </div>
           <div style="margin-bottom: 12px;">
-            <strong style="color: #1a7a3c;">Montants</strong>
+            <strong style="color: #1a7a3c;">Amounts</strong>
             <div style="margin-top: 4px; color: #666;">
-              <div><strong>Montant total:</strong> ${registration.montant_total ?? "-"} ${registration.devise ?? ""}</div>
-              <div><strong>Montant réduit:</strong> ${registration.montant_reduit ?? "-"}</div>
-              <div><strong>Code promo appliqué:</strong> ${registration.discount_code_id ? `#${registration.discount_code_id}` : "Aucun"}</div>
-              <div><strong>Méthode de paiement:</strong> ${registration.payment_method ?? "-"}</div>
-              <div><strong>Date paiement:</strong> ${registration.date_paiement ?? "-"}</div>
+              <div><strong>Total amount:</strong> ${registration.montant_total ?? "-"} ${registration.devise ?? ""}</div>
+              <div><strong>Discounted amount:</strong> ${registration.montant_reduit ?? "-"}</div>
+              <div><strong>Applied promo code:</strong> ${registration.discount_code_id ? `#${registration.discount_code_id}` : "None"}</div>
+              <div><strong>Payment method:</strong> ${registration.payment_method ?? "-"}</div>
+              <div><strong>Payment date:</strong> ${registration.date_paiement ?? "-"}</div>
             </div>
           </div>
           <div>
             <strong style="color: #1a7a3c;">Check-in</strong>
             <div style="margin-top: 4px; color: #666;">
-              <div><strong>Date check-in:</strong> ${registration.date_checkin ?? "-"}</div>
+              <div><strong>Check-in date:</strong> ${registration.date_checkin ?? "-"}</div>
             </div>
           </div>
         </div>
       `,
       width: "600px",
-      confirmButtonText: "Fermer",
+      confirmButtonText: "Close",
       confirmButtonColor: "#1a7a3c",
     });
   };
@@ -233,31 +233,31 @@ export default function RegistrationsTab() {
               const motif = extractMotif(h.changes);
               return `<div style="padding:8px 0; border-bottom:1px solid #eee;">
                 <div><strong>${h.action}</strong> — ${h.admin_nom ?? "System"} <span style="color:#999;">(${h.created_at ?? ""})</span></div>
-                ${motif ? `<div style="color:#666; margin-top:2px;">Motif : ${motif}</div>` : ""}
+                ${motif ? `<div style="color:#666; margin-top:2px;">Reason: ${motif}</div>` : ""}
               </div>`;
             })
             .join("")}</div>`
-        : `<p style="color:#999;">Aucun historique pour cette registration.</p>`;
+        : `<p style="color:#999;">No history for this registration.</p>`;
 
       Swal.fire({
-        title: "Historique",
+        title: "History",
         html,
         width: "600px",
-        confirmButtonText: "Fermer",
+        confirmButtonText: "Close",
         confirmButtonColor: "#1a7a3c",
       });
     } catch (error) {
-      console.error("Erreur lors du chargement de l'historique:", error);
-      Swal.fire("Erreur", "Impossible de charger l'historique.", "error");
+      console.error("Error loading history:", error);
+      Swal.fire("Error", "Unable to load history.", "error");
     }
   };
 
   const modalTitle = {
-    status: "Changer le statut de paiement",
-    amount: "Éditer le montant",
-    "apply-discount": "Appliquer un code promo",
-    "remove-discount": "Retirer le code promo",
-    "cancel-checkin": "Annuler le check-in",
+    status: "Change payment status",
+    amount: "Edit amount",
+    "apply-discount": "Apply a promo code",
+    "remove-discount": "Remove promo code",
+    "cancel-checkin": "Cancel check-in",
   }[actionModal?.type];
 
   return (
@@ -270,7 +270,7 @@ export default function RegistrationsTab() {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Rechercher par nom ou email..."
+              placeholder="Search by name or email..."
               className="w-full pl-9 pr-4 py-2 rounded-lg border border-gray-200 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30 focus:border-[#1a7a3c] transition"
             />
           </div>
@@ -288,26 +288,26 @@ export default function RegistrationsTab() {
         {showFilters && (
           <div className="flex items-center gap-4 pt-2 border-t border-gray-100 flex-wrap">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-medium text-gray-500">Statut paiement :</span>
+              <span className="text-xs font-medium text-gray-500">Payment status:</span>
               <select
                 value={statutPaiement}
                 onChange={(e) => setStatutPaiement(e.target.value)}
                 className="px-2 py-1 rounded-lg border border-gray-200 text-sm text-gray-700 focus:outline-none focus:ring-1 focus:ring-[#1a7a3c]/30"
               >
-                <option value="">Tous</option>
+                <option value="">All</option>
                 <option value="pending">Pending</option>
                 <option value="paid">Paid</option>
                 <option value="cancelled">Cancelled</option>
               </select>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-medium text-gray-500">Statut inscription :</span>
+              <span className="text-xs font-medium text-gray-500">Registration status:</span>
               <select
                 value={statutRegistration}
                 onChange={(e) => setStatutRegistration(e.target.value)}
                 className="px-2 py-1 rounded-lg border border-gray-200 text-sm text-gray-700 focus:outline-none focus:ring-1 focus:ring-[#1a7a3c]/30"
               >
-                <option value="">Tous</option>
+                <option value="">All</option>
                 <option value="pending">Pending</option>
                 <option value="paid">Paid</option>
                 <option value="cancelled">Cancelled</option>
@@ -324,21 +324,21 @@ export default function RegistrationsTab() {
             <tr className="border-b border-gray-100 bg-gray-50/50">
               <th className="text-left px-6 py-3 text-gray-500 font-medium">Participant</th>
               <th className="text-left px-4 py-3 text-gray-500 font-medium">Type</th>
-              <th className="text-left px-4 py-3 text-gray-500 font-medium">Montant</th>
-              <th className="text-left px-4 py-3 text-gray-500 font-medium">Statut paiement</th>
-              <th className="text-left px-4 py-3 text-gray-500 font-medium">Statut inscription</th>
-              <th className="text-left px-4 py-3 text-gray-500 font-medium">Date paiement</th>
+              <th className="text-left px-4 py-3 text-gray-500 font-medium">Amount</th>
+              <th className="text-left px-4 py-3 text-gray-500 font-medium">Payment status</th>
+              <th className="text-left px-4 py-3 text-gray-500 font-medium">Registration status</th>
+              <th className="text-left px-4 py-3 text-gray-500 font-medium">Payment date</th>
               <th className="text-left px-4 py-3 text-gray-500 font-medium">Actions</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={7} className="px-6 py-10 text-center text-gray-400">Chargement...</td>
+                <td colSpan={7} className="px-6 py-10 text-center text-gray-400">Loading...</td>
               </tr>
             ) : registrations.length === 0 ? (
               <tr>
-                <td colSpan={7} className="px-6 py-10 text-center text-gray-400">Aucune registration trouvée.</td>
+                <td colSpan={7} className="px-6 py-10 text-center text-gray-400">No registrations found.</td>
               </tr>
             ) : (
               registrations.map((registration, i) => {
@@ -372,33 +372,33 @@ export default function RegistrationsTab() {
                     <td className="px-4 py-4 text-gray-500">{registration.date_paiement ? new Date(registration.date_paiement).toLocaleDateString() : "-"}</td>
                     <td className="px-4 py-4">
                       <div className="flex items-center gap-2.5">
-                        <button onClick={() => viewDetail(registration)} className="text-gray-400 hover:text-[#1a7a3c] transition-colors" title="Voir le détail">
+                        <button onClick={() => viewDetail(registration)} className="text-gray-400 hover:text-[#1a7a3c] transition-colors" title="View details">
                           <Icon d={ICONS.eye} size={16} />
                         </button>
-                        <button onClick={() => openModal("status", registration)} className="text-gray-400 hover:text-[#1a7a3c] transition-colors" title="Changer le statut de paiement">
+                        <button onClick={() => openModal("status", registration)} className="text-gray-400 hover:text-[#1a7a3c] transition-colors" title="Change payment status">
                           <Icon d={ICONS.edit} size={16} />
                         </button>
-                        <button onClick={() => openModal("amount", registration)} className="text-gray-400 hover:text-[#1a7a3c] transition-colors" title="Éditer le montant">
+                        <button onClick={() => openModal("amount", registration)} className="text-gray-400 hover:text-[#1a7a3c] transition-colors" title="Edit amount">
                           <Icon d={ICONS.cash} size={16} />
                         </button>
                         <button
                           onClick={() => openModal(registration.discount_code_id ? "remove-discount" : "apply-discount", registration)}
                           className="text-gray-400 hover:text-[#1a7a3c] transition-colors"
-                          title={registration.discount_code_id ? "Retirer le code promo" : "Appliquer un code promo"}
+                          title={registration.discount_code_id ? "Remove promo code" : "Apply a promo code"}
                         >
                           <Icon d={ICONS.percent} size={16} />
                         </button>
                         {registration.statut_registration === "checked_in" && (
-                          <button onClick={() => openModal("cancel-checkin", registration)} className="text-gray-400 hover:text-red-500 transition-colors" title="Annuler le check-in">
+                          <button onClick={() => openModal("cancel-checkin", registration)} className="text-gray-400 hover:text-red-500 transition-colors" title="Cancel check-in">
                             <Icon d={ICONS.xcircle} size={16} />
                           </button>
                         )}
                         {registration.statut_paiement === "paid" && (
-                          <button onClick={() => downloadReceipt(registration)} className="text-gray-400 hover:text-[#1a7a3c] transition-colors" title="Télécharger le reçu">
+                          <button onClick={() => downloadReceipt(registration)} className="text-gray-400 hover:text-[#1a7a3c] transition-colors" title="Download receipt">
                             <Icon d={ICONS.download} size={16} />
                           </button>
                         )}
-                        <button onClick={() => viewHistory(registration)} className="text-gray-400 hover:text-[#1a7a3c] transition-colors" title="Historique">
+                        <button onClick={() => viewHistory(registration)} className="text-gray-400 hover:text-[#1a7a3c] transition-colors" title="History">
                           <Icon d={ICONS.clock} size={16} />
                         </button>
                       </div>
@@ -415,12 +415,12 @@ export default function RegistrationsTab() {
         <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-white flex-wrap gap-3">
           <div className="flex items-center gap-4 flex-wrap">
             <span className="text-sm text-gray-500">
-              Affichage de <span className="font-semibold">{pagination.from || 0}</span> à{" "}
-              <span className="font-semibold">{pagination.to || 0}</span> sur{" "}
+              Showing <span className="font-semibold">{pagination.from || 0}</span> to{" "}
+              <span className="font-semibold">{pagination.to || 0}</span> of{" "}
               <span className="font-semibold">{pagination.total || 0}</span> registrations
             </span>
             <div className="flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded border border-gray-200/50">
-              <span>Afficher</span>
+              <span>Show</span>
               <select
                 value={perPage}
                 onChange={(e) => setPerPage(Number(e.target.value))}
@@ -431,7 +431,7 @@ export default function RegistrationsTab() {
                 <option value={50}>50</option>
                 <option value={100}>100</option>
               </select>
-              <span>par page</span>
+              <span>per page</span>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -440,7 +440,7 @@ export default function RegistrationsTab() {
               disabled={pagination.current_page === 1}
               className="px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              Précédent
+              Previous
             </button>
             <span className="text-sm text-gray-500 px-2">
               Page {pagination.current_page} / {pagination.last_page}
@@ -450,7 +450,7 @@ export default function RegistrationsTab() {
               disabled={pagination.current_page === pagination.last_page}
               className="px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              Suivant
+              Next
             </button>
           </div>
         </div>
@@ -463,14 +463,14 @@ export default function RegistrationsTab() {
         footer={
           <>
             <button onClick={closeModal} className="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
-              Annuler
+              Cancel
             </button>
             <button
               onClick={submitModal}
               disabled={submitting}
               className="px-4 py-2 rounded-lg bg-[#1a7a3c] text-white text-sm font-semibold hover:bg-[#155f2f] disabled:opacity-60 transition-colors"
             >
-              {submitting ? "Enregistrement..." : "Confirmer"}
+              {submitting ? "Saving..." : "Confirm"}
             </button>
           </>
         }
@@ -479,7 +479,7 @@ export default function RegistrationsTab() {
           <div className="space-y-4">
             {actionModal.type === "status" && (
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">Nouveau statut de paiement</label>
+                <label className="block text-xs font-medium text-gray-500 mb-1">New payment status</label>
                 <select
                   value={form.statut_paiement}
                   onChange={(e) => setForm({ ...form, statut_paiement: e.target.value })}
@@ -495,7 +495,7 @@ export default function RegistrationsTab() {
             {actionModal.type === "amount" && (
               <>
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">Montant total</label>
+                  <label className="block text-xs font-medium text-gray-500 mb-1">Total amount</label>
                   <input
                     type="number"
                     step="0.01"
@@ -505,7 +505,7 @@ export default function RegistrationsTab() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">Montant réduit</label>
+                  <label className="block text-xs font-medium text-gray-500 mb-1">Discounted amount</label>
                   <input
                     type="number"
                     step="0.01"
@@ -519,7 +519,7 @@ export default function RegistrationsTab() {
 
             {actionModal.type === "apply-discount" && (
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">Code promo</label>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Promo code</label>
                 <input
                   type="text"
                   value={form.discount_code}
@@ -531,20 +531,20 @@ export default function RegistrationsTab() {
             )}
 
             {actionModal.type === "remove-discount" && (
-              <p className="text-sm text-gray-600">Le code promo actuellement appliqué à cette inscription sera retiré et le montant recalculé.</p>
+              <p className="text-sm text-gray-600">The promo code currently applied to this registration will be removed and the amount recalculated.</p>
             )}
 
             {actionModal.type === "cancel-checkin" && (
-              <p className="text-sm text-gray-600">Le check-in de ce participant sera annulé.</p>
+              <p className="text-sm text-gray-600">This participant's check-in will be cancelled.</p>
             )}
 
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">Motif (obligatoire)</label>
+              <label className="block text-xs font-medium text-gray-500 mb-1">Reason (required)</label>
               <textarea
                 value={form.motif}
                 onChange={(e) => setForm({ ...form, motif: e.target.value })}
                 rows={3}
-                placeholder="Expliquez la raison de cette action..."
+                placeholder="Explain the reason for this action..."
                 className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30"
               />
             </div>

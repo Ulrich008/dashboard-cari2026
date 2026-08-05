@@ -29,10 +29,10 @@ const ICONS = {
 };
 
 const formatDateTime = (value) => {
-  if (!value) return "En attente";
+  if (!value) return "Pending";
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "En attente";
-  return date.toLocaleString("fr-FR", { dateStyle: "medium", timeStyle: "short" });
+  if (Number.isNaN(date.getTime())) return "Pending";
+  return date.toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" });
 };
 
 export default function DiscountCodesTab() {
@@ -59,8 +59,8 @@ export default function DiscountCodesTab() {
       const res = await discountCodeService.getAll({ search, type_usage: typeUsage, page: 1, per_page: 100 });
       setCodes(res?.data ?? (Array.isArray(res) ? res : []));
     } catch (error) {
-      console.error("Erreur lors du chargement des codes promo:", error);
-      Swal.fire("Erreur", "Impossible de charger les codes promo.", "error");
+      console.error("Error loading promo codes:", error);
+      Swal.fire("Error", "Unable to load promo codes.", "error");
     } finally {
       setLoading(false);
     }
@@ -68,16 +68,16 @@ export default function DiscountCodesTab() {
 
   const toggleStatus = async (code) => {
     const result = await Swal.fire({
-      title: code.activated ? "Désactiver ce code ?" : "Réactiver ce code ?",
+      title: code.activated ? "Disable this code?" : "Reactivate this code?",
       text: code.activated
-        ? "Le code ne sera plus utilisable par les participants."
-        : "Le code redeviendra utilisable par les participants.",
+        ? "The code will no longer be usable by participants."
+        : "The code will become usable by participants again.",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: code.activated ? "#d33" : "#1a7a3c",
       cancelButtonColor: "#3085d6",
-      confirmButtonText: code.activated ? "Oui, désactiver" : "Oui, réactiver",
-      cancelButtonText: "Annuler",
+      confirmButtonText: code.activated ? "Yes, disable" : "Yes, reactivate",
+      cancelButtonText: "Cancel",
     });
 
     if (!result.isConfirmed) return;
@@ -89,10 +89,10 @@ export default function DiscountCodesTab() {
         await discountCodeService.activate(code.id);
       }
       await loadCodes();
-      Swal.fire({ icon: "success", title: "Succès", text: "Statut mis à jour.", timer: 1500, showConfirmButton: false });
+      Swal.fire({ icon: "success", title: "Success", text: "Status updated.", timer: 1500, showConfirmButton: false });
     } catch (error) {
-      console.error("Erreur lors du changement de statut:", error);
-      Swal.fire("Erreur", "Impossible de mettre à jour le statut.", "error");
+      console.error("Error changing status:", error);
+      Swal.fire("Error", "Unable to update status.", "error");
     }
   };
 
@@ -112,8 +112,8 @@ export default function DiscountCodesTab() {
       const rows = res?.data ?? [];
       setHistoryData((prev) => ({ ...prev, [code.id]: rows }));
     } catch (error) {
-      console.error("Erreur lors du chargement de l'historique:", error);
-      Swal.fire("Erreur", "Impossible de charger l'historique.", "error");
+      console.error("Error loading history:", error);
+      Swal.fire("Error", "Unable to load history.", "error");
       setExpandedId(null);
     } finally {
       setHistoryLoadingId(null);
@@ -129,7 +129,7 @@ export default function DiscountCodesTab() {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Rechercher un code promo..."
+            placeholder="Search for a promo code..."
             className="w-full pl-9 pr-4 py-2 rounded-lg border border-gray-200 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30 focus:border-[#1a7a3c] transition"
           />
         </div>
@@ -138,16 +138,16 @@ export default function DiscountCodesTab() {
           onChange={(e) => setTypeUsage(e.target.value)}
           className="px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-700 focus:outline-none focus:ring-1 focus:ring-[#1a7a3c]/30"
         >
-          <option value="">Tous les types</option>
-          <option value="unique">Usage unique</option>
-          <option value="massif">Usage massif</option>
+          <option value="">All types</option>
+          <option value="unique">Single use</option>
+          <option value="massif">Bulk use</option>
         </select>
         <button
           onClick={() => navigate("/promo-codes/create")}
           className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#1a7a3c] text-white text-sm font-semibold hover:bg-[#155f2f] transition-colors shadow-sm"
         >
           <Icon d={ICONS.plus} size={15} />
-          Ajouter un Code promo
+          Add a Promo Code
         </button>
       </div>
 
@@ -156,21 +156,21 @@ export default function DiscountCodesTab() {
           <thead className="bg-gray-50/50 border-b border-gray-100">
             <tr>
               <th className="text-left px-6 py-3 text-gray-500 font-medium">Code</th>
-              <th className="text-left px-4 py-3 text-gray-500 font-medium">Type d'usage</th>
-              <th className="text-left px-4 py-3 text-gray-500 font-medium">Réduction</th>
-              <th className="text-left px-4 py-3 text-gray-500 font-medium">Utilisations</th>
-              <th className="text-left px-4 py-3 text-gray-500 font-medium">Statut</th>
+              <th className="text-left px-4 py-3 text-gray-500 font-medium">Usage type</th>
+              <th className="text-left px-4 py-3 text-gray-500 font-medium">Discount</th>
+              <th className="text-left px-4 py-3 text-gray-500 font-medium">Uses</th>
+              <th className="text-left px-4 py-3 text-gray-500 font-medium">Status</th>
               <th className="text-left px-24 py-3 text-gray-500 font-medium">Action</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={6} className="px-6 py-10 text-center text-gray-400">Chargement...</td>
+                <td colSpan={6} className="px-6 py-10 text-center text-gray-400">Loading...</td>
               </tr>
             ) : codes.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-6 py-10 text-center text-gray-400">Aucun code promo trouvé.</td>
+                <td colSpan={6} className="px-6 py-10 text-center text-gray-400">No promo codes found.</td>
               </tr>
             ) : (
               codes.map((code) => (
@@ -178,13 +178,13 @@ export default function DiscountCodesTab() {
                   <tr className={`border-b border-gray-50 hover:bg-gray-50/60 transition-colors ${!code.activated ? "opacity-60" : ""}`}>
                     <td className="px-6 py-4 font-mono text-sm font-semibold text-gray-800">{code.code}</td>
                     <td className="px-4 py-4 text-gray-600">
-                      {code.type_usage === "unique" ? "Usage unique" : "Usage massif"}
+                      {code.type_usage === "unique" ? "Single use" : "Bulk use"}
                     </td>
                     <td className="px-4 py-4 font-semibold text-gray-900">{code.pourcentage}%</td>
                     <td className="px-4 py-4 text-gray-600">{code.nombre_utilisations ?? 0}</td>
                     <td className="px-4 py-4">
                       <span className={`px-2 py-1 rounded-full text-xs font-semibold ${code.activated ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
-                        {code.activated ? "Actif" : "Désactivé"}
+                        {code.activated ? "Active" : "Disabled"}
                       </span>
                     </td>
                     <td className="px-4 py-4">
@@ -192,24 +192,24 @@ export default function DiscountCodesTab() {
                         <button
                           onClick={() => navigate(`/promo-codes/edit/${code.id}`)}
                           className="text-gray-400 hover:text-[#1a7a3c] transition-colors"
-                          title="Modifier"
+                          title="Edit"
                         >
                           <Icon d={ICONS.edit} size={16} />
                         </button>
                         <button
                           onClick={() => toggleStatus(code)}
                           className={`transition-colors ${code.activated ? "text-green-600 hover:text-red-400" : "text-gray-300 hover:text-green-600"}`}
-                          title={code.activated ? "Désactiver" : "Réactiver"}
+                          title={code.activated ? "Disable" : "Reactivate"}
                         >
                           <Icon d={ICONS.power} size={16} />
                         </button>
                         <button
                           onClick={() => toggleHistory(code)}
                           className={`transition-colors ${expandedId === code.id ? "text-[#1a7a3c]" : "text-gray-400 hover:text-[#1a7a3c]"}`}
-                          title="Historique d'utilisation"
-                        > 
+                          title="Usage history"
+                        >
                         <div className="flex items-center gap-1">
-                          <p>Historique d'utilisation </p>
+                          <p>Usage history </p>
                           <Icon
                             d={ICONS.chevronDown}
                             size={16}
@@ -225,9 +225,9 @@ export default function DiscountCodesTab() {
                     <tr className="border-b border-gray-100 bg-gray-50/50">
                       <td colSpan={6} className="px-6 py-4">
                         {historyLoadingId === code.id ? (
-                          <p className="text-sm text-gray-400">Chargement de l'historique...</p>
+                          <p className="text-sm text-gray-400">Loading history...</p>
                         ) : (historyData[code.id] ?? []).length === 0 ? (
-                          <p className="text-sm text-gray-400">Ce code n'a pas encore été utilisé.</p>
+                          <p className="text-sm text-gray-400">This code has not been used yet.</p>
                         ) : (
                           <div className="space-y-2">
                             {(historyData[code.id] ?? []).map((r) => (
@@ -247,9 +247,9 @@ export default function DiscountCodesTab() {
                                 </div>
                                 <div className="flex items-center gap-4 text-gray-500">
                                   <span>
-                                    Réduction : <strong className="text-gray-800">{r.montant_reduction ?? "-"} {r.montant_reduction != null ? r.devise ?? "" : ""}</strong>
+                                    Discount: <strong className="text-gray-800">{r.montant_reduction ?? "-"} {r.montant_reduction != null ? r.devise ?? "" : ""}</strong>
                                   </span>
-                                  <span>Paiement : {formatDateTime(r.date_paiement)}</span>
+                                  <span>Payment: {formatDateTime(r.date_paiement)}</span>
                                 </div>
                               </div>
                             ))}
@@ -267,9 +267,9 @@ export default function DiscountCodesTab() {
 
       <div className="px-6 py-3 border-t border-gray-100 bg-gray-50/50">
         <div className="flex items-center justify-between text-xs text-gray-500">
-          <span>Total : {codes.length} code(s) promo</span>
+          <span>Total: {codes.length} promo code(s)</span>
           <span>
-            Actifs : {codes.filter((c) => c.activated).length} | Désactivés : {codes.filter((c) => !c.activated).length}
+            Active: {codes.filter((c) => c.activated).length} | Disabled: {codes.filter((c) => !c.activated).length}
           </span>
         </div>
       </div>

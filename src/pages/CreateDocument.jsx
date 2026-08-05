@@ -99,19 +99,19 @@ export default function CreateDocument() {
         activated: document.activated !== undefined ? document.activated : true,
       });
     } catch (error) {
-      console.error("Erreur lors du chargement du document:", error);
+      console.error("Error loading document:", error);
       Swal.fire({
         icon: 'error',
-        title: 'Erreur',
-        text: 'Erreur lors du chargement du document'
+        title: 'Error',
+        text: 'Error loading the document'
       });
     }
   };
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.nom_document.trim()) newErrors.nom_document = "Le nom du document est requis";
-    if (!formData.id_public.trim()) newErrors.id_public = "L'ID public est requis";
+    if (!formData.nom_document.trim()) newErrors.nom_document = "The document name is required";
+    if (!formData.id_public.trim()) newErrors.id_public = "The public ID is required";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -119,7 +119,7 @@ export default function CreateDocument() {
   const handleFileChange = (file) => {
     if (!file) return;
     if (file.size > 10 * 1024 * 1024) {
-      Swal.fire({ icon: 'warning', title: 'Fichier trop lourd', text: 'Max 10MB.' });
+      Swal.fire({ icon: 'warning', title: 'File too large', text: 'Max 10MB.' });
       return;
     }
     setFormData(prev => ({ ...prev, fileName: file.name, fileType: getFileTypeFromName(file.name) }));
@@ -129,7 +129,7 @@ export default function CreateDocument() {
         const url = `${import.meta.env.VITE_API_URL}/public/fichiers/${fichier.id}`;
         setFormData(prev => ({ ...prev, fichier_id: fichier.id, fichierUrl: url }));
       })
-      .catch(() => Swal.fire({ icon: 'error', title: 'Erreur', text: "Impossible d'uploader le fichier." }))
+      .catch(() => Swal.fire({ icon: 'error', title: 'Error', text: "Unable to upload the file." }))
       .finally(() => setFileUploading(false));
   };
 
@@ -174,8 +174,8 @@ export default function CreateDocument() {
           await documentService.update(id, documentData);
           Swal.fire({
             icon: 'success',
-            title: 'Succès',
-            text: 'Document mis à jour avec succès',
+            title: 'Success',
+            text: 'Document updated successfully',
             timer: 1500,
             showConfirmButton: false
           });
@@ -183,8 +183,8 @@ export default function CreateDocument() {
           await documentService.create(documentData);
           Swal.fire({
             icon: 'success',
-            title: 'Succès',
-            text: 'Document créé avec succès',
+            title: 'Success',
+            text: 'Document created successfully',
             timer: 1500,
             showConfirmButton: false
           });
@@ -192,11 +192,11 @@ export default function CreateDocument() {
 
         navigate("/documents");
       } catch (error) {
-        console.error("Erreur lors de la sauvegarde:", error);
+        console.error("Error saving:", error);
         Swal.fire({
           icon: 'error',
-          title: 'Erreur',
-          text: 'Erreur lors de la sauvegarde du document'
+          title: 'Error',
+          text: 'Error saving the document'
         });
       } finally {
         setIsLoading(false);
@@ -211,12 +211,12 @@ export default function CreateDocument() {
           <button
             onClick={() => navigate("/documents")}
             className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-            title="Retour"
+            title="Back"
           >
             <Icon d={ICONS.arrowLeft} size={20} className="text-gray-600" />
           </button>
           <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
-            {isEditing ? "Modifier un document" : "Nouveau document"}
+            {isEditing ? "Edit document" : "New document"}
           </h1>
         </div>
         <div className="flex items-center gap-3">
@@ -224,7 +224,7 @@ export default function CreateDocument() {
             onClick={() => navigate("/documents")}
             className="px-4 py-2 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
           >
-            Annuler
+            Cancel
           </button>
           <button
             onClick={handleSubmit}
@@ -232,7 +232,7 @@ export default function CreateDocument() {
             className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#1a7a3c] text-white text-sm font-semibold hover:bg-[#155f2f] transition-colors shadow-sm disabled:opacity-50"
           >
             <Icon d={ICONS.save} size={15} />
-            {isLoading ? "En cours..." : (isEditing ? "Mettre à jour" : "Téléverser")}
+            {isLoading ? "In progress..." : (isEditing ? "Update" : "Upload")}
           </button>
         </div>
       </div>
@@ -242,10 +242,10 @@ export default function CreateDocument() {
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
             <div className="p-8 space-y-8">
               
-              {/* Upload de fichier */}
+              {/* File upload */}
               <div>
                 <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">
-                  Fichier {!isEditing && <span className="text-red-500">*</span>}
+                  File {!isEditing && <span className="text-red-500">*</span>}
                 </h2>
                 <div
                   onDrop={handleDrop}
@@ -265,23 +265,23 @@ export default function CreateDocument() {
                   />
                   <Icon d={ICONS.upload} size={40} className="mx-auto text-gray-400 mb-3" />
                   <p className="text-gray-600 mb-1">
-                    {formData.fichier_id ? "Fichier associé" : "Cliquez pour sélectionner un fichier"}
+                    {formData.fichier_id ? "File attached" : "Click to select a file"}
                   </p>
                   <p className="text-xs text-gray-400">
-                    ou glissez-déposez (max 10MB)
+                    or drag and drop (max 10MB)
                   </p>
                   {formData.fileName && (
                     <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 bg-green-50 text-green-700 rounded-lg text-sm">
                       <Icon d={ICONS.check} size={14} />
-                      <span>Fichier sélectionné : {formData.fileName}</span>
+                      <span>Selected file: {formData.fileName}</span>
                     </div>
                   )}
                   {fileUploading && (
-                    <p className="text-xs text-[#1a7a3c] mt-2">Upload en cours…</p>
+                    <p className="text-xs text-[#1a7a3c] mt-2">Uploading…</p>
                   )}
                   {formData.fichierUrl && !fileUploading && (
                     <div className="mt-2 px-3 py-2 bg-blue-50 rounded-lg text-left">
-                      <p className="text-xs text-gray-500 mb-0.5">URL backend :</p>
+                      <p className="text-xs text-gray-500 mb-0.5">Backend URL:</p>
                       <a href={formData.fichierUrl} target="_blank" rel="noopener noreferrer"
                          className="text-xs text-blue-600 underline break-all font-mono">
                         {formData.fichierUrl}
@@ -292,10 +292,10 @@ export default function CreateDocument() {
                 {errors.fichier_id && <p className="text-xs text-red-500 mt-1">{errors.fichier_id}</p>}
               </div>
 
-              {/* Informations générales */}
+              {/* General information */}
               <div>
                 <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">
-                  Informations du document
+                  Document information
                 </h2>
                 <div className="grid grid-cols-2 gap-6">
                   {/* ID Public */}
@@ -321,16 +321,16 @@ export default function CreateDocument() {
                         onClick={regeneratePublicId}
                         className="px-3 py-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors text-sm"
                       >
-                        Générer
+                        Generate
                       </button>
                     </div>
                     {errors.id_public && <p className="text-xs text-red-500">{errors.id_public}</p>}
                   </div>
 
-                  {/* Nom du document */}
+                  {/* Document name */}
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Nom du document <span className="text-red-500">*</span>
+                      Document name <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
                       <Icon d={ICONS.file} size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -338,7 +338,7 @@ export default function CreateDocument() {
                         type="text"
                         value={formData.nom_document}
                         onChange={(e) => setFormData({...formData, nom_document: e.target.value})}
-                        placeholder="Ex: Programme officiel, Certificat..."
+                        placeholder="E.g.: Official program, Certificate..."
                         className={`w-full pl-10 pr-3 py-2.5 rounded-lg border ${
                           errors.nom_document ? 'border-red-400' : 'border-gray-200'
                         } text-sm text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30 focus:border-[#1a7a3c] transition`}
@@ -347,10 +347,10 @@ export default function CreateDocument() {
                     {errors.nom_document && <p className="text-xs text-red-500">{errors.nom_document}</p>}
                   </div>
 
-                  {/* Lien */}
+                  {/* Link */}
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Lien
+                      Link
                     </label>
                     <div className="relative">
                       <Icon d={ICONS.file} size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -364,18 +364,18 @@ export default function CreateDocument() {
                     </div>
                   </div>
 
-                  {/* Statut */}
+                  {/* Status */}
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Statut
+                      Status
                     </label>
                     <select
                       value={formData.statut}
                       onChange={(e) => setFormData({...formData, statut: e.target.value})}
                       className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30 focus:border-[#1a7a3c] transition"
                     >
-                      <option value="active">Actif</option>
-                      <option value="archived">Archivé</option>
+                      <option value="active">Active</option>
+                      <option value="archived">Archived</option>
                     </select>
                   </div>
 
@@ -390,7 +390,7 @@ export default function CreateDocument() {
                         value={formData.description}
                         onChange={(e) => setFormData({...formData, description: e.target.value})}
                         rows={4}
-                        placeholder="Description du document..."
+                        placeholder="Document description..."
                         className="w-full pl-10 pr-3 py-2.5 rounded-lg border border-gray-200 text-sm text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30 focus:border-[#1a7a3c] transition resize-none"
                       />
                     </div>
@@ -411,7 +411,7 @@ export default function CreateDocument() {
                       onChange={() => setFormData({...formData, activated: true})}
                       className="w-4 h-4 text-[#1a7a3c] focus:ring-[#1a7a3c]"
                     />
-                    <span className="text-sm text-gray-700">Activer immédiatement</span>
+                    <span className="text-sm text-gray-700">Activate immediately</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
@@ -420,7 +420,7 @@ export default function CreateDocument() {
                       onChange={() => setFormData({...formData, activated: false})}
                       className="w-4 h-4 text-gray-400 focus:ring-gray-400"
                     />
-                    <span className="text-sm text-gray-700">Désactivé</span>
+                    <span className="text-sm text-gray-700">Disabled</span>
                   </label>
                 </div>
               </div>

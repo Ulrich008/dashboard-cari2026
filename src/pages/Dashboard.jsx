@@ -64,7 +64,7 @@ export default function Dashboard() {
     try {
       setLoading(true);
       
-      // Charger les données depuis l'API
+      // Load data from the API
       const [pages, programs, speakers, sponsors, documents, users] = await Promise.all([
         pageService.getAll().catch(() => []),
         programService.getAll().catch(() => []),
@@ -83,7 +83,7 @@ export default function Dashboard() {
         users: Array.isArray(users) ? users.filter(u => u.statut_compte === 'ACTIF').length : 0,
       });
 
-      // Programmes à venir (triés par date)
+      // Upcoming programs (sorted by date)
       const today = new Date().toISOString().split('T')[0];
       const upcoming = Array.isArray(programs) 
         ? programs
@@ -93,7 +93,7 @@ export default function Dashboard() {
         : [];
       setUpcomingPrograms(upcoming);
 
-      // Documents récents
+      // Recent documents
       const recent = Array.isArray(documents)
         ? documents
           .sort((a, b) => new Date(b.created_at || b.createdAt) - new Date(a.created_at || a.createdAt))
@@ -101,11 +101,11 @@ export default function Dashboard() {
         : [];
       setRecentDocuments(recent);
 
-      // Activités récentes (simulées)
+      // Recent activities (simulated)
       setRecentActivities([]);
 
     } catch (error) {
-      console.error("Erreur lors du chargement du dashboard:", error);
+      console.error("Error loading dashboard:", error);
     } finally {
       setLoading(false);
     }
@@ -121,9 +121,9 @@ export default function Dashboard() {
       textColor: "text-blue-600",
       path: "/pages"
     },
-    { 
-      title: "Programmes", 
-      value: stats.programs, 
+    {
+      title: "Programs",
+      value: stats.programs,
       icon: "program", 
       color: "bg-green-500", 
       bgColor: "bg-green-100", 
@@ -157,9 +157,9 @@ export default function Dashboard() {
       textColor: "text-red-600",
       path: "/documents"
     },
-    { 
-      title: "Utilisateurs actifs", 
-      value: stats.users, 
+    {
+      title: "Active users",
+      value: stats.users,
       icon: "users", 
       color: "bg-indigo-500", 
       bgColor: "bg-indigo-100", 
@@ -173,7 +173,7 @@ export default function Dashboard() {
       <div className="flex-1 flex items-center justify-center min-h-screen bg-[#f5f6f8]">
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-[#1a7a3c] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-500">Chargement du tableau de bord...</p>
+          <p className="text-gray-500">Loading dashboard...</p>
         </div>
       </div>
     );
@@ -184,10 +184,10 @@ export default function Dashboard() {
       {/* En-tête */}
       <div className="px-8 pt-8 pb-6">
         <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
-          Tableau de bord
+          Dashboard
         </h1>
         <p className="text-sm text-gray-500 mt-1">
-          Bienvenue sur votre espace d'administration CARI 2026
+          Welcome to your CARI 2026 administration space
         </p>
       </div>
 
@@ -222,19 +222,19 @@ export default function Dashboard() {
             <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Icon d={ICONS.calendar} size={18} className="text-[#1a7a3c]" />
-                <h2 className="font-semibold text-gray-900">Programmes à venir</h2>
+                <h2 className="font-semibold text-gray-900">Upcoming programs</h2>
               </div>
-              <button 
+              <button
                 onClick={() => navigate("/program")}
                 className="text-xs text-[#1a7a3c] hover:underline font-medium"
               >
-                Voir tout
+                View all
               </button>
             </div>
             <div className="divide-y divide-gray-100">
               {upcomingPrograms.length === 0 ? (
                 <div className="px-6 py-8 text-center text-gray-400">
-                  Aucun programme à venir
+                  No upcoming programs
                 </div>
               ) : (
                 upcomingPrograms.map((program, idx) => (
@@ -267,19 +267,19 @@ export default function Dashboard() {
             <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Icon d={ICONS.doc} size={18} className="text-[#1a7a3c]" />
-                <h2 className="font-semibold text-gray-900">Documents récents</h2>
+                <h2 className="font-semibold text-gray-900">Recent documents</h2>
               </div>
-              <button 
+              <button
                 onClick={() => navigate("/documents")}
                 className="text-xs text-[#1a7a3c] hover:underline font-medium"
               >
-                Voir tout
+                View all
               </button>
             </div>
             <div className="divide-y divide-gray-100">
               {recentDocuments.length === 0 ? (
                 <div className="px-6 py-8 text-center text-gray-400">
-                  Aucun document disponible
+                  No documents available
                 </div>
               ) : (
                 recentDocuments.map((doc, idx) => (
@@ -298,7 +298,7 @@ export default function Dashboard() {
                       </div>
                       <div className="flex items-center gap-2">
                         <span className={`text-xs font-medium ${doc.activated !== undefined ? (doc.activated ? "text-green-600" : "text-gray-400") : (doc.online ? "text-green-600" : "text-gray-400")}`}>
-                          {doc.activated !== undefined ? (doc.activated ? "Actif" : "Inactif") : (doc.online ? "Actif" : "Inactif")}
+                          {doc.activated !== undefined ? (doc.activated ? "Active" : "Inactive") : (doc.online ? "Active" : "Inactive")}
                         </span>
                         <Icon d={ICONS.download} size={14} className="text-gray-400" />
                       </div>
@@ -314,7 +314,7 @@ export default function Dashboard() {
             <div className="px-6 py-4 border-b border-gray-100">
               <div className="flex items-center gap-2">
                 <Icon d={ICONS.clock} size={18} className="text-[#1a7a3c]" />
-                <h2 className="font-semibold text-gray-900">Activités récentes</h2>
+                <h2 className="font-semibold text-gray-900">Recent activities</h2>
               </div>
             </div>
             <div className="overflow-x-auto">
@@ -323,8 +323,8 @@ export default function Dashboard() {
                   <tr className="border-b border-gray-100 bg-gray-50/50">
                     <th className="text-left px-6 py-3 text-gray-500 font-medium">Type</th>
                     <th className="text-left px-4 py-3 text-gray-500 font-medium">Action</th>
-                    <th className="text-left px-4 py-3 text-gray-500 font-medium">Élément</th>
-                    <th className="text-left px-4 py-3 text-gray-500 font-medium">Utilisateur</th>
+                    <th className="text-left px-4 py-3 text-gray-500 font-medium">Item</th>
+                    <th className="text-left px-4 py-3 text-gray-500 font-medium">User</th>
                     <th className="text-left px-4 py-3 text-gray-500 font-medium">Date</th>
                   </tr>
                 </thead>
@@ -346,7 +346,7 @@ export default function Dashboard() {
                       <td className="px-4 py-3 font-medium text-gray-800">{activity.item}</td>
                       <td className="px-4 py-3 text-gray-600">{activity.user}</td>
                       <td className="px-4 py-3 text-gray-500 text-xs">
-                        {activity.date} à {activity.time}
+                        {activity.date} at {activity.time}
                       </td>
                     </tr>
                   ))}
@@ -355,7 +355,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Stats rapides */}
+          {/* Quick stats */}
           
         </div>
       </div>

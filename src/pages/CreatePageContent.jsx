@@ -73,13 +73,13 @@ function InsertSection({ title, count, children }) {
 }
 
 /* Generic insert widget: select + button (used for Programme) */
-function InsertWidget({ items, labelKey, onInsert, placeholder = "Choisir…" }) {
+function InsertWidget({ items, labelKey, onInsert, placeholder = "Choose…" }) {
   const [selected, setSelected] = useState("");
   const safeItems = Array.isArray(items) ? items : [];
 
   if (safeItems.length === 0) {
     return (
-      <p className="text-xs text-gray-400 italic text-center py-1">Aucun élément disponible</p>
+      <p className="text-xs text-gray-400 italic text-center py-1">No items available</p>
     );
   }
 
@@ -104,7 +104,7 @@ function InsertWidget({ items, labelKey, onInsert, placeholder = "Choisir…" })
         disabled={!selected}
         className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#1a7a3c] text-white text-xs font-semibold hover:bg-[#155f2f] transition-colors disabled:opacity-40">
         <Icon d={ICONS.insert} size={12} />
-        Insérer
+        Insert
       </button>
     </div>
   );
@@ -210,7 +210,7 @@ function BlockInsertWidget({ items, labelKey, blockType, onInsert, typeFilters, 
   };
 
   if (safeItems.length === 0) {
-    return <p className="text-xs text-gray-400 italic text-center py-1">Aucun élément disponible</p>;
+    return <p className="text-xs text-gray-400 italic text-center py-1">No items available</p>;
   }
 
   const allChecked = displayed.length > 0 && selected.size === displayed.length;
@@ -223,7 +223,7 @@ function BlockInsertWidget({ items, labelKey, blockType, onInsert, typeFilters, 
           <button
             onClick={() => { setActiveFilter(""); setSelected(new Set()); }}
             className={`px-2 py-0.5 rounded text-xs font-medium transition-colors ${!activeFilter ? 'bg-[#1a7a3c] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
-            Tous
+            All
           </button>
           {typeFilters.map(f => (
             <button key={f.value}
@@ -239,7 +239,7 @@ function BlockInsertWidget({ items, labelKey, blockType, onInsert, typeFilters, 
         <label className="flex items-center gap-1.5 cursor-pointer">
           <input type="checkbox" checked={allChecked} onChange={toggleAll}
             className="accent-[#1a7a3c] w-3 h-3" />
-          <span className="text-xs text-gray-500">Tout sélectionner</span>
+          <span className="text-xs text-gray-500">Select all</span>
         </label>
         <span className="text-xs text-gray-400">{selected.size}/{displayed.length}</span>
       </div>
@@ -273,7 +273,7 @@ function BlockInsertWidget({ items, labelKey, blockType, onInsert, typeFilters, 
                     /public/fichiers/{fichierId}
                   </a>
                 ) : fichierIdKey ? (
-                  <span className="text-[10px] text-gray-300 italic leading-tight">Aucun fichier</span>
+                  <span className="text-[10px] text-gray-300 italic leading-tight">No file</span>
                 ) : null}
                 {/* 3 — URL du lien ou du mail associé */}
                 {href && (
@@ -293,7 +293,7 @@ function BlockInsertWidget({ items, labelKey, blockType, onInsert, typeFilters, 
         onClick={handleInsert}
         className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#1a7a3c] text-white text-xs font-semibold hover:bg-[#155f2f] transition-colors">
         <Icon d={ICONS.insert} size={12} />
-        {selected.size > 0 ? `Insérer (${selected.size})` : 'Insérer tous'}
+        {selected.size > 0 ? `Insert (${selected.size})` : 'Insert all'}
       </button>
     </div>
   );
@@ -332,7 +332,7 @@ const _pFileUrl = (id) => id ? `${_PREVIEW_BASE}/public/fichiers/${id}` : null;
 const _FILE_DOWN = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:middle;"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M12 18v-6"/><path d="m9 15 3 3 3-3"/></svg>`;
 
 const _renderSponsors = (items) => {
-  if (!items.length) return '<p style="color:#6b7280;font-style:italic;">Aucun sponsor disponible.</p>';
+  if (!items.length) return '<p style="color:#6b7280;font-style:italic;">No sponsors available.</p>';
   const cards = items.map(s => {
     const logo = _pFileUrl(s.logo_fichier_id);
     return `<div style="display:flex;flex-direction:column;align-items:center;gap:0.75rem;padding:1.25rem;background:#f9fafb;border:1px solid #e5e7eb;border-radius:0.75rem;text-align:center;">
@@ -345,7 +345,7 @@ const _renderSponsors = (items) => {
 };
 
 const _renderSpeakers = (items) => {
-  if (!items.length) return '<p style="color:#6b7280;font-style:italic;">Aucun intervenant disponible.</p>';
+  if (!items.length) return '<p style="color:#6b7280;font-style:italic;">No speakers available.</p>';
   const cards = items.map(s => {
     const photo = _pFileUrl(s.photo_fichier_id);
     return `<div style="display:flex;flex-direction:column;align-items:center;gap:0.75rem;padding:1.25rem;background:#f9fafb;border:1px solid #e5e7eb;border-radius:0.75rem;text-align:center;">
@@ -358,7 +358,7 @@ const _renderSpeakers = (items) => {
         ${s.bio        ? `<p style="color:#374151;font-size:0.78rem;margin:0 0 0.5rem;font-style:italic;line-height:1.4;">${s.bio}</p>` : ''}
         ${s.email      ? `<p style="margin:0 0 0.2rem;"><a href="mailto:${s.email}" style="color:#2563eb;font-size:0.8rem;text-decoration:none;">${s.email}</a></p>` : ''}
         ${s.telephone  ? `<p style="color:#374151;font-size:0.8rem;margin:0 0 0.2rem;">${s.telephone}</p>` : ''}
-        ${s.website    ? `<p style="margin:0;"><a href="${s.website}" target="_blank" rel="noopener noreferrer" style="color:#16a34a;font-size:0.8rem;">Site web</a></p>` : ''}
+        ${s.website    ? `<p style="margin:0;"><a href="${s.website}" target="_blank" rel="noopener noreferrer" style="color:#16a34a;font-size:0.8rem;">Website</a></p>` : ''}
       </div>
     </div>`;
   }).join('');
@@ -366,7 +366,7 @@ const _renderSpeakers = (items) => {
 };
 
 const _renderDocuments = (items) => {
-  if (!items.length) return '<p style="color:#6b7280;font-style:italic;">Aucun document disponible.</p>';
+  if (!items.length) return '<p style="color:#6b7280;font-style:italic;">No documents available.</p>';
   const IMAGE_EXT = ['jpg','jpeg','png','gif','svg','webp','bmp'];
   const rows = items.map(d => {
     const href = _pFileUrl(d.fichier_id) || d.lien || '#';
@@ -395,7 +395,7 @@ const resolvePreviewBlocks = async (container) => {
     const type   = block.getAttribute('data-cari-block');
     const ids    = (block.getAttribute('data-ids') ?? '').split(',').map(Number).filter(Boolean);
     const filter = block.getAttribute('data-filter');
-    block.innerHTML = '<p style="color:#9ca3af;font-style:italic;font-size:0.8rem;padding:0.5rem 0;">Chargement…</p>';
+    block.innerHTML = '<p style="color:#9ca3af;font-style:italic;font-size:0.8rem;padding:0.5rem 0;">Loading…</p>';
     try {
       if (type === 'sponsors') {
         const res = await api.get('/public/sponsors');
@@ -413,7 +413,7 @@ const resolvePreviewBlocks = async (container) => {
         block.innerHTML = _renderDocuments(ids.length ? all.filter(d => ids.includes(d.id)) : all);
       }
     } catch (_) {
-      block.innerHTML = '<p style="color:#ef4444;font-size:0.8rem;padding:0.5rem 0;">Erreur de chargement</p>';
+      block.innerHTML = '<p style="color:#ef4444;font-size:0.8rem;padding:0.5rem 0;">Loading error</p>';
     }
   }
 };
@@ -484,7 +484,7 @@ export default function CreatePageContent() {
             menu_ordre:     mi?.ordre     ?? 0,
           });
         })
-        .catch(() => Swal.fire({ icon: 'error', title: 'Erreur', text: 'Impossible de charger la page.' }));
+        .catch(() => Swal.fire({ icon: 'error', title: 'Error', text: 'Unable to load the page.' }));
     }
   }, [id, isEditing]);
 
@@ -492,7 +492,7 @@ export default function CreatePageContent() {
   useEffect(() => {
     if (tab !== 'preview' || !previewRef.current) return;
     previewRef.current.innerHTML = formData.contenu_html
-      || "<p style='color:#9ca3af;font-style:italic'>Aucun contenu à afficher.</p>";
+      || "<p style='color:#9ca3af;font-style:italic'>No content to display.</p>";
     resolvePreviewBlocks(previewRef.current);
   }, [tab, formData.contenu_html]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -523,7 +523,7 @@ export default function CreatePageContent() {
 
   const handleSave = async () => {
     if (!formData.titre.trim() || !formData.contenu_html.trim()) {
-      Swal.fire({ icon: 'warning', title: 'Attention', text: 'Le titre et le contenu sont requis.' });
+      Swal.fire({ icon: 'warning', title: 'Warning', text: 'Title and content are required.' });
       return;
     }
     setIsLoading(true);
@@ -544,14 +544,14 @@ export default function CreatePageContent() {
     try {
       if (isEditing) {
         await pageService.update(id, payload);
-        Swal.fire({ icon: 'success', title: 'Page mise à jour', timer: 1500, showConfirmButton: false });
+        Swal.fire({ icon: 'success', title: 'Page updated', timer: 1500, showConfirmButton: false });
       } else {
         await pageService.create(payload);
-        Swal.fire({ icon: 'success', title: 'Page créée', timer: 1500, showConfirmButton: false });
+        Swal.fire({ icon: 'success', title: 'Page created', timer: 1500, showConfirmButton: false });
       }
       navigate("/pages");
     } catch {
-      Swal.fire({ icon: 'error', title: 'Erreur', text: 'Erreur lors de la sauvegarde.' });
+      Swal.fire({ icon: 'error', title: 'Error', text: 'Error while saving.' });
     } finally {
       setIsLoading(false);
     }
@@ -568,17 +568,17 @@ export default function CreatePageContent() {
       {/* Top bar */}
       <div className="flex items-center justify-between px-6 pt-6 pb-4">
         <h1 className="text-xl font-bold text-gray-900 tracking-tight">
-          {isEditing ? "Modifier une page" : "Créer une page"}
+          {isEditing ? "Edit page" : "Create page"}
         </h1>
         <div className="flex items-center gap-3">
           <button onClick={() => navigate("/pages")}
             className="px-4 py-2 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">
-            Annuler
+            Cancel
           </button>
           <button onClick={handleSave} disabled={isLoading}
             className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#1a7a3c] text-white text-sm font-semibold hover:bg-[#155f2f] transition-colors shadow-sm disabled:opacity-50">
             <Icon d={ICONS.save} size={15} />
-            {isLoading ? "En cours..." : (isEditing ? "Mettre à jour" : "Enregistrer")}
+            {isLoading ? "Saving..." : (isEditing ? "Update" : "Save")}
           </button>
         </div>
       </div>
@@ -589,13 +589,13 @@ export default function CreatePageContent() {
         {/* ── Colonne 1 : Informations de la page ── */}
         <div className="w-[260px] shrink-0 bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col gap-4 self-start overflow-y-auto max-h-[calc(100vh-120px)]">
 
-          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Informations</p>
+          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Information</p>
 
           {/* Titre */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-gray-700">Titre <span className="text-[#1a7a3c]">*</span></label>
+            <label className="text-xs font-semibold text-gray-700">Title <span className="text-[#1a7a3c]">*</span></label>
             <input type="text" value={formData.titre} onChange={e => handleTitleChange(e.target.value)}
-              placeholder="Ex: Call for Papers" className={inputClass} />
+              placeholder="e.g. Call for Papers" className={inputClass} />
           </div>
 
           {/* Slug */}
@@ -603,8 +603,8 @@ export default function CreatePageContent() {
             <label className="text-xs font-semibold text-gray-700">Slug</label>
             <input type="text" value={formData.slug}
               onChange={e => setFormData({ ...formData, slug: e.target.value })}
-              placeholder="ex: calls-papers" className={`${inputClass} font-mono text-xs`} />
-            <p className="text-xs text-gray-400">auto-généré depuis le titre</p>
+              placeholder="e.g. calls-papers" className={`${inputClass} font-mono text-xs`} />
+            <p className="text-xs text-gray-400">auto-generated from the title</p>
           </div>
 
           {/* Description */}
@@ -612,17 +612,17 @@ export default function CreatePageContent() {
             <label className="text-xs font-semibold text-gray-700">Description</label>
             <textarea value={formData.description}
               onChange={e => setFormData({ ...formData, description: e.target.value })}
-              placeholder="Description courte de la page…" rows={3}
+              placeholder="Short description of the page…" rows={3}
               className={`${inputClass} resize-none`} />
           </div>
 
           {/* URL Frontend */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-gray-700">URL sur le site</label>
+            <label className="text-xs font-semibold text-gray-700">URL on the site</label>
             <input type="text" value={formData.url_frontend}
               onChange={e => setFormData({ ...formData, url_frontend: e.target.value })}
-              placeholder="Ex: /calls/papers" className={inputClass} />
-            <p className="text-xs text-gray-400">lien d'accès depuis le site public</p>
+              placeholder="e.g. /calls/papers" className={inputClass} />
+            <p className="text-xs text-gray-400">access link from the public site</p>
           </div>
 
           <div className="border-t border-gray-100" />
@@ -630,11 +630,11 @@ export default function CreatePageContent() {
 
           {/* Menu parent */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-gray-700">Placer dans le menu</label>
+            <label className="text-xs font-semibold text-gray-700">Place in menu</label>
             <select value={formData.menu_parent_id}
               onChange={e => handleMenuParentChange(e.target.value)}
               className={inputClass}>
-              <option value="">— Aucun menu —</option>
+              <option value="">— No menu —</option>
               {rootMenus.map(m => <option key={m.id} value={m.id}>{m.label}</option>)}
             </select>
           </div>
@@ -642,29 +642,29 @@ export default function CreatePageContent() {
           {/* Sous-menu (conditionnel) */}
           {formData.menu_parent_id && subMenus.length > 0 && (
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-gray-700">Sous-menu</label>
+              <label className="text-xs font-semibold text-gray-700">Submenu</label>
               <select value={formData.menu_sub_id}
                 onChange={e => handleSubMenuChange(e.target.value)}
                 className={inputClass}>
-                <option value="">— Aucun sous-menu —</option>
+                <option value="">— No submenu —</option>
                 {subMenus.map(m => <option key={m.id} value={m.id}>{m.label}</option>)}
               </select>
-              <p className="text-xs text-gray-400">remplit le slug si disponible</p>
+              <p className="text-xs text-gray-400">fills the slug if available</p>
             </div>
           )}
 
           {/* Nom dans le menu */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-gray-700">Nom dans le menu</label>
+            <label className="text-xs font-semibold text-gray-700">Menu name</label>
             <input type="text" value={formData.menu_label}
               onChange={e => setFormData({ ...formData, menu_label: e.target.value })}
-              placeholder="Ex: Call for Papers" className={inputClass} />
-            <p className="text-xs text-gray-400">texte affiché dans la navigation</p>
+              placeholder="e.g. Call for Papers" className={inputClass} />
+            <p className="text-xs text-gray-400">text shown in the navigation</p>
           </div>
 
           {/* Ordre dans le menu */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-gray-700">Ordre</label>
+            <label className="text-xs font-semibold text-gray-700">Order</label>
             <input type="number" min={0} value={formData.menu_ordre}
               onChange={e => setFormData({ ...formData, menu_ordre: e.target.value })}
               className={inputClass} />
@@ -675,23 +675,23 @@ export default function CreatePageContent() {
 
           {/* Statut */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-gray-700">Statut</label>
+            <label className="text-xs font-semibold text-gray-700">Status</label>
             <select value={formData.statut}
               onChange={e => setFormData({ ...formData, statut: e.target.value })}
               className={inputClass}>
-              <option value="draft">Brouillon</option>
-              <option value="published">Publié</option>
-              <option value="archived">Archivé</option>
+              <option value="draft">Draft</option>
+              <option value="published">Published</option>
+              <option value="archived">Archived</option>
             </select>
           </div>
 
           {/* Activated */}
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-gray-700">Activé</span>
+            <span className="text-xs font-semibold text-gray-700">Activated</span>
             <div className="flex flex-col items-end gap-1">
               <Toggle checked={formData.activated} onChange={v => setFormData({ ...formData, activated: v })} />
               <span className={`text-xs font-medium ${formData.activated ? "text-[#1a7a3c]" : "text-gray-400"}`}>
-                {formData.activated ? "Actif" : "Inactif"}
+                {formData.activated ? "Active" : "Inactive"}
               </span>
             </div>
           </div>
@@ -705,12 +705,12 @@ export default function CreatePageContent() {
               <button onClick={() => setTab("editor")}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
                   tab === "editor" ? "bg-gray-100 text-gray-800 shadow-sm" : "text-gray-400 hover:text-gray-600"}`}>
-                <Icon d={ICONS.edit} size={13} />Éditeur HTML
+                <Icon d={ICONS.edit} size={13} />HTML Editor
               </button>
               <button onClick={() => setTab("preview")}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
                   tab === "preview" ? "bg-gray-100 text-gray-800 shadow-sm" : "text-gray-400 hover:text-gray-600"}`}>
-                <Icon d={ICONS.eye} size={13} />Aperçu
+                <Icon d={ICONS.eye} size={13} />Preview
               </button>
             </div>
           </div>
@@ -721,7 +721,7 @@ export default function CreatePageContent() {
               <textarea ref={textareaRef}
                 value={formData.contenu_html}
                 onChange={e => setFormData({ ...formData, contenu_html: e.target.value })}
-                placeholder="<!-- Écrivez votre contenu HTML ici -->"
+                placeholder="<!-- Write your HTML content here -->"
                 spellCheck={false}
                 className="flex-1 w-full p-5 text-sm font-mono text-gray-700 placeholder-gray-300 resize-none focus:outline-none bg-transparent leading-relaxed"
                 style={{ minHeight: "420px" }}
@@ -734,14 +734,14 @@ export default function CreatePageContent() {
 
           <div className="px-5 py-2.5 border-t border-gray-100 bg-gray-50/60">
             <p className="text-xs text-gray-400 text-center">
-              HTML + CSS inline avec la palette de référence du site vitrine
+              Inline HTML + CSS using the showcase site's reference palette
             </p>
           </div>
         </div>
 
         {/* ── Colonne 3 : Insérer des éléments ── */}
         <div className="w-[240px] shrink-0 flex flex-col gap-3 self-start overflow-y-auto max-h-[calc(100vh-120px)]">
-          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Insérer</p>
+          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1">Insert</p>
 
           <InsertSection title="Speakers / Committees" count={speakers.length}>
             <BlockInsertWidget
@@ -800,7 +800,7 @@ export default function CreatePageContent() {
             <InsertWidget
               items={programs}
               labelKey="titre"
-              placeholder="Choisir une session…"
+              placeholder="Choose a session…"
               onInsert={p => insertAtCursor(textareaRef, '\n' + snippets.program(p) + '\n')}
             />
           </InsertSection>

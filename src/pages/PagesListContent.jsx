@@ -74,11 +74,11 @@ export default function PagesListContent() {
         setPagination(null);
       }
     } catch (error) {
-      console.error("Erreur lors du chargement des pages:", error);
+      console.error("Error loading pages:", error);
       Swal.fire({
         icon: 'error',
-        title: 'Erreur',
-        text: 'Erreur lors du chargement des pages'
+        title: 'Error',
+        text: 'Error loading pages'
       });
     } finally {
       setLoading(false);
@@ -98,31 +98,31 @@ export default function PagesListContent() {
       await loadPages();
       Swal.fire({
         icon: 'success',
-        title: 'Succès',
-        text: 'Statut mis à jour avec succès',
+        title: 'Success',
+        text: 'Status updated successfully',
         timer: 1500,
         showConfirmButton: false
       });
     } catch (error) {
-      console.error("Erreur lors de la mise à jour du statut:", error);
+      console.error("Error updating status:", error);
       Swal.fire({
         icon: 'error',
-        title: 'Erreur',
-        text: 'Erreur lors de la mise à jour du statut'
+        title: 'Error',
+        text: 'Error updating status'
       });
     }
   };
 
   const deletePage = async (id) => {
     const result = await Swal.fire({
-      title: 'Êtes-vous sûr ?',
-      text: "Vous ne pourrez pas récupérer cette page !",
+      title: 'Are you sure?',
+      text: "You won't be able to recover this page!",
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#d33',
       cancelButtonColor: '#3085d6',
-      confirmButtonText: 'Oui, supprimer !',
-      cancelButtonText: 'Annuler'
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel'
     });
 
     if (result.isConfirmed) {
@@ -131,17 +131,17 @@ export default function PagesListContent() {
         await loadPages();
         Swal.fire({
           icon: 'success',
-          title: 'Supprimé !',
-          text: 'La page a été supprimée.',
+          title: 'Deleted!',
+          text: 'The page has been deleted.',
           timer: 1500,
           showConfirmButton: false
         });
       } catch (error) {
-        console.error("Erreur lors de la suppression:", error);
+        console.error("Error deleting:", error);
         Swal.fire({
           icon: 'error',
-          title: 'Erreur',
-          text: 'Erreur lors de la suppression'
+          title: 'Error',
+          text: 'Error deleting'
         });
       }
     }
@@ -153,16 +153,16 @@ export default function PagesListContent() {
       html: `
         <div class="text-left" style="font-size: 14px;">
           <div style="margin-bottom: 12px;">
-            <strong style="color: #1a7a3c;">Informations générales</strong>
+            <strong style="color: #1a7a3c;">General information</strong>
             <div style="margin-top: 4px; color: #666;">
               <div><strong>Slug:</strong> ${page.slug || '-'}</div>
-              <div><strong>Contexte:</strong> ${page.contexte || page.context || '-'}</div>
-              <div><strong>Statut:</strong> ${page.statut || '-'}</div>
-              <div><strong>Activé:</strong> ${page.activated !== undefined ? (page.activated ? 'Oui' : 'Non') : (page.online ? 'Oui' : 'Non')}</div>
+              <div><strong>Context:</strong> ${page.contexte || page.context || '-'}</div>
+              <div><strong>Status:</strong> ${page.statut || '-'}</div>
+              <div><strong>Enabled:</strong> ${page.activated !== undefined ? (page.activated ? 'Yes' : 'No') : (page.online ? 'Yes' : 'No')}</div>
             </div>
           </div>
           <div style="margin-bottom: 12px;">
-            <strong style="color: #1a7a3c;">Contenu</strong>
+            <strong style="color: #1a7a3c;">Content</strong>
             <div style="margin-top: 4px; color: #666; max-height: 200px; overflow-y: auto;">
               ${page.contenu_html || page.content || '-'}
             </div>
@@ -171,7 +171,7 @@ export default function PagesListContent() {
       `,
       width: '600px',
       showConfirmButton: true,
-      confirmButtonText: 'Fermer',
+      confirmButtonText: 'Close',
       confirmButtonColor: '#1a7a3c',
     });
   };
@@ -181,7 +181,7 @@ export default function PagesListContent() {
       {/* ── Page title ── */}
       <div className="px-8 pt-8 pb-6">
         <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
-          Gestions des pages publiques
+          Public pages management
         </h1>
       </div>
 
@@ -203,7 +203,7 @@ export default function PagesListContent() {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Recherchez une page"
+              placeholder="Search for a page"
               className="w-full pl-9 pr-4 py-2 rounded-lg border border-gray-200 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30 focus:border-[#1a7a3c] transition"
             />
           </div>
@@ -219,7 +219,7 @@ export default function PagesListContent() {
             className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#1a7a3c] text-white text-sm font-semibold hover:bg-[#155f2f] transition-colors shadow-sm shrink-0"
           >
             <Icon d={ICONS.plus} size={15} />
-            Créer une page
+            Create a page
           </button>
         </div>
 
@@ -228,11 +228,11 @@ export default function PagesListContent() {
           <thead>
             <tr className="border-b border-gray-100">
               <th className="text-left px-6 py-3 text-gray-500 font-medium">ID</th>
-              <th className="text-left px-4 py-3 text-gray-500 font-medium">Titre</th>
+              <th className="text-left px-4 py-3 text-gray-500 font-medium">Title</th>
               <th className="text-left px-4 py-3 text-gray-400 font-normal italic">slug</th>
-              <th className="text-left px-4 py-3 text-gray-500 font-medium">contexte</th>
-              <th className="text-left px-4 py-3 text-gray-500 font-medium">Dernière modif.</th>
-              <th className="text-left px-4 py-3 text-gray-500 font-medium">Statut</th>
+              <th className="text-left px-4 py-3 text-gray-500 font-medium">context</th>
+              <th className="text-left px-4 py-3 text-gray-500 font-medium">Last modified</th>
+              <th className="text-left px-4 py-3 text-gray-500 font-medium">Status</th>
               <th className="text-left px-4 py-3 text-gray-500 font-medium">Action</th>
             </tr>
           </thead>
@@ -240,7 +240,7 @@ export default function PagesListContent() {
             {filtered.length === 0 ? (
               <tr>
                 <td colSpan={7} className="px-6 py-10 text-center text-gray-400">
-                  Aucune page trouvée.
+                  No pages found.
                 </td>
               </tr>
             ) : (
@@ -266,7 +266,7 @@ export default function PagesListContent() {
                       page.statut === 'draft' ? 'bg-yellow-100 text-yellow-700' :
                       'bg-gray-100 text-gray-700'
                     }`}>
-                      {page.statut === 'published' ? 'Publié' : page.statut === 'draft' ? 'Brouillon' : 'Archivé'}
+                      {page.statut === 'published' ? 'Published' : page.statut === 'draft' ? 'Draft' : 'Archived'}
                     </span>
                   </td>
                   <td className="px-4 py-4">
@@ -274,14 +274,14 @@ export default function PagesListContent() {
                       <button
                         onClick={() => viewPage(page)}
                         className="text-gray-400 hover:text-blue-500 transition-colors"
-                        title="Voir les détails"
+                        title="View details"
                       >
                         <Icon d={ICONS.eye} size={16} />
                       </button>
                       <button
                         onClick={() => navigate(`/pages/edit/${page.id}`)}
                         className="text-gray-400 hover:text-[#1a7a3c] transition-colors"
-                        title="Modifier"
+                        title="Edit"
                       >
                         <Icon d={ICONS.edit} size={16} />
                       </button>
@@ -290,7 +290,7 @@ export default function PagesListContent() {
                         className={`transition-colors ${
                           page.activated !== undefined ? (page.activated ? "text-[#1a7a3c] hover:text-red-400" : "text-gray-300 hover:text-[#1a7a3c]") : (page.online ? "text-[#1a7a3c] hover:text-red-400" : "text-gray-300 hover:text-[#1a7a3c]")
                         }`}
-                        title={page.activated !== undefined ? (page.activated ? "Désactiver" : "Activer") : (page.online ? "Mettre hors ligne" : "Mettre en ligne")}
+                        title={page.activated !== undefined ? (page.activated ? "Disable" : "Enable") : (page.online ? "Take offline" : "Publish online")}
                       >
                         <Icon d={ICONS.power} size={16} />
                       </button>
@@ -298,7 +298,7 @@ export default function PagesListContent() {
                         <button
                           onClick={() => deletePage(page.id)}
                           className="text-gray-400 hover:text-red-500 transition-colors"
-                          title="Supprimer"
+                          title="Delete"
                         >
                           <Icon d={ICONS.delete} size={16} />
                         </button>
@@ -315,12 +315,12 @@ export default function PagesListContent() {
           <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-white">
             <div className="flex items-center gap-4 flex-wrap">
               <span className="text-sm text-gray-500">
-                Affichage de <span className="font-semibold">{pagination.from || 0}</span> à{" "}
-                <span className="font-semibold">{pagination.to || 0}</span> sur{" "}
+                Showing <span className="font-semibold">{pagination.from || 0}</span> to{" "}
+                <span className="font-semibold">{pagination.to || 0}</span> of{" "}
                 <span className="font-semibold">{pagination.total || 0}</span> pages
               </span>
               <div className="flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded border border-gray-200/50">
-                <span>Afficher</span>
+                <span>Show</span>
                 <select
                   value={perPage}
                   onChange={(e) => setPerPage(Number(e.target.value))}
@@ -332,7 +332,7 @@ export default function PagesListContent() {
                   <option value={50}>50</option>
                   <option value={100}>100</option>
                 </select>
-                <span>par page</span>
+                <span>per page</span>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -341,7 +341,7 @@ export default function PagesListContent() {
                 disabled={pagination.current_page === 1}
                 className="px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                Précédent
+                Previous
               </button>
               {Array.from({ length: pagination.last_page }, (_, index) => {
                 const pageNum = index + 1;
@@ -376,7 +376,7 @@ export default function PagesListContent() {
                 disabled={pagination.current_page === pagination.last_page}
                 className="px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                Suivant
+                Next
               </button>
             </div>
           </div>

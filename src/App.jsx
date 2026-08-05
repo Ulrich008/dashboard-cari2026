@@ -19,7 +19,7 @@ import CreateUser from "./pages/CreateUser";
 import SiteInfo from "./pages/SiteInfo";
 import Participants from "./pages/Participants";
 import CreateParticipant from "./pages/CreateParticipant";
-import ImportPapiers from "./pages/ImportPapiers";
+import CreatePapier from "./pages/CreatePapier";
 import MenusPage from "./pages/MenusPage";
 import CreateMenuContent from "./pages/CreateMenuContent";
 import Finance from "./pages/Finance";
@@ -28,14 +28,14 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 
 const PATH_TO_LABEL = {
-  "/dashboard":           "Tableau de bord",
+  "/dashboard":           "Dashboard",
   "/pages":               "Pages",
   "/pages/create":        "Pages",
   "/pages/edit":          "Pages",
   "/participants":        "Participants",
   "/participants/create": "Participants",
   "/participants/edit":   "Participants",
-  "/participants/import-papiers": "Importation de papiers",
+  "/participants/papiers/edit": "Participants",
   "/program":             "Program",
   "/program/create":      "Program",
   "/program/edit":        "Program",
@@ -85,7 +85,7 @@ function Layout() {
      location.pathname.startsWith("/promo-codes") ? "Finance" :
      location.pathname.startsWith("/roles") ? "Users & Roles" :
      location.pathname.startsWith("/participants") ? "Participants" :
-     location.pathname.startsWith("/menus") ? "Menus" : "Tableau de bord");
+     location.pathname.startsWith("/menus") ? "Menus" : "Dashboard");
 
   return (
     <div className="flex min-h-screen bg-[#f5f6f8]">
@@ -148,11 +148,14 @@ function Layout() {
           <Route path="/roles/create" element={<CreateUser />} />
           <Route path="/roles/edit/:id" element={<CreateUser />} />
 
-          {/* Participants */}
+          {/* Participants (Liste / Import Papiers / Papiers Acceptés) */}
           <Route path="/participants" element={<Participants />} />
           <Route path="/participants/create" element={<CreateParticipant />} />
           <Route path="/participants/edit/:id" element={<CreateParticipant />} />
-          <Route path="/participants/import-papiers" element={<ImportPapiers />} />
+          <Route path="/participants/papiers/edit/:id" element={<CreatePapier />} />
+
+          {/* Import Papiers — liste repliée dans l'onglet "Import Papiers" de Participants */}
+          <Route path="/participants/import-papiers" element={<RedirectTo path="/participants" />} />
 
           {/* Menus de navigation */}
           <Route path="/menus" element={<MenusPage />} />

@@ -40,7 +40,7 @@ const DOCUMENT_TYPES = [
   { value: "PPT", label: "PowerPoint", color: "orange", icon: "ppt" },
   { value: "IMG", label: "Image", color: "purple", icon: "img" },
   { value: "ZIP", label: "Archive", color: "gray", icon: "zip" },
-  { value: "TXT", label: "Texte", color: "slate", icon: "txt" },
+  { value: "TXT", label: "Text", color: "slate", icon: "txt" },
 ];
 
 // Générer un ID public unique
@@ -95,11 +95,11 @@ export default function Documents() {
         setPagination(null);
       }
     } catch (error) {
-      console.error("Erreur lors du chargement des documents:", error);
+      console.error("Error loading documents:", error);
       Swal.fire({
         icon: 'error',
-        title: 'Erreur',
-        text: 'Erreur lors du chargement des documents'
+        title: 'Error',
+        text: 'Error loading documents'
       });
     } finally {
       setLoading(false);
@@ -119,31 +119,31 @@ export default function Documents() {
       await loadDocuments();
       Swal.fire({
         icon: 'success',
-        title: 'Succès',
-        text: 'Statut mis à jour avec succès',
+        title: 'Success',
+        text: 'Status updated successfully',
         timer: 1500,
         showConfirmButton: false
       });
     } catch (error) {
-      console.error("Erreur lors de la mise à jour du statut:", error);
+      console.error("Error updating status:", error);
       Swal.fire({
         icon: 'error',
-        title: 'Erreur',
-        text: 'Erreur lors de la mise à jour du statut'
+        title: 'Error',
+        text: 'Error updating status'
       });
     }
   };
 
   const deleteDocument = async (id) => {
     const result = await Swal.fire({
-      title: 'Êtes-vous sûr ?',
-      text: "Vous ne pourrez pas récupérer ce document !",
+      title: 'Are you sure?',
+      text: "You won't be able to recover this document!",
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#d33',
       cancelButtonColor: '#3085d6',
-      confirmButtonText: 'Oui, supprimer !',
-      cancelButtonText: 'Annuler'
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel'
     });
 
     if (result.isConfirmed) {
@@ -152,17 +152,17 @@ export default function Documents() {
         await loadDocuments();
         Swal.fire({
           icon: 'success',
-          title: 'Supprimé !',
-          text: 'Le document a été supprimé.',
+          title: 'Deleted!',
+          text: 'The document has been deleted.',
           timer: 1500,
           showConfirmButton: false
         });
       } catch (error) {
-        console.error("Erreur lors de la suppression:", error);
+        console.error("Error deleting:", error);
         Swal.fire({
           icon: 'error',
-          title: 'Erreur',
-          text: 'Erreur lors de la suppression'
+          title: 'Error',
+          text: 'Error deleting'
         });
       }
     }
@@ -174,11 +174,11 @@ export default function Documents() {
       html: `
         <div class="text-left" style="font-size: 14px;">
           <div style="margin-bottom: 12px;">
-            <strong style="color: #1a7a3c;">Informations générales</strong>
+            <strong style="color: #1a7a3c;">General information</strong>
             <div style="margin-top: 4px; color: #666;">
-              <div><strong>ID Public:</strong> ${document.id_public || document.publicId || '-'}</div>
-              <div><strong>Statut:</strong> ${document.statut || '-'}</div>
-              <div><strong>Activé:</strong> ${document.activated !== undefined ? (document.activated ? 'Oui' : 'Non') : (document.online ? 'Oui' : 'Non')}</div>
+              <div><strong>Public ID:</strong> ${document.id_public || document.publicId || '-'}</div>
+              <div><strong>Status:</strong> ${document.statut || '-'}</div>
+              <div><strong>Enabled:</strong> ${document.activated !== undefined ? (document.activated ? 'Yes' : 'No') : (document.online ? 'Yes' : 'No')}</div>
             </div>
           </div>
           <div style="margin-bottom: 12px;">
@@ -188,7 +188,7 @@ export default function Documents() {
             </div>
           </div>
           <div style="margin-bottom: 12px;">
-            <strong style="color: #1a7a3c;">Lien</strong>
+            <strong style="color: #1a7a3c;">Link</strong>
             <div style="margin-top: 4px; color: #666;">
               ${document.lien ? `<a href="${document.lien}" target="_blank">${document.lien}</a>` : '-'}
             </div>
@@ -197,7 +197,7 @@ export default function Documents() {
       `,
       width: '600px',
       showConfirmButton: true,
-      confirmButtonText: 'Fermer',
+      confirmButtonText: 'Close',
       confirmButtonColor: '#1a7a3c',
     });
   };
@@ -244,10 +244,10 @@ export default function Documents() {
     <div className="flex-1 flex flex-col min-h-screen bg-[#f5f6f8]">
       <div className="px-8 pt-8 pb-6">
         <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
-          Gestion des documents
+          Document management
         </h1>
         <p className="text-sm text-gray-500 mt-1">
-          Gérez les documents de la conférence (programmes, certificats, etc.)
+          Manage the conference documents (programs, certificates, etc.)
         </p>
       </div>
 
@@ -268,7 +268,7 @@ export default function Documents() {
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Rechercher par nom, ID public..."
+                placeholder="Search by name, public ID..."
                 className="w-full pl-9 pr-4 py-2 rounded-lg border border-gray-200 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30 focus:border-[#1a7a3c] transition"
               />
             </div>
@@ -287,13 +287,13 @@ export default function Documents() {
               className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#1a7a3c] text-white text-sm font-semibold hover:bg-[#155f2f] transition-colors shadow-sm shrink-0"
             >
               <Icon d={ICONS.plus} size={15} />
-              Nouveau document
+              New document
             </button>
           </div>
 
           {showFilters && (
             <div className="flex items-center gap-3 pt-2 border-t border-gray-100 flex-wrap">
-              <span className="text-xs font-medium text-gray-500">Filtrer par type :</span>
+              <span className="text-xs font-medium text-gray-500">Filter by type:</span>
               <div className="flex gap-2 flex-wrap">
                 <button
                   onClick={() => setSelectedType("")}
@@ -303,7 +303,7 @@ export default function Documents() {
                       : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                   }`}
                 >
-                  Tous
+                  All
                 </button>
                 {DOCUMENT_TYPES.map((type) => (
                   <button
@@ -328,10 +328,10 @@ export default function Documents() {
             <thead>
               <tr className="border-b border-gray-100 bg-gray-50/50">
                 <th className="text-left px-6 py-3 text-gray-500 font-medium">ID</th>
-                <th className="text-left px-4 py-3 text-gray-500 font-medium">ID Public</th>
-                <th className="text-left px-4 py-3 text-gray-500 font-medium">Nom du document</th>
-                <th className="text-left px-4 py-3 text-gray-500 font-medium">Téléch.</th>
-                <th className="text-left px-4 py-3 text-gray-500 font-medium">Statut</th>
+                <th className="text-left px-4 py-3 text-gray-500 font-medium">Public ID</th>
+                <th className="text-left px-4 py-3 text-gray-500 font-medium">Document name</th>
+                <th className="text-left px-4 py-3 text-gray-500 font-medium">Downl.</th>
+                <th className="text-left px-4 py-3 text-gray-500 font-medium">Status</th>
                 <th className="text-left px-4 py-3 text-gray-500 font-medium">Action</th>
               </tr>
             </thead>
@@ -339,7 +339,7 @@ export default function Documents() {
               {filtered.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-6 py-10 text-center text-gray-400">
-                    Aucun document trouvé.
+                    No documents found.
                   </td>
                 </tr>
               ) : (
@@ -378,7 +378,7 @@ export default function Documents() {
                         doc.statut === 'archived' ? 'bg-gray-100 text-gray-700' :
                         'bg-gray-100 text-gray-700'
                       }`}>
-                        {doc.statut === 'active' ? 'Actif' : doc.statut === 'archived' ? 'Archivé' : '-'}
+                        {doc.statut === 'active' ? 'Active' : doc.statut === 'archived' ? 'Archived' : '-'}
                       </span>
                     </td>
                     <td className="px-4 py-4">
@@ -386,14 +386,14 @@ export default function Documents() {
                         <button
                           onClick={() => viewDocument(doc)}
                           className="text-gray-400 hover:text-blue-500 transition-colors"
-                          title="Voir les détails"
+                          title="View details"
                         >
                           <Icon d={ICONS.eye} size={16} />
                         </button>
                         <button
                           onClick={() => navigate(`/documents/edit/${doc.id}`)}
                           className="text-gray-400 hover:text-[#1a7a3c] transition-colors"
-                          title="Modifier"
+                          title="Edit"
                         >
                           <Icon d={ICONS.edit} size={16} />
                         </button>
@@ -402,7 +402,7 @@ export default function Documents() {
                           className={`transition-colors ${
                             doc.activated !== undefined ? (doc.activated ? "text-green-600 hover:text-red-400" : "text-gray-300 hover:text-green-600") : (doc.online ? "text-green-600 hover:text-red-400" : "text-gray-300 hover:text-green-600")
                           }`}
-                          title={doc.activated !== undefined ? (doc.activated ? "Désactiver" : "Activer") : (doc.online ? "Désactiver" : "Activer")}
+                          title={doc.activated !== undefined ? (doc.activated ? "Disable" : "Enable") : (doc.online ? "Disable" : "Enable")}
                         >
                           <Icon d={ICONS.power} size={16} />
                         </button>
@@ -410,7 +410,7 @@ export default function Documents() {
                           <button
                             onClick={() => deleteDocument(doc.id)}
                             className="text-gray-400 hover:text-red-500 transition-colors"
-                            title="Supprimer"
+                            title="Delete"
                           >
                             <Icon d={ICONS.delete} size={16} />
                           </button>
@@ -428,12 +428,12 @@ export default function Documents() {
           <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-white">
             <div className="flex items-center gap-4 flex-wrap">
               <span className="text-sm text-gray-500">
-                Affichage de <span className="font-semibold">{pagination.from || 0}</span> à{" "}
-                <span className="font-semibold">{pagination.to || 0}</span> sur{" "}
+                Showing <span className="font-semibold">{pagination.from || 0}</span> to{" "}
+                <span className="font-semibold">{pagination.to || 0}</span> of{" "}
                 <span className="font-semibold">{pagination.total || 0}</span> documents
               </span>
               <div className="flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded border border-gray-200/50">
-                <span>Afficher</span>
+                <span>Show</span>
                 <select
                   value={perPage}
                   onChange={(e) => setPerPage(Number(e.target.value))}
@@ -445,7 +445,7 @@ export default function Documents() {
                   <option value={50}>50</option>
                   <option value={100}>100</option>
                 </select>
-                <span>par page</span>
+                <span>per page</span>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -454,7 +454,7 @@ export default function Documents() {
                 disabled={pagination.current_page === 1}
                 className="px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                Précédent
+                Previous
               </button>
               {Array.from({ length: pagination.last_page }, (_, index) => {
                 const pageNum = index + 1;
@@ -489,7 +489,7 @@ export default function Documents() {
                 disabled={pagination.current_page === pagination.last_page}
                 className="px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                Suivant
+                Next
               </button>
             </div>
           </div>
@@ -497,10 +497,10 @@ export default function Documents() {
 
         <div className="px-6 py-3 border-t border-gray-100 bg-gray-50/50">
           <div className="flex items-center justify-between text-xs text-gray-500">
-            <span>Total : {pagination ? pagination.total : filtered.length} document(s)</span>
+            <span>Total: {pagination ? pagination.total : filtered.length} document(s)</span>
             <span>
-              Actifs : {filtered.filter(d => d.activated !== undefined ? d.activated : d.online).length} | 
-              Inactifs : {filtered.filter(d => d.activated !== undefined ? !d.activated : !d.online).length}
+              Active: {filtered.filter(d => d.activated !== undefined ? d.activated : d.online).length} |
+              Inactive: {filtered.filter(d => d.activated !== undefined ? !d.activated : !d.online).length}
             </span>
           </div>
         </div>

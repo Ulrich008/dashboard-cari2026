@@ -83,11 +83,11 @@ export default function Speakers() {
         setPagination(null);
       }
     } catch (error) {
-      console.error("Erreur lors du chargement des speakers:", error);
+      console.error("Error loading speakers:", error);
       Swal.fire({
         icon: 'error',
-        title: 'Erreur',
-        text: 'Erreur lors du chargement des speakers'
+        title: 'Error',
+        text: 'Error loading speakers'
       });
     } finally {
       setLoading(false);
@@ -107,31 +107,31 @@ export default function Speakers() {
       await loadMembers();
       Swal.fire({
         icon: 'success',
-        title: 'Succès',
-        text: 'Statut mis à jour avec succès',
+        title: 'Success',
+        text: 'Status updated successfully',
         timer: 1500,
         showConfirmButton: false
       });
     } catch (error) {
-      console.error("Erreur lors de la mise à jour du statut:", error);
+      console.error("Error updating status:", error);
       Swal.fire({
         icon: 'error',
-        title: 'Erreur',
-        text: 'Erreur lors de la mise à jour du statut'
+        title: 'Error',
+        text: 'Error updating status'
       });
     }
   };
 
   const deleteMember = async (id) => {
     const result = await Swal.fire({
-      title: 'Êtes-vous sûr ?',
-      text: "Vous ne pourrez pas récupérer ce membre !",
+      title: 'Are you sure?',
+      text: "You won't be able to recover this member!",
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#d33',
       cancelButtonColor: '#3085d6',
-      confirmButtonText: 'Oui, supprimer !',
-      cancelButtonText: 'Annuler'
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel'
     });
 
     if (result.isConfirmed) {
@@ -140,17 +140,17 @@ export default function Speakers() {
         await loadMembers();
         Swal.fire({
           icon: 'success',
-          title: 'Supprimé !',
-          text: 'Le membre a été supprimé.',
+          title: 'Deleted!',
+          text: 'The member has been deleted.',
           timer: 1500,
           showConfirmButton: false
         });
       } catch (error) {
-        console.error("Erreur lors de la suppression:", error);
+        console.error("Error deleting:", error);
         Swal.fire({
           icon: 'error',
-          title: 'Erreur',
-          text: 'Erreur lors de la suppression'
+          title: 'Error',
+          text: 'Error deleting'
         });
       }
     }
@@ -171,15 +171,15 @@ export default function Speakers() {
       html: `
         <div class="text-left" style="font-size: 14px;">
           <div style="margin-bottom: 12px;">
-            <strong style="color: #1a7a3c;">Informations générales</strong>
+            <strong style="color: #1a7a3c;">General information</strong>
             <div style="margin-top: 4px; color: #666;">
               <div><strong>Type:</strong> ${member.type}</div>
               <div><strong>Email:</strong> ${member.email || '-'}</div>
-              <div><strong>Statut:</strong> ${member.activated ? 'Actif' : 'Inactif'}</div>
+              <div><strong>Status:</strong> ${member.activated ? 'Active' : 'Inactive'}</div>
             </div>
           </div>
           <div style="margin-bottom: 12px;">
-            <strong style="color: #1a7a3c;">Professionnel</strong>
+            <strong style="color: #1a7a3c;">Professional</strong>
             <div style="margin-top: 4px; color: #666;">
               <div><strong>Affiliation:</strong> ${member.affiliation || '-'}</div>
               <div><strong>Website:</strong> ${member.website ? `<a href="${member.website}" target="_blank">${member.website}</a>` : '-'}</div>
@@ -188,7 +188,7 @@ export default function Speakers() {
           <div style="margin-bottom: 12px;">
             <strong style="color: #1a7a3c;">Contact</strong>
             <div style="margin-top: 4px; color: #666;">
-              <div><strong>Téléphone:</strong> ${member.telephone || '-'}</div>
+              <div><strong>Phone:</strong> ${member.telephone || '-'}</div>
             </div>
           </div>
           <div style="margin-bottom: 12px;">
@@ -201,7 +201,7 @@ export default function Speakers() {
       `,
       width: '600px',
       showConfirmButton: true,
-      confirmButtonText: 'Fermer',
+      confirmButtonText: 'Close',
       confirmButtonColor: '#1a7a3c',
     });
   };
@@ -210,10 +210,10 @@ export default function Speakers() {
     <div className="flex-1 flex flex-col min-h-screen bg-[#f5f6f8]">
       <div className="px-8 pt-8 pb-6">
         <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
-          Gestion des Speakers / Committees
+          Speakers / Committees management
         </h1>
         <p className="text-sm text-gray-500 mt-1">
-          Gérez les intervenants et membres des comités de la conférence
+          Manage the conference speakers and committee members
         </p>
       </div>
 
@@ -234,7 +234,7 @@ export default function Speakers() {
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Rechercher par nom, affiliation ou email..."
+                placeholder="Search by name, affiliation or email..."
                 className="w-full pl-9 pr-4 py-2 rounded-lg border border-gray-200 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30 focus:border-[#1a7a3c] transition"
               />
             </div>
@@ -253,13 +253,13 @@ export default function Speakers() {
               className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#1a7a3c] text-white text-sm font-semibold hover:bg-[#155f2f] transition-colors shadow-sm shrink-0"
             >
               <Icon d={ICONS.plus} size={15} />
-              Ajouter un speaker / committee
+              Add a speaker / committee member
             </button>
           </div>
 
           {showFilters && (
             <div className="flex items-center gap-3 pt-2 border-t border-gray-100 flex-wrap">
-              <span className="text-xs font-medium text-gray-500">Filtrer par type :</span>
+              <span className="text-xs font-medium text-gray-500">Filter by type:</span>
               <div className="flex gap-2 flex-wrap">
                 <button
                   onClick={() => setSelectedType("")}
@@ -269,7 +269,7 @@ export default function Speakers() {
                       : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                   }`}
                 >
-                  Tous
+                  All
                 </button>
                 {MEMBER_TYPES.map((type) => (
                   <button
@@ -294,10 +294,10 @@ export default function Speakers() {
             <thead>
               <tr className="border-b border-gray-100 bg-gray-50/50">
                 <th className="text-left px-6 py-3 text-gray-500 font-medium">ID</th>
-                <th className="text-left px-4 py-3 text-gray-500 font-medium">Nom</th>
+                <th className="text-left px-4 py-3 text-gray-500 font-medium">Name</th>
                 <th className="text-left px-4 py-3 text-gray-500 font-medium">Affiliation</th>
                 <th className="text-left px-4 py-3 text-gray-500 font-medium">Type</th>
-                <th className="text-left px-4 py-3 text-gray-500 font-medium">Statut</th>
+                <th className="text-left px-4 py-3 text-gray-500 font-medium">Status</th>
                 <th className="text-left px-4 py-3 text-gray-500 font-medium">Action</th>
               </tr>
             </thead>
@@ -305,7 +305,7 @@ export default function Speakers() {
               {filtered.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-6 py-10 text-center text-gray-400">
-                    Aucun membre trouvé.
+                    No members found.
                   </td>
                 </tr>
               ) : (
@@ -345,7 +345,7 @@ export default function Speakers() {
                     </td>
                     <td className="px-4 py-4">
                       <span className={`font-semibold ${member.activated ? "text-green-600" : "text-gray-400"}`}>
-                        {member.activated ? "Actif" : "Inactif"}
+                        {member.activated ? "Active" : "Inactive"}
                       </span>
                     </td>
                     <td className="px-4 py-4">
@@ -353,7 +353,7 @@ export default function Speakers() {
                         <button
                           onClick={() => navigate(`/speakers/edit/${member.id}`)}
                           className="text-gray-400 hover:text-[#1a7a3c] transition-colors"
-                          title="Modifier"
+                          title="Edit"
                         >
                           <Icon d={ICONS.edit} size={16} />
                         </button>
@@ -362,7 +362,7 @@ export default function Speakers() {
                           className={`transition-colors ${
                             member.activated ? "text-green-600 hover:text-red-400" : "text-gray-300 hover:text-green-600"
                           }`}
-                          title={member.activated ? "Désactiver" : "Activer"}
+                          title={member.activated ? "Disable" : "Enable"}
                         >
                           <Icon d={ICONS.speaker} size={16} />
                         </button>
@@ -370,7 +370,7 @@ export default function Speakers() {
                           <button
                             onClick={() => deleteMember(member.id)}
                             className="text-gray-400 hover:text-red-500 transition-colors"
-                            title="Supprimer"
+                            title="Delete"
                           >
                             <Icon d={ICONS.delete} size={16} />
                           </button>
@@ -388,12 +388,12 @@ export default function Speakers() {
           <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-white">
             <div className="flex items-center gap-4 flex-wrap">
               <span className="text-sm text-gray-500">
-                Affichage de <span className="font-semibold">{pagination.from || 0}</span> à{" "}
-                <span className="font-semibold">{pagination.to || 0}</span> sur{" "}
-                <span className="font-semibold">{pagination.total || 0}</span> membres
+                Showing <span className="font-semibold">{pagination.from || 0}</span> to{" "}
+                <span className="font-semibold">{pagination.to || 0}</span> of{" "}
+                <span className="font-semibold">{pagination.total || 0}</span> members
               </span>
               <div className="flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded border border-gray-200/50">
-                <span>Afficher</span>
+                <span>Show</span>
                 <select
                   value={perPage}
                   onChange={(e) => setPerPage(Number(e.target.value))}
@@ -405,7 +405,7 @@ export default function Speakers() {
                   <option value={50}>50</option>
                   <option value={100}>100</option>
                 </select>
-                <span>par page</span>
+                <span>per page</span>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -414,7 +414,7 @@ export default function Speakers() {
                 disabled={pagination.current_page === 1}
                 className="px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                Précédent
+                Previous
               </button>
               {Array.from({ length: pagination.last_page }, (_, index) => {
                 const pageNum = index + 1;
@@ -449,7 +449,7 @@ export default function Speakers() {
                 disabled={pagination.current_page === pagination.last_page}
                 className="px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                Suivant
+                Next
               </button>
             </div>
           </div>
@@ -457,10 +457,10 @@ export default function Speakers() {
 
         <div className="px-6 py-3 border-t border-gray-100 bg-gray-50/50">
           <div className="flex items-center justify-between text-xs text-gray-500">
-            <span>Total : {pagination ? pagination.total : filtered.length} membre(s)</span>
+            <span>Total: {pagination ? pagination.total : filtered.length} member(s)</span>
             <span>
-              Actifs : {filtered.filter(m => m.activated).length} |
-              Inactifs : {filtered.filter(m => !m.activated).length}
+              Active: {filtered.filter(m => m.activated).length} |
+              Inactive: {filtered.filter(m => !m.activated).length}
             </span>
           </div>
         </div>

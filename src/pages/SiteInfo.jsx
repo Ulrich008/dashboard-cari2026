@@ -42,19 +42,19 @@ export default function SiteInfo() {
   const [logoPreview, setLogoPreview] = useState(null);
   const [faviconPreview, setFaviconPreview] = useState(null);
 
-  // Informations générales
+  // General information
   const [generalInfo, setGeneralInfo] = useState({
     siteName: "CARI 2026",
-    siteTagline: "Conférence Africaine sur la Recherche en Informatique",
-    siteDescription: "La conférence de référence en Afrique pour les technologies de l'information et la recherche en informatique",
+    siteTagline: "African Conference on Computer Science Research",
+    siteDescription: "Africa's premier conference for information technology and computer science research",
     contactEmail: "contact@cari2026.org",
     contactPhone: "+229 21 00 00 00",
-    address: "Cotonou, Bénin",
+    address: "Cotonou, Benin",
     timezone: "Africa/Porto-Novo",
     language: "fr",
   });
 
-  // Dates importantes
+  // Important dates
   const [importantDates, setImportantDates] = useState({
     conferenceStart: "2026-10-21",
     conferenceEnd: "2026-10-23",
@@ -64,7 +64,7 @@ export default function SiteInfo() {
     registrationDeadline: "2026-09-15",
   });
 
-  // Réseaux sociaux
+  // Social networks
   const [socialLinks, setSocialLinks] = useState({
     facebook: "https://facebook.com/cari2026",
     twitter: "https://twitter.com/cari2026",
@@ -75,13 +75,13 @@ export default function SiteInfo() {
 
   // SEO
   const [seoInfo, setSeoInfo] = useState({
-    metaTitle: "CARI 2026 - Conférence Africaine sur la Recherche en Informatique",
-    metaDescription: "Rejoignez la plus grande conférence en informatique d'Afrique. Participez aux keynotes, workshops et panels avec les experts internationaux.",
-    metaKeywords: "CARI, conférence, informatique, Afrique, recherche, IA, data science, Bénin",
+    metaTitle: "CARI 2026 - African Conference on Computer Science Research",
+    metaDescription: "Join Africa's largest computer science conference. Attend keynotes, workshops and panels with international experts.",
+    metaKeywords: "CARI, conference, computer science, Africa, research, AI, data science, Benin",
     googleAnalyticsId: "",
   });
 
-  // Apparence
+  // Appearance
   const [appearance, setAppearance] = useState({
     primaryColor: "#1a7a3c",
     secondaryColor: "#2d5a3f",
@@ -131,7 +131,7 @@ export default function SiteInfo() {
     const file = e.target.files[0];
     if (file) {
       if (file.size > 2 * 1024 * 1024) {
-        alert("Le fichier ne doit pas dépasser 2MB");
+        alert("The file must not exceed 2MB");
         return;
       }
       const reader = new FileReader();
@@ -147,7 +147,7 @@ export default function SiteInfo() {
     const file = e.target.files[0];
     if (file) {
       if (file.size > 500 * 1024) {
-        alert("Le favicon ne doit pas dépasser 500KB");
+        alert("The favicon must not exceed 500KB");
         return;
       }
       const reader = new FileReader();
@@ -160,31 +160,31 @@ export default function SiteInfo() {
   };
 
   const tabs = [
-    { id: "general", label: "Général", icon: "globe" },
+    { id: "general", label: "General", icon: "globe" },
     { id: "dates", label: "Dates", icon: "calendar" },
-    { id: "social", label: "Réseaux sociaux", icon: "facebook" },
+    { id: "social", label: "Social networks", icon: "facebook" },
     { id: "seo", label: "SEO", icon: "settings" },
-    { id: "appearance", label: "Apparence", icon: "settings" },
+    { id: "appearance", label: "Appearance", icon: "settings" },
   ];
 
   return (
     <div className="flex-1 flex flex-col min-h-screen bg-[#f5f6f8]">
-      {/* En-tête */}
+      {/* Header */}
       <div className="px-8 pt-8 pb-6">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
-              Informations du site
+              Site information
             </h1>
             <p className="text-sm text-gray-500 mt-1">
-              Gérez les paramètres généraux de votre site web
+              Manage your website's general settings
             </p>
           </div>
           <div className="flex items-center gap-3">
             {saved && (
               <div className="flex items-center gap-2 px-3 py-2 bg-green-50 text-green-700 rounded-lg text-sm">
                 <Icon d={ICONS.check} size={16} />
-                <span>Enregistré !</span>
+                <span>Saved!</span>
               </div>
             )}
             <button
@@ -193,13 +193,13 @@ export default function SiteInfo() {
               className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#1a7a3c] text-white text-sm font-semibold hover:bg-[#155f2f] transition-colors shadow-sm disabled:opacity-50"
             >
               <Icon d={ICONS.save} size={15} />
-              {isLoading ? "Enregistrement..." : "Enregistrer"}
+              {isLoading ? "Saving..." : "Save"}
             </button>
           </div>
         </div>
       </div>
 
-      {/* Onglets */}
+      {/* Tabs */}
       <div className="px-8">
         <div className="flex gap-1 border-b border-gray-200">
           {tabs.map((tab) => (
@@ -219,18 +219,18 @@ export default function SiteInfo() {
         </div>
       </div>
 
-      {/* Contenu des onglets */}
+      {/* Tab content */}
       <div className="flex-1 px-8 pb-8 pt-6">
         <div className="max-w-6xl mx-auto">
-          
-          {/* Onglet Général */}
+
+          {/* General tab */}
           {activeTab === "general" && (
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
               <div className="p-8 space-y-8">
-                {/* Logo et Favicon */}
+                {/* Logo and Favicon */}
                 <div>
                   <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">
-                    Logo et favicon
+                    Logo and favicon
                   </h2>
                   <div className="flex gap-8">
                     {/* Logo */}
@@ -243,7 +243,7 @@ export default function SiteInfo() {
                           ) : (
                             <div className="text-center">
                               <Icon d={ICONS.upload} size={24} className="text-gray-400 mx-auto mb-2" />
-                              <p className="text-xs text-gray-400">Aucun logo</p>
+                              <p className="text-xs text-gray-400">No logo</p>
                             </div>
                           )}
                         </div>
@@ -275,14 +275,14 @@ export default function SiteInfo() {
                   </div>
                 </div>
 
-                {/* Informations du site */}
+                {/* Site information */}
                 <div>
                   <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">
-                    Informations générales
+                    General information
                   </h2>
                   <div className="grid grid-cols-2 gap-6">
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-sm font-semibold text-gray-700">Nom du site</label>
+                      <label className="text-sm font-semibold text-gray-700">Site name</label>
                       <input
                         type="text"
                         value={generalInfo.siteName}
@@ -291,7 +291,7 @@ export default function SiteInfo() {
                       />
                     </div>
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-sm font-semibold text-gray-700">Slogan</label>
+                      <label className="text-sm font-semibold text-gray-700">Tagline</label>
                       <input
                         type="text"
                         value={generalInfo.siteTagline}
@@ -309,7 +309,7 @@ export default function SiteInfo() {
                       />
                     </div>
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-sm font-semibold text-gray-700">Email de contact</label>
+                      <label className="text-sm font-semibold text-gray-700">Contact email</label>
                       <div className="relative">
                         <Icon d={ICONS.mail} size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                         <input
@@ -321,7 +321,7 @@ export default function SiteInfo() {
                       </div>
                     </div>
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-sm font-semibold text-gray-700">Téléphone</label>
+                      <label className="text-sm font-semibold text-gray-700">Phone</label>
                       <div className="relative">
                         <Icon d={ICONS.phone} size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                         <input
@@ -333,7 +333,7 @@ export default function SiteInfo() {
                       </div>
                     </div>
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-sm font-semibold text-gray-700">Adresse</label>
+                      <label className="text-sm font-semibold text-gray-700">Address</label>
                       <div className="relative">
                         <Icon d={ICONS.location} size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                         <input
@@ -345,13 +345,13 @@ export default function SiteInfo() {
                       </div>
                     </div>
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-sm font-semibold text-gray-700">Langue</label>
+                      <label className="text-sm font-semibold text-gray-700">Language</label>
                       <select
                         value={generalInfo.language}
                         onChange={(e) => setGeneralInfo({...generalInfo, language: e.target.value})}
                         className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30 focus:border-[#1a7a3c]"
                       >
-                        <option value="fr">Français</option>
+                        <option value="fr">French</option>
                         <option value="en">English</option>
                       </select>
                     </div>
@@ -361,16 +361,16 @@ export default function SiteInfo() {
             </div>
           )}
 
-          {/* Onglet Dates importantes */}
+          {/* Important dates tab */}
           {activeTab === "dates" && (
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
               <div className="p-8">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">
-                  Dates importantes
+                  Important dates
                 </h2>
                 <div className="grid grid-cols-2 gap-6">
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-sm font-semibold text-gray-700">Début de la conférence</label>
+                    <label className="text-sm font-semibold text-gray-700">Conference start</label>
                     <input
                       type="date"
                       value={importantDates.conferenceStart}
@@ -379,7 +379,7 @@ export default function SiteInfo() {
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-sm font-semibold text-gray-700">Fin de la conférence</label>
+                    <label className="text-sm font-semibold text-gray-700">Conference end</label>
                     <input
                       type="date"
                       value={importantDates.conferenceEnd}
@@ -388,7 +388,7 @@ export default function SiteInfo() {
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-sm font-semibold text-gray-700">Date limite des résumés</label>
+                    <label className="text-sm font-semibold text-gray-700">Abstract deadline</label>
                     <input
                       type="date"
                       value={importantDates.abstractDeadline}
@@ -397,7 +397,7 @@ export default function SiteInfo() {
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-sm font-semibold text-gray-700">Date limite des articles</label>
+                    <label className="text-sm font-semibold text-gray-700">Paper deadline</label>
                     <input
                       type="date"
                       value={importantDates.paperDeadline}
@@ -406,7 +406,7 @@ export default function SiteInfo() {
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-sm font-semibold text-gray-700">Date de notification</label>
+                    <label className="text-sm font-semibold text-gray-700">Notification date</label>
                     <input
                       type="date"
                       value={importantDates.notificationDate}
@@ -415,7 +415,7 @@ export default function SiteInfo() {
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-sm font-semibold text-gray-700">Date limite d'inscription</label>
+                    <label className="text-sm font-semibold text-gray-700">Registration deadline</label>
                     <input
                       type="date"
                       value={importantDates.registrationDeadline}
@@ -428,12 +428,12 @@ export default function SiteInfo() {
             </div>
           )}
 
-          {/* Onglet Réseaux sociaux */}
+          {/* Social networks tab */}
           {activeTab === "social" && (
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
               <div className="p-8">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">
-                  Liens des réseaux sociaux
+                  Social network links
                 </h2>
                 <div className="space-y-6">
                   <div className="flex items-center gap-4">
@@ -511,23 +511,23 @@ export default function SiteInfo() {
             </div>
           )}
 
-          {/* Onglet SEO */}
+          {/* SEO tab */}
           {activeTab === "seo" && (
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
               <div className="p-8">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">
-                  Optimisation SEO
+                  SEO optimization
                 </h2>
                 <div className="space-y-6">
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-sm font-semibold text-gray-700">Meta titre</label>
+                    <label className="text-sm font-semibold text-gray-700">Meta title</label>
                     <input
                       type="text"
                       value={seoInfo.metaTitle}
                       onChange={(e) => setSeoInfo({...seoInfo, metaTitle: e.target.value})}
                       className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm"
                     />
-                    <p className="text-xs text-gray-400">Recommandé : 50-60 caractères</p>
+                    <p className="text-xs text-gray-400">Recommended: 50-60 characters</p>
                   </div>
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">Meta description</label>
@@ -537,7 +537,7 @@ export default function SiteInfo() {
                       rows={3}
                       className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm resize-none"
                     />
-                    <p className="text-xs text-gray-400">Recommandé : 150-160 caractères</p>
+                    <p className="text-xs text-gray-400">Recommended: 150-160 characters</p>
                   </div>
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">Meta keywords</label>
@@ -545,10 +545,10 @@ export default function SiteInfo() {
                       type="text"
                       value={seoInfo.metaKeywords}
                       onChange={(e) => setSeoInfo({...seoInfo, metaKeywords: e.target.value})}
-                      placeholder="mot-clé1, mot-clé2, mot-clé3"
+                      placeholder="keyword1, keyword2, keyword3"
                       className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm"
                     />
-                    <p className="text-xs text-gray-400">Séparez les mots-clés par des virgules</p>
+                    <p className="text-xs text-gray-400">Separate keywords with commas</p>
                   </div>
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">Google Analytics ID</label>
@@ -565,16 +565,16 @@ export default function SiteInfo() {
             </div>
           )}
 
-          {/* Onglet Apparence */}
+          {/* Appearance tab */}
           {activeTab === "appearance" && (
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
               <div className="p-8">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">
-                  Personnalisation
+                  Customization
                 </h2>
                 <div className="grid grid-cols-2 gap-6">
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-sm font-semibold text-gray-700">Couleur primaire</label>
+                    <label className="text-sm font-semibold text-gray-700">Primary color</label>
                     <div className="flex gap-3 items-center">
                       <input
                         type="color"
@@ -591,7 +591,7 @@ export default function SiteInfo() {
                     </div>
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-sm font-semibold text-gray-700">Couleur secondaire</label>
+                    <label className="text-sm font-semibold text-gray-700">Secondary color</label>
                     <div className="flex gap-3 items-center">
                       <input
                         type="color"
@@ -608,34 +608,34 @@ export default function SiteInfo() {
                     </div>
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-sm font-semibold text-gray-700">Style de l'en-tête</label>
+                    <label className="text-sm font-semibold text-gray-700">Header style</label>
                     <select
                       value={appearance.headerStyle}
                       onChange={(e) => setAppearance({...appearance, headerStyle: e.target.value})}
                       className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm"
                     >
-                      <option value="solid">Solide</option>
+                      <option value="solid">Solid</option>
                       <option value="transparent">Transparent</option>
                       <option value="glass">Glassmorphism</option>
                     </select>
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-sm font-semibold text-gray-700">Style du pied de page</label>
+                    <label className="text-sm font-semibold text-gray-700">Footer style</label>
                     <select
                       value={appearance.footerStyle}
                       onChange={(e) => setAppearance({...appearance, footerStyle: e.target.value})}
                       className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm"
                     >
-                      <option value="solid">Solide</option>
-                      <option value="dark">Sombre</option>
-                      <option value="light">Clair</option>
+                      <option value="solid">Solid</option>
+                      <option value="dark">Dark</option>
+                      <option value="light">Light</option>
                     </select>
                   </div>
                 </div>
 
-                {/* Aperçu */}
+                {/* Preview */}
                 <div className="mt-8 p-4 bg-gray-50 rounded-xl">
-                  <p className="text-sm font-medium text-gray-700 mb-3">Aperçu des couleurs</p>
+                  <p className="text-sm font-medium text-gray-700 mb-3">Color preview</p>
                   <div className="flex gap-3">
                     <div className="w-20 h-10 rounded" style={{ backgroundColor: appearance.primaryColor }}></div>
                     <div className="w-20 h-10 rounded" style={{ backgroundColor: appearance.secondaryColor }}></div>

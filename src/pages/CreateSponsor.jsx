@@ -32,13 +32,13 @@ const ICONS = {
 };
 
 const SPONSOR_TYPES = [
-  { value: "Platinum Sponsor", label: "Platinum Sponsor", description: "Sponsor Platine - Niveau maximum" },
-  { value: "Gold Sponsor", label: "Gold Sponsor", description: "Sponsor Or" },
-  { value: "Silver Sponsor", label: "Silver Sponsor", description: "Sponsor Argent" },
-  { value: "Bronze Sponsor", label: "Bronze Sponsor", description: "Sponsor Bronze" },
-  { value: "Partners Institution", label: "Partners Institution", description: "Partenaire Institutionnel" },
-  { value: "Media Partner", label: "Media Partner", description: "Partenaire Média" },
-  { value: "Academic Partner", label: "Academic Partner", description: "Partenaire Académique" },
+  { value: "Platinum Sponsor", label: "Platinum Sponsor", description: "Platinum Sponsor - Highest level" },
+  { value: "Gold Sponsor", label: "Gold Sponsor", description: "Gold Sponsor" },
+  { value: "Silver Sponsor", label: "Silver Sponsor", description: "Silver Sponsor" },
+  { value: "Bronze Sponsor", label: "Bronze Sponsor", description: "Bronze Sponsor" },
+  { value: "Partners Institution", label: "Partners Institution", description: "Institutional Partner" },
+  { value: "Media Partner", label: "Media Partner", description: "Media Partner" },
+  { value: "Academic Partner", label: "Academic Partner", description: "Academic Partner" },
 ];
 
 // Générer un ID public unique
@@ -100,18 +100,18 @@ export default function CreateSponsor() {
       console.error("Erreur lors du chargement du sponsor:", error);
       Swal.fire({
         icon: 'error',
-        title: 'Erreur',
-        text: 'Erreur lors du chargement du sponsor'
+        title: 'Error',
+        text: 'Error while loading the sponsor'
       });
     }
   };
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.nom.trim()) newErrors.nom = "Le nom est requis";
-    if (!formData.type) newErrors.type = "Le type est requis";
-    if (formData.url && !/^https?:\/\/.+\..+/.test(formData.url)) newErrors.url = "URL invalide (ex: https://example.com)";
-    if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = "Email invalide";
+    if (!formData.nom.trim()) newErrors.nom = "Name is required";
+    if (!formData.type) newErrors.type = "Type is required";
+    if (formData.url && !/^https?:\/\/.+\..+/.test(formData.url)) newErrors.url = "Invalid URL (e.g. https://example.com)";
+    if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = "Invalid email";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -120,7 +120,7 @@ export default function CreateSponsor() {
     const file = e.target.files[0];
     if (!file) return;
     if (file.size > 2 * 1024 * 1024) {
-      Swal.fire({ icon: 'warning', title: 'Fichier trop lourd', text: 'Le fichier ne doit pas dépasser 2MB.' });
+      Swal.fire({ icon: 'warning', title: 'File too large', text: 'The file must not exceed 2MB.' });
       return;
     }
     const reader = new FileReader();
@@ -129,7 +129,7 @@ export default function CreateSponsor() {
     setLogoUploading(true);
     fichierService.upload(file, 'logo_sponsor')
       .then(fichier => setFormData(prev => ({ ...prev, logo_fichier_id: fichier.id })))
-      .catch(() => Swal.fire({ icon: 'error', title: 'Erreur', text: "Impossible d'uploader le logo." }))
+      .catch(() => Swal.fire({ icon: 'error', title: 'Error', text: "Unable to upload the logo." }))
       .finally(() => setLogoUploading(false));
   };
 
@@ -144,8 +144,8 @@ export default function CreateSponsor() {
           await sponsorService.update(id, sponsorData);
           Swal.fire({
             icon: 'success',
-            title: 'Succès',
-            text: 'Sponsor mis à jour avec succès',
+            title: 'Success',
+            text: 'Sponsor updated successfully',
             timer: 1500,
             showConfirmButton: false
           });
@@ -153,8 +153,8 @@ export default function CreateSponsor() {
           await sponsorService.create(sponsorData);
           Swal.fire({
             icon: 'success',
-            title: 'Succès',
-            text: 'Sponsor créé avec succès',
+            title: 'Success',
+            text: 'Sponsor created successfully',
             timer: 1500,
             showConfirmButton: false
           });
@@ -165,8 +165,8 @@ export default function CreateSponsor() {
         console.error("Erreur lors de la sauvegarde:", error);
         Swal.fire({
           icon: 'error',
-          title: 'Erreur',
-          text: 'Erreur lors de la sauvegarde du sponsor'
+          title: 'Error',
+          text: 'Error while saving the sponsor'
         });
       } finally {
         setIsLoading(false);
@@ -185,12 +185,12 @@ export default function CreateSponsor() {
           <button
             onClick={() => navigate("/sponsors")}
             className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-            title="Retour"
+            title="Back"
           >
             <Icon d={ICONS.arrowLeft} size={20} className="text-gray-600" />
           </button>
           <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
-            {isEditing ? "Modifier un sponsor" : "Nouveau Sponsor / Partner"}
+            {isEditing ? "Edit sponsor" : "New Sponsor / Partner"}
           </h1>
         </div>
         <div className="flex items-center gap-3">
@@ -198,7 +198,7 @@ export default function CreateSponsor() {
             onClick={() => navigate("/sponsors")}
             className="px-4 py-2 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
           >
-            Annuler
+            Cancel
           </button>
           <button
             onClick={handleSubmit}
@@ -206,7 +206,7 @@ export default function CreateSponsor() {
             className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#1a7a3c] text-white text-sm font-semibold hover:bg-[#155f2f] transition-colors shadow-sm disabled:opacity-50"
           >
             <Icon d={ICONS.save} size={15} />
-            {isLoading ? "En cours..." : (isEditing ? "Mettre à jour" : "Ajouter")}
+            {isLoading ? "Saving..." : (isEditing ? "Update" : "Add")}
           </button>
         </div>
       </div>
@@ -229,7 +229,7 @@ export default function CreateSponsor() {
                       ) : (
                         <div className="text-center">
                           <Icon d={ICONS.image} size={32} className="text-gray-400 mx-auto mb-2" />
-                          <p className="text-xs text-gray-400">Aucun logo</p>
+                          <p className="text-xs text-gray-400">No logo</p>
                         </div>
                       )}
                     </div>
@@ -244,11 +244,11 @@ export default function CreateSponsor() {
                     </label>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600 mb-1">Cliquez pour sélectionner un fichier</p>
+                    <p className="text-sm text-gray-600 mb-1">Click to select a file</p>
                     <p className="text-xs text-gray-400">
-                      Format recommandé : PNG, JPG. Taille max : 2MB
+                      Recommended format: PNG, JPG. Max size: 2MB
                     </p>
-                    {logoUploading && <p className="text-xs text-[#1a7a3c] mt-1">Upload en cours…</p>}
+                    {logoUploading && <p className="text-xs text-[#1a7a3c] mt-1">Uploading…</p>}
                   </div>
                 </div>
               </div>
@@ -256,13 +256,13 @@ export default function CreateSponsor() {
               {/* Informations générales */}
               <div>
                 <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">
-                  Informations générales
+                  General information
                 </h2>
                 <div className="grid grid-cols-2 gap-6">
                   {/* Nom */}
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Nom <span className="text-red-500">*</span>
+                      Name <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
                       <Icon d={ICONS.building} size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -270,7 +270,7 @@ export default function CreateSponsor() {
                         type="text"
                         value={formData.nom}
                         onChange={(e) => setFormData({...formData, nom: e.target.value})}
-                        placeholder="Ex: IFRI, Orange, etc."
+                        placeholder="e.g. IFRI, Orange, etc."
                         className={`w-full pl-10 pr-3 py-2.5 rounded-lg border ${
                           errors.nom ? 'border-red-400' : 'border-gray-200'
                         } text-sm text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30 focus:border-[#1a7a3c] transition`}
@@ -303,7 +303,7 @@ export default function CreateSponsor() {
                   {/* URL */}
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Site web
+                      Website
                     </label>
                     <div className="relative">
                       <Icon d={ICONS.link} size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -311,7 +311,7 @@ export default function CreateSponsor() {
                         type="url"
                         value={formData.url}
                         onChange={(e) => setFormData({...formData, url: e.target.value})}
-                        placeholder="https://exemple.com"
+                        placeholder="https://example.com"
                         className={`w-full pl-10 pr-3 py-2.5 rounded-lg border ${
                           errors.url ? 'border-red-400' : 'border-gray-200'
                         } text-sm text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30 focus:border-[#1a7a3c] transition`}
@@ -329,7 +329,7 @@ export default function CreateSponsor() {
                       type="email"
                       value={formData.email}
                       onChange={(e) => setFormData({...formData, email: e.target.value})}
-                      placeholder="contact@exemple.com"
+                      placeholder="contact@example.com"
                       className={`w-full px-3 py-2.5 rounded-lg border ${
                         errors.email ? 'border-red-400' : 'border-gray-200'
                       } text-sm text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30 focus:border-[#1a7a3c] transition`}
@@ -340,7 +340,7 @@ export default function CreateSponsor() {
                   {/* Téléphone */}
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Téléphone
+                      Phone
                     </label>
                     <input
                       type="tel"
@@ -354,7 +354,7 @@ export default function CreateSponsor() {
                   {/* Ordre d'affichage */}
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Ordre d'affichage
+                      Display order
                     </label>
                     <input
                       type="number"
@@ -368,7 +368,7 @@ export default function CreateSponsor() {
                   {/* Afficher sur le site public */}
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Afficher sur le site public
+                      Show on public site
                     </label>
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input
@@ -377,7 +377,7 @@ export default function CreateSponsor() {
                         onChange={(e) => setFormData({...formData, affiche_site_public: e.target.checked})}
                         className="w-4 h-4 rounded border-gray-300 text-[#1a7a3c] focus:ring-[#1a7a3c]"
                       />
-                      <span className="text-sm text-gray-600">Oui, afficher ce sponsor sur le site public</span>
+                      <span className="text-sm text-gray-600">Yes, show this sponsor on the public site</span>
                     </label>
                   </div>
 
@@ -390,7 +390,7 @@ export default function CreateSponsor() {
                       value={formData.description}
                       onChange={(e) => setFormData({...formData, description: e.target.value})}
                       rows={4}
-                      placeholder="Description du sponsor/partenaire..."
+                      placeholder="Description of the sponsor/partner..."
                       className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30 focus:border-[#1a7a3c] transition resize-none"
                     />
                   </div>
@@ -400,7 +400,7 @@ export default function CreateSponsor() {
               {/* Statut */}
               <div>
                 <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">
-                  Statut
+                  Status
                 </h2>
                 <div className="flex items-center gap-6">
                   <label className="flex items-center gap-2 cursor-pointer">
@@ -410,7 +410,7 @@ export default function CreateSponsor() {
                       onChange={() => setFormData({...formData, online: true})}
                       className="w-4 h-4 text-[#1a7a3c] focus:ring-[#1a7a3c]"
                     />
-                    <span className="text-sm text-gray-700">Activer immédiatement</span>
+                    <span className="text-sm text-gray-700">Activate immediately</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
@@ -419,7 +419,7 @@ export default function CreateSponsor() {
                       onChange={() => setFormData({...formData, online: false})}
                       className="w-4 h-4 text-gray-400 focus:ring-gray-400"
                     />
-                    <span className="text-sm text-gray-700">Désactivé</span>
+                    <span className="text-sm text-gray-700">Deactivated</span>
                   </label>
                 </div>
               </div>

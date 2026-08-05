@@ -268,7 +268,7 @@ export default function Program() {
         setPagination(null);
       }
     } catch (error) {
-      Swal.fire({ icon: "error", title: "Erreur", text: "Erreur lors du chargement des programmes" });
+      Swal.fire({ icon: "error", title: "Error", text: "Error loading programs" });
     } finally {
       setLoading(false);
     }
@@ -281,30 +281,30 @@ export default function Program() {
       const program = programs.find(p => p.id === id);
       await programmeService.update(id, { ...program, activated: !program.activated });
       await loadPrograms();
-      Swal.fire({ icon: "success", title: "Succès", text: "Statut mis à jour", timer: 1500, showConfirmButton: false });
+      Swal.fire({ icon: "success", title: "Success", text: "Status updated", timer: 1500, showConfirmButton: false });
     } catch {
-      Swal.fire({ icon: "error", title: "Erreur", text: "Erreur lors de la mise à jour du statut" });
+      Swal.fire({ icon: "error", title: "Error", text: "Error updating status" });
     }
   };
 
   const deleteProgram = async (id) => {
     const result = await Swal.fire({
-      title: "Êtes-vous sûr ?",
-      text: "Vous ne pourrez pas récupérer ce programme !",
+      title: "Are you sure?",
+      text: "You won't be able to recover this program!",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#d33",
       cancelButtonColor: "#3085d6",
-      confirmButtonText: "Oui, supprimer !",
-      cancelButtonText: "Annuler",
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "Cancel",
     });
     if (result.isConfirmed) {
       try {
         await programmeService.delete(id);
         await loadPrograms();
-        Swal.fire({ icon: "success", title: "Supprimé !", text: "Le programme a été supprimé.", timer: 1500, showConfirmButton: false });
+        Swal.fire({ icon: "success", title: "Deleted!", text: "The program has been deleted.", timer: 1500, showConfirmButton: false });
       } catch {
-        Swal.fire({ icon: "error", title: "Erreur", text: "Erreur lors de la suppression" });
+        Swal.fire({ icon: "error", title: "Error", text: "Error deleting" });
       }
     }
   };
@@ -323,7 +323,7 @@ export default function Program() {
 
   const formatDateTime = (dateStr) => {
     const date = new Date(dateStr);
-    return date.toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }).replace(".", "");
+    return date.toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }).replace(".", "");
   };
 
   const viewProgram = (program) => {
@@ -332,32 +332,32 @@ export default function Program() {
       html: `
         <div class="text-left" style="font-size:14px;">
           <div style="margin-bottom:12px;">
-            <strong style="color:#1a7a3c;">Informations générales</strong>
+            <strong style="color:#1a7a3c;">General information</strong>
             <div style="margin-top:4px;color:#666;">
               <div><strong>Type:</strong> ${program.type}</div>
               <div><strong>Description:</strong> ${program.description || "-"}</div>
-              <div><strong>Salle:</strong> ${program.salle || "-"}</div>
-              <div><strong>Statut:</strong> ${program.activated ? "Actif" : "Inactif"}</div>
+              <div><strong>Room:</strong> ${program.salle || "-"}</div>
+              <div><strong>Status:</strong> ${program.activated ? "Active" : "Inactive"}</div>
             </div>
           </div>
           <div style="margin-bottom:12px;">
-            <strong style="color:#1a7a3c;">Horaires</strong>
+            <strong style="color:#1a7a3c;">Schedule</strong>
             <div style="margin-top:4px;color:#666;">
-              <div><strong>Début :</strong> ${formatDateTime(program.date_debut)}</div>
-              <div><strong>Fin :</strong> ${formatDateTime(program.date_fin)}</div>
+              <div><strong>Start:</strong> ${formatDateTime(program.date_debut)}</div>
+              <div><strong>End:</strong> ${formatDateTime(program.date_fin)}</div>
             </div>
           </div>
           <div>
-            <strong style="color:#1a7a3c;">Speakers / Papiers</strong>
+            <strong style="color:#1a7a3c;">Speakers / Papers</strong>
             <div style="margin-top:4px;color:#666;">
-              <div><strong>Speaker IDs :</strong> ${program.speaker_committee_ids?.length ? program.speaker_committee_ids.join(", ") : "-"}</div>
-              <div><strong>Papier IDs :</strong> ${program.papier_ids?.length ? program.papier_ids.join(", ") : "-"}</div>
+              <div><strong>Speaker IDs:</strong> ${program.speaker_committee_ids?.length ? program.speaker_committee_ids.join(", ") : "-"}</div>
+              <div><strong>Paper IDs:</strong> ${program.papier_ids?.length ? program.papier_ids.join(", ") : "-"}</div>
             </div>
           </div>
         </div>`,
       width: "600px",
       showConfirmButton: true,
-      confirmButtonText: "Fermer",
+      confirmButtonText: "Close",
       confirmButtonColor: "#1a7a3c",
     });
   };
@@ -367,10 +367,10 @@ export default function Program() {
       {/* Page header */}
       <div className="px-8 pt-8 pb-6">
         <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
-          Gestion des Programmes
+          Programs management
         </h1>
         <p className="text-sm text-gray-500 mt-1">
-          Gérez les sessions, keynotes, workshops et panels de la conférence
+          Manage the conference sessions, keynotes, workshops and panels
         </p>
       </div>
 
@@ -379,7 +379,7 @@ export default function Program() {
         {/* Toolbar */}
         <div className="flex flex-col gap-3 px-6 py-4 border-b border-gray-100">
           <div className="flex items-center gap-3">
-            <span className="text-base font-bold text-gray-900 shrink-0">Programmes</span>
+            <span className="text-base font-bold text-gray-900 shrink-0">Programs</span>
 
             {/* Search — hidden in schedule view */}
             {viewMode === "list" && (
@@ -389,7 +389,7 @@ export default function Program() {
                   type="text"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Rechercher par titre..."
+                  placeholder="Search by title..."
                   className="w-full pl-9 pr-4 py-2 rounded-lg border border-gray-200 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30 focus:border-[#1a7a3c] transition"
                 />
               </div>
@@ -412,7 +412,7 @@ export default function Program() {
             <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden shrink-0">
               <button
                 onClick={() => setViewMode("list")}
-                title="Vue liste"
+                title="List view"
                 className={`flex items-center justify-center w-9 h-9 transition-colors ${
                   viewMode === "list" ? "bg-[#1a7a3c] text-white" : "text-gray-500 hover:bg-gray-50"
                 }`}
@@ -421,7 +421,7 @@ export default function Program() {
               </button>
               <button
                 onClick={() => setViewMode("schedule")}
-                title="Vue planning"
+                title="Schedule view"
                 className={`flex items-center justify-center w-9 h-9 transition-colors border-l border-gray-200 ${
                   viewMode === "schedule" ? "bg-[#1a7a3c] text-white" : "text-gray-500 hover:bg-gray-50"
                 }`}
@@ -435,13 +435,13 @@ export default function Program() {
               className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#1a7a3c] text-white text-sm font-semibold hover:bg-[#155f2f] transition-colors shadow-sm shrink-0"
             >
               <Icon d={ICONS.plus} size={15} />
-              Créer
+              Create
             </button>
           </div>
 
           {viewMode === "list" && showFilters && (
             <div className="flex items-center gap-3 pt-2 border-t border-gray-100">
-              <span className="text-xs font-medium text-gray-500">Type :</span>
+              <span className="text-xs font-medium text-gray-500">Type:</span>
               <div className="flex gap-2 flex-wrap">
                 <button
                   onClick={() => setSelectedType("")}
@@ -449,7 +449,7 @@ export default function Program() {
                     !selectedType ? "bg-[#1a7a3c] text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                   }`}
                 >
-                  Tous
+                  All
                 </button>
                 {PROGRAM_TYPES.map((type) => (
                   <button
@@ -470,7 +470,7 @@ export default function Program() {
         {/* Content */}
         {loading ? (
           <div className="flex items-center justify-center py-16 text-gray-400 text-sm">
-            Chargement...
+            Loading...
           </div>
         ) : viewMode === "schedule" ? (
           <ScheduleView programs={programs} />
@@ -481,11 +481,11 @@ export default function Program() {
                 <thead>
                   <tr className="border-b border-gray-100 bg-gray-50/50">
                     <th className="text-left px-6 py-3 text-gray-500 font-medium">ID</th>
-                    <th className="text-left px-4 py-3 text-gray-500 font-medium">Titre</th>
+                    <th className="text-left px-4 py-3 text-gray-500 font-medium">Title</th>
                     <th className="text-left px-4 py-3 text-gray-500 font-medium">Type</th>
-                    <th className="text-left px-4 py-3 text-gray-500 font-medium">Date début</th>
-                    <th className="text-left px-4 py-3 text-gray-500 font-medium">Date fin</th>
-                    <th className="text-left px-4 py-3 text-gray-500 font-medium">Salle</th>
+                    <th className="text-left px-4 py-3 text-gray-500 font-medium">Start date</th>
+                    <th className="text-left px-4 py-3 text-gray-500 font-medium">End date</th>
+                    <th className="text-left px-4 py-3 text-gray-500 font-medium">Room</th>
                     <th className="text-left px-4 py-3 text-gray-500 font-medium">Action</th>
                   </tr>
                 </thead>
@@ -493,7 +493,7 @@ export default function Program() {
                   {filtered.length === 0 ? (
                     <tr>
                       <td colSpan={7} className="px-6 py-10 text-center text-gray-400">
-                        Aucun programme trouvé.
+                        No programs found.
                       </td>
                     </tr>
                   ) : (
@@ -526,21 +526,21 @@ export default function Program() {
                         <td className="px-4 py-4 text-gray-600">{program.salle || "—"}</td>
                         <td className="px-4 py-4">
                           <div className="flex items-center gap-3">
-                            <button onClick={() => viewProgram(program)} className="text-gray-400 hover:text-blue-500 transition-colors" title="Voir">
+                            <button onClick={() => viewProgram(program)} className="text-gray-400 hover:text-blue-500 transition-colors" title="View">
                               <Icon d={ICONS.eye} size={16} />
                             </button>
-                            <button onClick={() => navigate(`/program/edit/${program.id}`)} className="text-gray-400 hover:text-[#1a7a3c] transition-colors" title="Modifier">
+                            <button onClick={() => navigate(`/program/edit/${program.id}`)} className="text-gray-400 hover:text-[#1a7a3c] transition-colors" title="Edit">
                               <Icon d={ICONS.edit} size={16} />
                             </button>
                             <button
                               onClick={() => toggleActivated(program.id)}
                               className={`transition-colors ${program.activated ? "text-green-600 hover:text-red-400" : "text-gray-300 hover:text-green-600"}`}
-                              title={program.activated ? "Désactiver" : "Activer"}
+                              title={program.activated ? "Disable" : "Enable"}
                             >
                               <Icon d={ICONS.power} size={16} />
                             </button>
                             {!isEditor(currentUser) && (
-                              <button onClick={() => deleteProgram(program.id)} className="text-gray-400 hover:text-red-500 transition-colors" title="Supprimer">
+                              <button onClick={() => deleteProgram(program.id)} className="text-gray-400 hover:text-red-500 transition-colors" title="Delete">
                                 <Icon d={ICONS.delete} size={16} />
                               </button>
                             )}
@@ -557,12 +557,12 @@ export default function Program() {
               <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-white">
                 <div className="flex items-center gap-4 flex-wrap">
                   <span className="text-sm text-gray-500">
-                    Affichage de <span className="font-semibold">{pagination.from || 0}</span> à{" "}
-                    <span className="font-semibold">{pagination.to || 0}</span> sur{" "}
-                    <span className="font-semibold">{pagination.total || 0}</span> programmes
+                    Showing <span className="font-semibold">{pagination.from || 0}</span> to{" "}
+                    <span className="font-semibold">{pagination.to || 0}</span> of{" "}
+                    <span className="font-semibold">{pagination.total || 0}</span> programs
                   </span>
                   <div className="flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded border border-gray-200/50">
-                    <span>Afficher</span>
+                    <span>Show</span>
                     <select
                       value={perPage}
                       onChange={(e) => setPerPage(Number(e.target.value))}
@@ -574,7 +574,7 @@ export default function Program() {
                       <option value={50}>50</option>
                       <option value={100}>100</option>
                     </select>
-                    <span>par page</span>
+                    <span>per page</span>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -583,7 +583,7 @@ export default function Program() {
                     disabled={pagination.current_page === 1}
                     className="px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
-                    Précédent
+                    Previous
                   </button>
                   {Array.from({ length: pagination.last_page }, (_, index) => {
                     const pageNum = index + 1;
@@ -618,7 +618,7 @@ export default function Program() {
                     disabled={pagination.current_page === pagination.last_page}
                     className="px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
-                    Suivant
+                    Next
                   </button>
                 </div>
               </div>
@@ -626,9 +626,9 @@ export default function Program() {
 
             <div className="px-6 py-3 border-t border-gray-100 bg-gray-50/50">
               <div className="flex items-center justify-between text-xs text-gray-500">
-                <span>Total : {pagination ? pagination.total : filtered.length} programme(s)</span>
+                <span>Total: {pagination ? pagination.total : filtered.length} program(s)</span>
                 <span>
-                  Actifs : {filtered.filter(p => p.activated).length} | Inactifs : {filtered.filter(p => !p.activated).length}
+                  Active: {filtered.filter(p => p.activated).length} | Inactive: {filtered.filter(p => !p.activated).length}
                 </span>
               </div>
             </div>

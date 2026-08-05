@@ -31,12 +31,12 @@ const ICONS = {
 };
 
 const USER_ROLES = [
-  { value: "Super Admin", label: "Super Admin", description: "Accès complet à toutes les fonctionnalités", permissions: ["all"] },
-  { value: "Admin", label: "Admin", description: "Gestion complète du contenu", permissions: ["read", "write", "delete", "manage_users"] },
-  { value: "Editor", label: "Editor", description: "Peut créer et modifier du contenu", permissions: ["read", "write", "edit"] },
-  { value: "Author", label: "Author", description: "Peut créer son propre contenu", permissions: ["read", "write_own"] },
-  { value: "Viewer", label: "Viewer", description: "Lecture seule", permissions: ["read"] },
-  { value: "Contributor", label: "Contributor", description: "Peut soumettre du contenu", permissions: ["read", "submit"] },
+  { value: "Super Admin", label: "Super Admin", description: "Full access to all features", permissions: ["all"] },
+  { value: "Admin", label: "Admin", description: "Full content management", permissions: ["read", "write", "delete", "manage_users"] },
+  { value: "Editor", label: "Editor", description: "Can create and edit content", permissions: ["read", "write", "edit"] },
+  { value: "Author", label: "Author", description: "Can create their own content", permissions: ["read", "write_own"] },
+  { value: "Viewer", label: "Viewer", description: "Read only", permissions: ["read"] },
+  { value: "Contributor", label: "Contributor", description: "Can submit content", permissions: ["read", "submit"] },
 ];
 
 const isSuperAdmin = (usr) => {
@@ -83,8 +83,8 @@ export default function CreateUser() {
       if (!hasAccess) {
         Swal.fire({
           icon: 'error',
-          title: 'Accès refusé',
-          text: "Vous n'avez pas la permission d'accéder à cette page."
+          title: 'Access denied',
+          text: "You do not have permission to access this page."
         });
         navigate("/dashboard");
       }
@@ -134,29 +134,29 @@ export default function CreateUser() {
       console.error("Erreur lors du chargement de l'utilisateur:", error);
       Swal.fire({
         icon: 'error',
-        title: 'Erreur',
-        text: 'Erreur lors du chargement de l\'utilisateur'
+        title: 'Error',
+        text: 'Error while loading the user'
       });
     }
   };
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.nom.trim()) newErrors.nom = "Le nom est requis";
-    if (!formData.email.trim()) newErrors.email = "L'email est requis";
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = "Email invalide";
-    if (!formData.role_admin_id) newErrors.role_admin_id = "Le rôle est requis";
-    
+    if (!formData.nom.trim()) newErrors.nom = "Last name is required";
+    if (!formData.email.trim()) newErrors.email = "Email is required";
+    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = "Invalid email";
+    if (!formData.role_admin_id) newErrors.role_admin_id = "Role is required";
+
     if (!isEditing) {
-      if (!formData.password) newErrors.password = "Le mot de passe est requis";
-      else if (formData.password.length < 8) newErrors.password = "Le mot de passe doit contenir au moins 8 caractères";
+      if (!formData.password) newErrors.password = "Password is required";
+      else if (formData.password.length < 8) newErrors.password = "Password must be at least 8 characters";
       if (formData.password !== formData.password_confirmation) {
-        newErrors.password_confirmation = "Les mots de passe ne correspondent pas";
+        newErrors.password_confirmation = "Passwords do not match";
       }
     } else if (formData.password) {
-      if (formData.password.length < 8) newErrors.password = "Le mot de passe doit contenir au moins 8 caractères";
+      if (formData.password.length < 8) newErrors.password = "Password must be at least 8 characters";
       if (formData.password !== formData.password_confirmation) {
-        newErrors.password_confirmation = "Les mots de passe ne correspondent pas";
+        newErrors.password_confirmation = "Passwords do not match";
       }
     }
     
@@ -192,8 +192,8 @@ export default function CreateUser() {
           await userService.update(id, userData);
           Swal.fire({
             icon: 'success',
-            title: 'Succès',
-            text: 'Utilisateur mis à jour avec succès',
+            title: 'Success',
+            text: 'User updated successfully',
             timer: 1500,
             showConfirmButton: false
           });
@@ -201,8 +201,8 @@ export default function CreateUser() {
           await userService.create(userData);
           Swal.fire({
             icon: 'success',
-            title: 'Succès',
-            text: 'Utilisateur créé avec succès',
+            title: 'Success',
+            text: 'User created successfully',
             timer: 1500,
             showConfirmButton: false
           });
@@ -213,8 +213,8 @@ export default function CreateUser() {
         console.error("Erreur lors de la sauvegarde:", error);
         Swal.fire({
           icon: 'error',
-          title: 'Erreur',
-          text: 'Erreur lors de la sauvegarde de l\'utilisateur'
+          title: 'Error',
+          text: 'Error while saving the user'
         });
       } finally {
         setIsLoading(false);
@@ -234,12 +234,12 @@ export default function CreateUser() {
           <button
             onClick={() => navigate("/roles")}
             className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-            title="Retour"
+            title="Back"
           >
             <Icon d={ICONS.arrowLeft} size={20} className="text-gray-600" />
           </button>
           <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
-            {isEditing ? "Modifier un utilisateur" : "Nouvel utilisateur"}
+            {isEditing ? "Edit user" : "New user"}
           </h1>
         </div>
         <div className="flex items-center gap-3">
@@ -247,7 +247,7 @@ export default function CreateUser() {
             onClick={() => navigate("/roles")}
             className="px-4 py-2 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
           >
-            Annuler
+            Cancel
           </button>
           <button
             onClick={handleSubmit}
@@ -255,7 +255,7 @@ export default function CreateUser() {
             className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#1a7a3c] text-white text-sm font-semibold hover:bg-[#155f2f] transition-colors shadow-sm disabled:opacity-50"
           >
             <Icon d={ICONS.save} size={15} />
-            {isLoading ? "En cours..." : (isEditing ? "Mettre à jour" : "Ajouter")}
+            {isLoading ? "Saving..." : (isEditing ? "Update" : "Add")}
           </button>
         </div>
       </div>
@@ -268,13 +268,13 @@ export default function CreateUser() {
               {/* Informations de l'utilisateur */}
               <div>
                 <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">
-                  Informations de l'utilisateur
+                  User information
                 </h2>
                 <div className="grid grid-cols-2 gap-6">
                   {/* Nom complet */}
                   <div className="col-span-2 flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Nom <span className="text-red-500">*</span>
+                      Last name <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
                       <Icon d={ICONS.user} size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -282,7 +282,7 @@ export default function CreateUser() {
                         type="text"
                         value={formData.nom}
                         onChange={(e) => setFormData({...formData, nom: e.target.value})}
-                        placeholder="Ex: Jean Dupont"
+                        placeholder="e.g. John Smith"
                         className={`w-full pl-10 pr-3 py-2.5 rounded-lg border ${
                           errors.nom ? 'border-red-400' : 'border-gray-200'
                         } text-sm text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30 focus:border-[#1a7a3c] transition`}
@@ -291,7 +291,7 @@ export default function CreateUser() {
                     {errors.nom && <p className="text-xs text-red-500">{errors.nom}</p>}
 
                     <label className="text-sm font-semibold text-gray-700">
-                      Prénoms <span className="text-red-500">*</span>
+                      First name <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
                       <Icon d={ICONS.user} size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -299,7 +299,7 @@ export default function CreateUser() {
                         type="text"
                         value={formData.prenom}
                         onChange={(e) => setFormData({...formData, prenom: e.target.value})}
-                        placeholder="Ex: Jean Dupont"
+                        placeholder="e.g. John Smith"
                         className={`w-full pl-10 pr-3 py-2.5 rounded-lg border ${
                           errors.prenom ? 'border-red-400' : 'border-gray-200'
                         } text-sm text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30 focus:border-[#1a7a3c] transition`}
@@ -319,7 +319,7 @@ export default function CreateUser() {
                         type="email"
                         value={formData.email}
                         onChange={(e) => setFormData({...formData, email: e.target.value})}
-                        placeholder="ex: jean.dupont@example.com"
+                        placeholder="e.g. john.smith@example.com"
                         className={`w-full pl-10 pr-3 py-2.5 rounded-lg border ${
                           errors.email ? 'border-red-400' : 'border-gray-200'
                         } text-sm text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30 focus:border-[#1a7a3c] transition`}
@@ -331,7 +331,7 @@ export default function CreateUser() {
                   {/* Rôle */}
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Rôle <span className="text-red-500">*</span>
+                      Role <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
                       <Icon d={ICONS.role} size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -343,7 +343,7 @@ export default function CreateUser() {
                           !isSuperAdmin(currentUser) ? 'bg-gray-100 cursor-not-allowed opacity-80' : 'bg-white'
                         }`}
                       >
-                        <option value="">Sélectionner un rôle</option>
+                        <option value="">Select a role</option>
                         {roles.map(role => (
                           <option key={role.id} value={role.id}>
                             {role.libelle}
@@ -357,7 +357,7 @@ export default function CreateUser() {
                   {/* Mot de passe */}
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Mot de passe {!isEditing && <span className="text-red-500">*</span>}
+                      Password {!isEditing && <span className="text-red-500">*</span>}
                     </label>
                     <div className="relative">
                       <Icon d={ICONS.lock} size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -365,7 +365,7 @@ export default function CreateUser() {
                         type={showPassword ? "text" : "password"}
                         value={formData.password}
                         onChange={(e) => setFormData({...formData, password: e.target.value})}
-                        placeholder={isEditing ? "Laisser vide pour conserver" : "Minimum 8 caractères"}
+                        placeholder={isEditing ? "Leave blank to keep" : "Minimum 8 characters"}
                         className={`w-full pl-10 pr-10 py-2.5 rounded-lg border ${
                           errors.password ? 'border-red-400' : 'border-gray-200'
                         } text-sm text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30 focus:border-[#1a7a3c] transition`}
@@ -384,7 +384,7 @@ export default function CreateUser() {
                   {/* Confirmation mot de passe */}
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Confirmer le mot de passe {!isEditing && <span className="text-red-500">*</span>}
+                      Confirm password {!isEditing && <span className="text-red-500">*</span>}
                     </label>
                     <div className="relative">
                       <Icon d={ICONS.lock} size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -392,7 +392,7 @@ export default function CreateUser() {
                         type={showPassword ? "text" : "password"}
                         value={formData.password_confirmation}
                         onChange={(e) => setFormData({...formData, password_confirmation: e.target.value})}
-                        placeholder="Confirmez le mot de passe"
+                        placeholder="Confirm the password"
                         className={`w-full pl-10 pr-3 py-2.5 rounded-lg border ${
                           errors.password_confirmation ? 'border-red-400' : 'border-gray-200'
                         } text-sm text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30 focus:border-[#1a7a3c] transition`}
@@ -416,7 +416,7 @@ export default function CreateUser() {
                       onChange={() => setFormData({...formData, activated: true})}
                       className="w-4 h-4 text-[#1a7a3c] focus:ring-[#1a7a3c]"
                     />
-                    <span className="text-sm text-gray-700">Activer immédiatement</span>
+                    <span className="text-sm text-gray-700">Activate immediately</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
@@ -425,7 +425,7 @@ export default function CreateUser() {
                       onChange={() => setFormData({...formData, activated: false})}
                       className="w-4 h-4 text-gray-400 focus:ring-gray-400"
                     />
-                    <span className="text-sm text-gray-700">Désactivé</span>
+                    <span className="text-sm text-gray-700">Deactivated</span>
                   </label>
                 </div>
               </div>

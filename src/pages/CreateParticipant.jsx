@@ -35,25 +35,46 @@ const PARTICIPANT_TYPES = [
 ];
 
 const TITRES = [
-  { value: "", label: "Sélectionner" },
-  { value: "Mr", label: "M." },
-  { value: "Mrs", label: "Mme" },
+  { value: "", label: "Select" },
+  { value: "Mr", label: "Mr." },
+  { value: "Mrs", label: "Mrs." },
   { value: "Dr", label: "Dr" },
   { value: "Prof", label: "Prof" },
-  { value: "Ms", label: "Mlle" },
+  { value: "Ms", label: "Ms." },
 ];
 
 const GENRES = [
-  { value: "", label: "Sélectionner" },
-  { value: "Male", label: "Homme" },
-  { value: "Female", label: "Femme" },
-  { value: "Other", label: "Autre" },
+  { value: "", label: "Select" },
+  { value: "Male", label: "Male" },
+  { value: "Female", label: "Female" },
+  { value: "Other", label: "Other" },
 ];
 
 const COUNTRIES = [
-  "Bénin", "Nigeria", "Togo", "Ghana", "Côte d'Ivoire", "Sénégal", "Maroc", "Tunisie",
-  "Algérie", "Égypte", "Afrique du Sud", "Kenya", "Cameroun", "RDC", "France", "Canada",
-  "États-Unis", "Royaume-Uni", "Allemagne", "Belgique", "Suisse", "Espagne", "Italie", "Pays-Bas"
+  { value: "Bénin", label: "Benin" },
+  { value: "Nigeria", label: "Nigeria" },
+  { value: "Togo", label: "Togo" },
+  { value: "Ghana", label: "Ghana" },
+  { value: "Côte d'Ivoire", label: "Ivory Coast" },
+  { value: "Sénégal", label: "Senegal" },
+  { value: "Maroc", label: "Morocco" },
+  { value: "Tunisie", label: "Tunisia" },
+  { value: "Algérie", label: "Algeria" },
+  { value: "Égypte", label: "Egypt" },
+  { value: "Afrique du Sud", label: "South Africa" },
+  { value: "Kenya", label: "Kenya" },
+  { value: "Cameroun", label: "Cameroon" },
+  { value: "RDC", label: "DR Congo" },
+  { value: "France", label: "France" },
+  { value: "Canada", label: "Canada" },
+  { value: "États-Unis", label: "United States" },
+  { value: "Royaume-Uni", label: "United Kingdom" },
+  { value: "Allemagne", label: "Germany" },
+  { value: "Belgique", label: "Belgium" },
+  { value: "Suisse", label: "Switzerland" },
+  { value: "Espagne", label: "Spain" },
+  { value: "Italie", label: "Italy" },
+  { value: "Pays-Bas", label: "Netherlands" },
 ];
 
 export default function CreateParticipant() {
@@ -160,12 +181,12 @@ export default function CreateParticipant() {
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.email.trim()) newErrors.email = "L'email est requis";
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = "Email invalide";
-    if (!isEditing && !formData.mot_de_passe.trim()) newErrors.mot_de_passe = "Le mot de passe est requis";
-    if (!formData.prenom.trim()) newErrors.prenom = "Le prénom est requis";
-    if (!formData.nom.trim()) newErrors.nom = "Le nom est requis";
-    if (!formData.type_participant) newErrors.type_participant = "Le type est requis";
+    if (!formData.email.trim()) newErrors.email = "Email is required";
+    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = "Invalid email";
+    if (!isEditing && !formData.mot_de_passe.trim()) newErrors.mot_de_passe = "Password is required";
+    if (!formData.prenom.trim()) newErrors.prenom = "First name is required";
+    if (!formData.nom.trim()) newErrors.nom = "Last name is required";
+    if (!formData.type_participant) newErrors.type_participant = "Type is required";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -190,8 +211,8 @@ export default function CreateParticipant() {
           await participantService.update(id, dataToSend);
           Swal.fire({
             icon: 'success',
-            title: 'Succès',
-            text: 'Participant mis à jour avec succès',
+            title: 'Success',
+            text: 'Participant updated successfully',
             timer: 1500,
             showConfirmButton: false
           });
@@ -200,7 +221,7 @@ export default function CreateParticipant() {
           Swal.fire({
             icon: 'info',
             title: 'Information',
-            text: 'La création de participants via l\'admin n\'est pas disponible. Les participants doivent s\'inscrire via le formulaire public.'
+            text: 'Creating participants via the admin panel is not available. Participants must register via the public form.'
           });
           return;
         }
@@ -210,8 +231,8 @@ export default function CreateParticipant() {
         console.error("Erreur lors de l'enregistrement:", error);
         Swal.fire({
           icon: 'error',
-          title: 'Erreur',
-          text: 'Erreur lors de l\'enregistrement du participant'
+          title: 'Error',
+          text: 'Error while saving the participant'
         });
       } finally {
         setIsLoading(false);
@@ -230,7 +251,7 @@ export default function CreateParticipant() {
             <Icon d={ICONS.arrowLeft} size={20} className="text-gray-600" />
           </button>
           <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
-            {isEditing ? "Modifier un participant" : "Nouveau participant"}
+            {isEditing ? "Edit participant" : "New participant"}
           </h1>
         </div>
         <div className="flex items-center gap-3">
@@ -238,7 +259,7 @@ export default function CreateParticipant() {
             onClick={() => navigate("/participants")}
             className="px-4 py-2 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50"
           >
-            Annuler
+            Cancel
           </button>
           <button
             onClick={handleSubmit}
@@ -246,7 +267,7 @@ export default function CreateParticipant() {
             className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#1a7a3c] text-white text-sm font-semibold hover:bg-[#155f2f] disabled:opacity-50"
           >
             <Icon d={ICONS.save} size={15} />
-            {isLoading ? "En cours..." : (isEditing ? "Mettre à jour" : "Ajouter")}
+            {isLoading ? "Saving..." : (isEditing ? "Update" : "Add")}
           </button>
         </div>
       </div>
@@ -259,7 +280,7 @@ export default function CreateParticipant() {
               {/* Compte */}
               <div>
                 <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">
-                  Informations de compte
+                  Account information
                 </h2>
                 <div className="grid grid-cols-2 gap-6">
                   <div className="flex flex-col gap-1.5">
@@ -288,7 +309,7 @@ export default function CreateParticipant() {
                         type="password"
                         value={formData.mot_de_passe}
                         onChange={(e) => setFormData({...formData, mot_de_passe: e.target.value})}
-                        placeholder="Mot de passe"
+                        placeholder="Password"
                         className={`w-full px-3 py-2.5 rounded-lg border ${errors.mot_de_passe ? 'border-red-400' : 'border-gray-200'} text-sm focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30`}
                       />
                       {errors.mot_de_passe && <p className="text-xs text-red-500">{errors.mot_de_passe}</p>}
@@ -300,12 +321,12 @@ export default function CreateParticipant() {
               {/* Identité personnelle */}
               <div>
                 <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">
-                  Identité personnelle
+                  Personal identity
                 </h2>
                 <div className="grid grid-cols-2 gap-6">
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Titre
+                      Title
                     </label>
                     <select
                       value={formData.titre}
@@ -320,7 +341,7 @@ export default function CreateParticipant() {
 
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Genre
+                      Gender
                     </label>
                     <select
                       value={formData.genre}
@@ -335,13 +356,13 @@ export default function CreateParticipant() {
 
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Prénom <span className="text-red-500">*</span>
+                      First name <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
                       value={formData.prenom}
                       onChange={(e) => setFormData({...formData, prenom: e.target.value})}
-                      placeholder="Ex: Jean"
+                      placeholder="e.g. John"
                       className={`w-full px-3 py-2.5 rounded-lg border ${errors.prenom ? 'border-red-400' : 'border-gray-200'} text-sm focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30`}
                     />
                     {errors.prenom && <p className="text-xs text-red-500">{errors.prenom}</p>}
@@ -349,13 +370,13 @@ export default function CreateParticipant() {
 
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Nom <span className="text-red-500">*</span>
+                      Last name <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
                       value={formData.nom}
                       onChange={(e) => setFormData({...formData, nom: e.target.value})}
-                      placeholder="Ex: Dupont"
+                      placeholder="e.g. Smith"
                       className={`w-full px-3 py-2.5 rounded-lg border ${errors.nom ? 'border-red-400' : 'border-gray-200'} text-sm focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30`}
                     />
                     {errors.nom && <p className="text-xs text-red-500">{errors.nom}</p>}
@@ -371,7 +392,7 @@ export default function CreateParticipant() {
                 <div className="grid grid-cols-2 gap-6">
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Type de participant <span className="text-red-500">*</span>
+                      Participant type <span className="text-red-500">*</span>
                     </label>
                     <select
                       value={formData.type_participant}
@@ -394,7 +415,7 @@ export default function CreateParticipant() {
                       className="w-4 h-4 rounded text-[#1a7a3c] focus:ring-[#1a7a3c]"
                     />
                     <label htmlFor="est_auteur" className="text-sm font-medium text-gray-700">
-                      Est auteur d'un papier
+                      Is an author of a paper
                     </label>
                   </div>
                 </div>
@@ -403,31 +424,31 @@ export default function CreateParticipant() {
               {/* Professionnel */}
               <div>
                 <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">
-                  Informations professionnelles
+                  Professional information
                 </h2>
                 <div className="grid grid-cols-2 gap-6">
                   <div className="col-span-2 flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Institution / Université
+                      Institution / University
                     </label>
                     <input
                       type="text"
                       value={formData.institution}
                       onChange={(e) => setFormData({...formData, institution: e.target.value})}
-                      placeholder="Ex: Université d'Abomey-Calavi"
+                      placeholder="e.g. University of Abomey-Calavi"
                       className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30"
                     />
                   </div>
 
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Département
+                      Department
                     </label>
                     <input
                       type="text"
                       value={formData.departement}
                       onChange={(e) => setFormData({...formData, departement: e.target.value})}
-                      placeholder="Ex: Informatique"
+                      placeholder="e.g. Computer Science"
                       className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30"
                     />
                   </div>
@@ -437,64 +458,64 @@ export default function CreateParticipant() {
               {/* Adresse */}
               <div>
                 <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">
-                  Adresse
+                  Address
                 </h2>
                 <div className="grid grid-cols-2 gap-6">
                   <div className="col-span-2 flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Adresse
+                      Address
                     </label>
                     <textarea
                       value={formData.adresse}
                       onChange={(e) => setFormData({...formData, adresse: e.target.value})}
                       rows={2}
-                      placeholder="Adresse complète"
+                      placeholder="Full address"
                       className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30 resize-none"
                     />
                   </div>
 
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Ville
+                      City
                     </label>
                     <input
                       type="text"
                       value={formData.ville}
                       onChange={(e) => setFormData({...formData, ville: e.target.value})}
-                      placeholder="Ex: Cotonou"
+                      placeholder="e.g. Cotonou"
                       className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30"
                     />
                   </div>
 
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Région
+                      Region
                     </label>
                     <input
                       type="text"
                       value={formData.region}
                       onChange={(e) => setFormData({...formData, region: e.target.value})}
-                      placeholder="Ex: Littoral"
+                      placeholder="e.g. Littoral"
                       className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30"
                     />
                   </div>
 
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Code postal
+                      Postal code
                     </label>
                     <input
                       type="text"
                       value={formData.code_postal}
                       onChange={(e) => setFormData({...formData, code_postal: e.target.value})}
-                      placeholder="Ex: 01 BP 123"
+                      placeholder="e.g. 01 BP 123"
                       className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30"
                     />
                   </div>
 
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Pays
+                      Country
                     </label>
                     <div className="relative">
                       <Icon d={ICONS.globe} size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -504,7 +525,7 @@ export default function CreateParticipant() {
                         className="w-full pl-10 pr-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30"
                       >
                         {COUNTRIES.map(country => (
-                          <option key={country} value={country}>{country}</option>
+                          <option key={country.value} value={country.value}>{country.label}</option>
                         ))}
                       </select>
                     </div>
@@ -520,7 +541,7 @@ export default function CreateParticipant() {
                 <div className="grid grid-cols-3 gap-6">
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Téléphone
+                      Phone
                     </label>
                     <div className="relative">
                       <Icon d={ICONS.phone} size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -565,17 +586,17 @@ export default function CreateParticipant() {
               {/* Préférences */}
               <div>
                 <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">
-                  Préférences
+                  Preferences
                 </h2>
                 <div className="flex flex-col gap-1.5">
                   <label className="text-sm font-semibold text-gray-700">
-                    Préférences alimentaires
+                    Dietary preferences
                   </label>
                   <textarea
                     value={formData.preferences_alimentaires}
                     onChange={(e) => setFormData({...formData, preferences_alimentaires: e.target.value})}
                     rows={2}
-                    placeholder="Végétarien, Halal, Allergies, etc."
+                    placeholder="Vegetarian, Halal, Allergies, etc."
                     className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30 resize-none"
                   />
                 </div>
@@ -584,51 +605,51 @@ export default function CreateParticipant() {
               {/* Facturation */}
               <div>
                 <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">
-                  Informations de facturation
+                  Billing information
                 </h2>
                 <div className="grid grid-cols-2 gap-6">
                   <div className="col-span-2 flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Institution de facturation
+                      Billing institution
                     </label>
                     <input
                       type="text"
                       value={formData.facturation_institution}
                       onChange={(e) => setFormData({...formData, facturation_institution: e.target.value})}
-                      placeholder="Ex: Université d'Abomey-Calavi"
+                      placeholder="e.g. University of Abomey-Calavi"
                       className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30"
                     />
                   </div>
 
                   <div className="col-span-2 flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Adresse de facturation
+                      Billing address
                     </label>
                     <textarea
                       value={formData.facturation_adresse}
                       onChange={(e) => setFormData({...formData, facturation_adresse: e.target.value})}
                       rows={2}
-                      placeholder="Adresse de facturation complète"
+                      placeholder="Full billing address"
                       className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30 resize-none"
                     />
                   </div>
 
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Bureau fiscal
+                      Tax office
                     </label>
                     <input
                       type="text"
                       value={formData.bureau_fiscal}
                       onChange={(e) => setFormData({...formData, bureau_fiscal: e.target.value})}
-                      placeholder="Ex: Bureau fiscal de Cotonou"
+                      placeholder="e.g. Cotonou tax office"
                       className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30"
                     />
                   </div>
 
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Numéro fiscal
+                      Tax number
                     </label>
                     <input
                       type="text"
@@ -644,44 +665,44 @@ export default function CreateParticipant() {
               {/* Diversité */}
               <div>
                 <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">
-                  Informations diversité (optionnel)
+                  Diversity information (optional)
                 </h2>
                 <div className="grid grid-cols-2 gap-6">
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Résidence
+                      Residence
                     </label>
                     <input
                       type="text"
                       value={formData.residence}
                       onChange={(e) => setFormData({...formData, residence: e.target.value})}
-                      placeholder="Ex: Campus"
+                      placeholder="e.g. Campus"
                       className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30"
                     />
                   </div>
 
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Handicap
+                      Disability
                     </label>
                     <input
                       type="text"
                       value={formData.handicap}
                       onChange={(e) => setFormData({...formData, handicap: e.target.value})}
-                      placeholder="Ex: Mobilité réduite"
+                      placeholder="e.g. Reduced mobility"
                       className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30"
                     />
                   </div>
 
                   <div className="col-span-2 flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Autre religion
+                      Other religion
                     </label>
                     <input
                       type="text"
                       value={formData.autre_religion}
                       onChange={(e) => setFormData({...formData, autre_religion: e.target.value})}
-                      placeholder="Préciser si autre religion"
+                      placeholder="Specify if other religion"
                       className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30"
                     />
                   </div>
@@ -692,20 +713,20 @@ export default function CreateParticipant() {
               {isEditing && (
                 <div>
                   <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">
-                    Statut du compte
+                    Account status
                   </h2>
                   <div className="grid grid-cols-2 gap-6">
                     <div className="flex flex-col gap-1.5">
                       <label className="text-sm font-semibold text-gray-700">
-                        Statut du compte
+                        Account status
                       </label>
                       <select
                         value={formData.statut_compte}
                         onChange={(e) => setFormData({...formData, statut_compte: e.target.value})}
                         className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30"
                       >
-                        <option value="ACTIF">Actif</option>
-                        <option value="DESACTIVE">Désactivé</option>
+                        <option value="ACTIF">Active</option>
+                        <option value="DESACTIVE">Deactivated</option>
                       </select>
                     </div>
 
@@ -718,7 +739,7 @@ export default function CreateParticipant() {
                         className="w-4 h-4 rounded text-[#1a7a3c] focus:ring-[#1a7a3c]"
                       />
                       <label htmlFor="activated" className="text-sm font-medium text-gray-700">
-                        Compte activé
+                        Account activated
                       </label>
                     </div>
                   </div>

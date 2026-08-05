@@ -36,12 +36,12 @@ const ICONS = {
 };
 
 const PROGRAM_TYPES = [
-  { value: "keynote", label: "Keynote", color: "purple", description: "Session principale" },
-  { value: "session", label: "Session", color: "blue", description: "Session régulière" },
-  { value: "workshop", label: "Workshop", color: "green", description: "Atelier pratique" },
-  { value: "panel", label: "Panel", color: "orange", description: "Table ronde" },
-  { value: "break", label: "Pause", color: "pink", description: "Pause café" },
-  { value: "social", label: "Social", color: "indigo", description: "Événement social" },
+  { value: "keynote", label: "Keynote", color: "purple", description: "Main session" },
+  { value: "session", label: "Session", color: "blue", description: "Regular session" },
+  { value: "workshop", label: "Workshop", color: "green", description: "Hands-on workshop" },
+  { value: "panel", label: "Panel", color: "orange", description: "Panel discussion" },
+  { value: "break", label: "Break", color: "pink", description: "Coffee break" },
+  { value: "social", label: "Social", color: "indigo", description: "Social event" },
 ];
 
 export default function CreateProgramContent() {
@@ -110,32 +110,32 @@ export default function CreateProgramContent() {
         planning_fichier_id: program.planning_fichier_id || null,
       });
       if (program.planning_fichier_id) {
-        setPlanningFileName(`Fichier ID #${program.planning_fichier_id} (existant)`);
+        setPlanningFileName(`File ID #${program.planning_fichier_id} (existing)`);
       }
     } catch (error) {
       console.error("Erreur lors du chargement du programme:", error);
       Swal.fire({
         icon: 'error',
-        title: 'Erreur',
-        text: 'Erreur lors du chargement du programme'
+        title: 'Error',
+        text: 'Error while loading the program'
       });
     }
   };
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.titre.trim()) newErrors.titre = "Le titre est requis";
-    if (!formData.type) newErrors.type = "Le type est requis";
-    if (!formData.date_debut) newErrors.date_debut = "La date de début est requise";
-    if (!formData.date_fin) newErrors.date_fin = "La date de fin est requise";
-    if (!formData.evenement_id) newErrors.evenement_id = "L'événement est requis";
-    
+    if (!formData.titre.trim()) newErrors.titre = "Title is required";
+    if (!formData.type) newErrors.type = "Type is required";
+    if (!formData.date_debut) newErrors.date_debut = "Start date is required";
+    if (!formData.date_fin) newErrors.date_fin = "End date is required";
+    if (!formData.evenement_id) newErrors.evenement_id = "Event is required";
+
     // Validation des dates
     if (formData.date_debut && formData.date_fin) {
       const debut = new Date(formData.date_debut);
       const fin = new Date(formData.date_fin);
       if (fin < debut) {
-        newErrors.date_fin = "La date de fin doit être postérieure ou égale à la date de début";
+        newErrors.date_fin = "The end date must be after or equal to the start date";
       }
     }
     
@@ -165,14 +165,14 @@ export default function CreateProgramContent() {
     const file = e.target.files[0];
     if (!file) return;
     if (file.size > 10 * 1024 * 1024) {
-      Swal.fire({ icon: 'warning', title: 'Fichier trop lourd', text: 'Le fichier ne doit pas dépasser 10MB.' });
+      Swal.fire({ icon: 'warning', title: 'File too large', text: 'The file must not exceed 10MB.' });
       return;
     }
     setPlanningFileName(file.name);
     setPlanningUploading(true);
     fichierService.upload(file, 'planning')
       .then(fichier => setFormData(prev => ({ ...prev, planning_fichier_id: fichier.id })))
-      .catch(() => Swal.fire({ icon: 'error', title: 'Erreur', text: "Impossible d'uploader le fichier planning." }))
+      .catch(() => Swal.fire({ icon: 'error', title: 'Error', text: "Unable to upload the schedule file." }))
       .finally(() => setPlanningUploading(false));
   };
 
@@ -187,8 +187,8 @@ export default function CreateProgramContent() {
           await programmeService.update(id, programData);
           Swal.fire({
             icon: 'success',
-            title: 'Succès',
-            text: 'Programme mis à jour avec succès',
+            title: 'Success',
+            text: 'Program updated successfully',
             timer: 1500,
             showConfirmButton: false
           });
@@ -196,8 +196,8 @@ export default function CreateProgramContent() {
           await programmeService.create(programData);
           Swal.fire({
             icon: 'success',
-            title: 'Succès',
-            text: 'Programme créé avec succès',
+            title: 'Success',
+            text: 'Program created successfully',
             timer: 1500,
             showConfirmButton: false
           });
@@ -208,8 +208,8 @@ export default function CreateProgramContent() {
         console.error("Erreur lors de la sauvegarde:", error);
         Swal.fire({
           icon: 'error',
-          title: 'Erreur',
-          text: 'Erreur lors de la sauvegarde du programme'
+          title: 'Error',
+          text: 'Error while saving the program'
         });
       } finally {
         setIsLoading(false);
@@ -231,12 +231,12 @@ export default function CreateProgramContent() {
           <button
             onClick={() => navigate("/program")}
             className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-            title="Retour"
+            title="Back"
           >
             <Icon d={ICONS.arrowLeft} size={20} className="text-gray-600" />
           </button>
           <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
-            {isEditing ? "Modifier le programme" : "Créer un programme"}
+            {isEditing ? "Edit program" : "Create a program"}
           </h1>
         </div>
         <div className="flex items-center gap-3">
@@ -244,7 +244,7 @@ export default function CreateProgramContent() {
             onClick={() => navigate("/program")}
             className="px-4 py-2 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
           >
-            Annuler
+            Cancel
           </button>
           <button
             onClick={handleSubmit}
@@ -252,7 +252,7 @@ export default function CreateProgramContent() {
             className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#1a7a3c] text-white text-sm font-semibold hover:bg-[#155f2f] transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Icon d={ICONS.save} size={15} />
-            {isLoading ? "En cours..." : (isEditing ? "Mettre à jour" : "Créer le programme")}
+            {isLoading ? "Saving..." : (isEditing ? "Update" : "Create program")}
           </button>
         </div>
       </div>
@@ -265,12 +265,12 @@ export default function CreateProgramContent() {
               {/* Informations générales */}
               <div>
                 <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">
-                  Informations générales
+                  General information
                 </h2>
                 <div className="grid grid-cols-2 gap-6">
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Événement <span className="text-red-500">*</span>
+                      Event <span className="text-red-500">*</span>
                     </label>
                     <select
                       value={formData.evenement_id}
@@ -279,7 +279,7 @@ export default function CreateProgramContent() {
                         errors.evenement_id ? 'border-red-400' : 'border-gray-200'
                       } text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30 focus:border-[#1a7a3c] transition`}
                     >
-                      <option value="">Sélectionner un événement</option>
+                      <option value="">Select an event</option>
                       {evenements.map(evenement => (
                         <option key={evenement.id} value={evenement.id}>
                           {evenement.nom} ({evenement.code})
@@ -291,7 +291,7 @@ export default function CreateProgramContent() {
 
                   <div className="col-span-2 flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Titre du programme <span className="text-red-500">*</span>
+                      Program title <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
@@ -324,7 +324,7 @@ export default function CreateProgramContent() {
 
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Lieu / Salle
+                      Location / Room
                     </label>
                     <div className="relative">
                       <Icon d={ICONS.location} size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -332,7 +332,7 @@ export default function CreateProgramContent() {
                         type="text"
                         value={formData.salle}
                         onChange={(e) => setFormData({...formData, salle: e.target.value})}
-                        placeholder="Ex: Auditorium A, Salle 101"
+                        placeholder="e.g. Auditorium A, Room 101"
                         className="w-full pl-10 pr-3 py-2.5 rounded-lg border border-gray-200 text-sm text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30 focus:border-[#1a7a3c] transition"
                       />
                     </div>
@@ -343,12 +343,12 @@ export default function CreateProgramContent() {
               {/* Date et horaire */}
               <div>
                 <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">
-                  Date et horaire
+                  Date and time
                 </h2>
                 <div className="grid grid-cols-2 gap-6">
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Date de début <span className="text-red-500">*</span>
+                      Start date <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
                       <Icon d={ICONS.calendar} size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -366,7 +366,7 @@ export default function CreateProgramContent() {
 
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Date de fin <span className="text-red-500">*</span>
+                      End date <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
                       <Icon d={ICONS.calendar} size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -387,13 +387,13 @@ export default function CreateProgramContent() {
               {/* Fichier planning */}
               <div>
                 <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">
-                  Fichier planning (optionnel)
+                  Schedule file (optional)
                 </h2>
                 <div className="flex items-center gap-4">
                   <label className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-dashed border-gray-300 bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors">
                     <Icon d={ICONS.upload} size={16} className="text-gray-500" />
                     <span className="text-sm text-gray-600">
-                      {planningUploading ? 'Upload en cours…' : 'Choisir un fichier PDF ou image'}
+                      {planningUploading ? 'Uploading…' : 'Choose a PDF or image file'}
                     </span>
                     <input
                       type="file"
@@ -412,13 +412,13 @@ export default function CreateProgramContent() {
                     </div>
                   )}
                 </div>
-                <p className="text-xs text-gray-400 mt-2">Format : PDF, PNG, JPG. Taille max : 10MB</p>
+                <p className="text-xs text-gray-400 mt-2">Format: PDF, PNG, JPG. Max size: 10MB</p>
               </div>
 
               {/* Intervenants */}
               <div>
                 <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">
-                  Intervenants (IDs)
+                  Speakers (IDs)
                 </h2>
                 <div className="space-y-3">
                   <div className="flex gap-2">
@@ -429,7 +429,7 @@ export default function CreateProgramContent() {
                         value={newSpeakerId}
                         onChange={(e) => setNewSpeakerId(e.target.value)}
                         onKeyPress={handleKeyPress}
-                        placeholder="ID de l'intervenant..."
+                        placeholder="Speaker ID..."
                         className="w-full pl-10 pr-3 py-2.5 rounded-lg border border-gray-200 text-sm text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30 focus:border-[#1a7a3c] transition"
                       />
                     </div>
@@ -439,7 +439,7 @@ export default function CreateProgramContent() {
                       className="px-4 py-2 rounded-lg bg-[#1a7a3c] text-white text-sm font-semibold hover:bg-[#155f2f] transition-colors flex items-center gap-1"
                     >
                       <Icon d={ICONS.plus} size={14} />
-                      Ajouter
+                      Add
                     </button>
                   </div>
 
@@ -461,14 +461,14 @@ export default function CreateProgramContent() {
                       </div>
                     ))}
                   </div>
-                  <p className="text-xs text-gray-400">Note: Les IDs doivent correspondre aux speakers/committees existants dans la base de données</p>
+                  <p className="text-xs text-gray-400">Note: IDs must match existing speakers/committees in the database</p>
                 </div>
               </div>
 
               {/* Informations complémentaires */}
               <div>
                 <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">
-                  Informations complémentaires
+                  Additional information
                 </h2>
                 <div className="flex flex-col gap-1.5">
                   <label className="text-sm font-semibold text-gray-700">
@@ -478,7 +478,7 @@ export default function CreateProgramContent() {
                     value={formData.description}
                     onChange={(e) => setFormData({...formData, description: e.target.value})}
                     rows={4}
-                    placeholder="Décrivez le contenu de ce programme..."
+                    placeholder="Describe the content of this program..."
                     className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30 focus:border-[#1a7a3c] transition resize-none"
                   />
                 </div>

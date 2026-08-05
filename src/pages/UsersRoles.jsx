@@ -35,12 +35,12 @@ const ICONS = {
 };
 
 const USER_ROLES = [
-  { value: "Super Admin", label: "Super Admin", description: "Accès complet à toutes les fonctionnalités", color: "red" },
-  { value: "Admin", label: "Admin", description: "Gestion complète du contenu", color: "purple" },
-  { value: "Editor", label: "Editor", description: "Peut créer et modifier du contenu", color: "blue" },
-  { value: "Author", label: "Author", description: "Peut créer son propre contenu", color: "green" },
-  { value: "Viewer", label: "Viewer", description: "Lecture seule", color: "gray" },
-  { value: "Contributor", label: "Contributor", description: "Peut soumettre du contenu", color: "orange" },
+  { value: "Super Admin", label: "Super Admin", description: "Full access to all features", color: "red" },
+  { value: "Admin", label: "Admin", description: "Full content management", color: "purple" },
+  { value: "Editor", label: "Editor", description: "Can create and edit content", color: "blue" },
+  { value: "Author", label: "Author", description: "Can create their own content", color: "green" },
+  { value: "Viewer", label: "Viewer", description: "Read only", color: "gray" },
+  { value: "Contributor", label: "Contributor", description: "Can submit content", color: "orange" },
 ];
 
 const isSuperAdmin = (usr) => {
@@ -89,8 +89,8 @@ export default function UsersRoles() {
       console.error("Erreur lors du chargement des utilisateurs:", error);
       Swal.fire({
         icon: 'error',
-        title: 'Erreur',
-        text: 'Erreur lors du chargement des utilisateurs'
+        title: 'Error',
+        text: 'Error while loading users'
       });
     } finally {
       setLoading(false);
@@ -110,8 +110,8 @@ export default function UsersRoles() {
       await loadUsers();
       Swal.fire({
         icon: 'success',
-        title: 'Succès',
-        text: 'Statut mis à jour avec succès',
+        title: 'Success',
+        text: 'Status updated successfully',
         timer: 1500,
         showConfirmButton: false
       });
@@ -119,22 +119,22 @@ export default function UsersRoles() {
       console.error("Erreur lors de la mise à jour du statut:", error);
       Swal.fire({
         icon: 'error',
-        title: 'Erreur',
-        text: 'Erreur lors de la mise à jour du statut'
+        title: 'Error',
+        text: 'Error while updating the status'
       });
     }
   };
 
   const deleteUser = async (id) => {
     const result = await Swal.fire({
-      title: 'Êtes-vous sûr ?',
-      text: "Vous ne pourrez pas récupérer cet utilisateur !",
+      title: 'Are you sure?',
+      text: "You won't be able to recover this user!",
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#d33',
       cancelButtonColor: '#3085d6',
-      confirmButtonText: 'Oui, supprimer !',
-      cancelButtonText: 'Annuler'
+      confirmButtonText: 'Yes, delete!',
+      cancelButtonText: 'Cancel'
     });
 
     if (result.isConfirmed) {
@@ -143,8 +143,8 @@ export default function UsersRoles() {
         await loadUsers();
         Swal.fire({
           icon: 'success',
-          title: 'Supprimé !',
-          text: 'L\'utilisateur a été supprimé.',
+          title: 'Deleted!',
+          text: 'The user has been deleted.',
           timer: 1500,
           showConfirmButton: false
         });
@@ -152,8 +152,8 @@ export default function UsersRoles() {
         console.error("Erreur lors de la suppression:", error);
         Swal.fire({
           icon: 'error',
-          title: 'Erreur',
-          text: 'Erreur lors de la suppression'
+          title: 'Error',
+          text: 'Error while deleting'
         });
       }
     }
@@ -165,26 +165,26 @@ export default function UsersRoles() {
       html: `
         <div class="text-left" style="font-size: 14px;">
           <div style="margin-bottom: 12px;">
-            <strong style="color: #1a7a3c;">Informations générales</strong>
+            <strong style="color: #1a7a3c;">General information</strong>
             <div style="margin-top: 4px; color: #666;">
               <div><strong>Email:</strong> ${user.email || '-'}</div>
-              <div><strong>Rôle:</strong> ${user.role_admin ? user.role_admin.libelle : '-'}</div>
-              <div><strong>Statut du compte:</strong> ${user.statut_compte || '-'}</div>
-              <div><strong>Activé:</strong> ${user.activated !== undefined ? (user.activated ? 'Oui' : 'Non') : (user.online ? 'Oui' : 'Non')}</div>
+              <div><strong>Role:</strong> ${user.role_admin ? user.role_admin.libelle : '-'}</div>
+              <div><strong>Account status:</strong> ${user.statut_compte || '-'}</div>
+              <div><strong>Activated:</strong> ${user.activated !== undefined ? (user.activated ? 'Yes' : 'No') : (user.online ? 'Yes' : 'No')}</div>
             </div>
           </div>
           <div style="margin-bottom: 12px;">
             <strong style="color: #1a7a3c;">Dates</strong>
             <div style="margin-top: 4px; color: #666;">
-              <div><strong>Dernière connexion:</strong> ${user.date_derniere_connexion || '-'}</div>
-              <div><strong>Créé le:</strong> ${user.created_at || '-'}</div>
+              <div><strong>Last login:</strong> ${user.date_derniere_connexion || '-'}</div>
+              <div><strong>Created on:</strong> ${user.created_at || '-'}</div>
             </div>
           </div>
         </div>
       `,
       width: '600px',
       showConfirmButton: true,
-      confirmButtonText: 'Fermer',
+      confirmButtonText: 'Close',
       confirmButtonColor: '#1a7a3c',
     });
   };
@@ -225,10 +225,10 @@ export default function UsersRoles() {
     <div className="flex-1 flex flex-col min-h-screen bg-[#f5f6f8]">
       <div className="px-8 pt-8 pb-6">
         <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
-          Gestion des utilisateurs et rôles
+          User and role management
         </h1>
         <p className="text-sm text-gray-500 mt-1">
-          Gérez les utilisateurs et leurs permissions
+          Manage users and their permissions
         </p>
       </div>
 
@@ -236,7 +236,7 @@ export default function UsersRoles() {
         <div className="flex flex-col gap-3 px-6 py-4 border-b border-gray-100">
           <div className="flex items-center gap-3">
             <span className="text-base font-bold text-gray-900 shrink-0">
-              Utilisateurs
+              Users
             </span>
 
             <div className="flex-1 relative">
@@ -249,7 +249,7 @@ export default function UsersRoles() {
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Rechercher par nom ou email..."
+                placeholder="Search by name or email..."
                 className="w-full pl-9 pr-4 py-2 rounded-lg border border-gray-200 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30 focus:border-[#1a7a3c] transition"
               />
             </div>
@@ -269,14 +269,14 @@ export default function UsersRoles() {
                 className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#1a7a3c] text-white text-sm font-semibold hover:bg-[#155f2f] transition-colors shadow-sm shrink-0"
               >
                 <Icon d={ICONS.plus} size={15} />
-                Ajouter un utilisateur
+                Add a user
               </button>
             )}
           </div>
 
           {showFilters && (
             <div className="flex items-center gap-3 pt-2 border-t border-gray-100 flex-wrap">
-              <span className="text-xs font-medium text-gray-500">Filtrer par rôle :</span>
+              <span className="text-xs font-medium text-gray-500">Filter by role:</span>
               <div className="flex gap-2 flex-wrap">
                 <button
                   onClick={() => setSelectedRole("")}
@@ -286,7 +286,7 @@ export default function UsersRoles() {
                       : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                   }`}
                 >
-                  Tous
+                  All
                 </button>
                 {USER_ROLES.map((role) => (
                   <button
@@ -311,11 +311,11 @@ export default function UsersRoles() {
             <thead>
               <tr className="border-b border-gray-100 bg-gray-50/50">
                 <th className="text-left px-6 py-3 text-gray-500 font-medium">ID</th>
-                <th className="text-left px-4 py-3 text-gray-500 font-medium">Nom</th>
+                <th className="text-left px-4 py-3 text-gray-500 font-medium">Name</th>
                 <th className="text-left px-4 py-3 text-gray-500 font-medium">Email</th>
-                <th className="text-left px-4 py-3 text-gray-500 font-medium">Rôle</th>
-                <th className="text-left px-4 py-3 text-gray-500 font-medium">Dernière connexion</th>
-                <th className="text-left px-4 py-3 text-gray-500 font-medium">Statut</th>
+                <th className="text-left px-4 py-3 text-gray-500 font-medium">Role</th>
+                <th className="text-left px-4 py-3 text-gray-500 font-medium">Last login</th>
+                <th className="text-left px-4 py-3 text-gray-500 font-medium">Status</th>
                 <th className="text-left px-4 py-3 text-gray-500 font-medium">Action</th>
               </tr>
             </thead>
@@ -323,7 +323,7 @@ export default function UsersRoles() {
               {filtered.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="px-6 py-10 text-center text-gray-400">
-                    Aucun utilisateur trouvé.
+                    No users found.
                   </td>
                 </tr>
               ) : (
@@ -355,7 +355,7 @@ export default function UsersRoles() {
                       </span>
                     </td>
                     <td className="px-4 py-4 text-gray-500 text-sm">
-                      {user.date_derniere_connexion || "Jamais"}
+                      {user.date_derniere_connexion || "Never"}
                     </td>
                     <td className="px-4 py-4">
                       <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
@@ -364,7 +364,7 @@ export default function UsersRoles() {
                         user.statut_compte === 'SUSPENDU' ? 'bg-red-100 text-red-700' :
                         'bg-gray-100 text-gray-700'
                       }`}>
-                        {user.statut_compte === 'ACTIF' ? 'Actif' : user.statut_compte === 'DESACTIVE' ? 'Désactivé' : user.statut_compte === 'SUSPENDU' ? 'Suspendu' : '-'}
+                        {user.statut_compte === 'ACTIF' ? 'Active' : user.statut_compte === 'DESACTIVE' ? 'Deactivated' : user.statut_compte === 'SUSPENDU' ? 'Suspended' : '-'}
                       </span>
                     </td>
                     <td className="px-4 py-4">
@@ -372,7 +372,7 @@ export default function UsersRoles() {
                         <button
                           onClick={() => viewUser(user)}
                           className="text-gray-400 hover:text-blue-500 transition-colors"
-                          title="Voir les détails"
+                          title="View details"
                         >
                           <Icon d={ICONS.eye} size={16} />
                         </button>
@@ -380,7 +380,7 @@ export default function UsersRoles() {
                           <button
                             onClick={() => navigate(`/roles/edit/${user.id}`)}
                             className="text-gray-400 hover:text-[#1a7a3c] transition-colors"
-                            title="Modifier"
+                            title="Edit"
                           >
                             <Icon d={ICONS.edit} size={16} />
                           </button>
@@ -391,7 +391,7 @@ export default function UsersRoles() {
                             className={`transition-colors ${
                               user.activated !== undefined ? (user.activated ? "text-green-600 hover:text-red-400" : "text-gray-300 hover:text-green-600") : (user.online ? "text-green-600 hover:text-red-400" : "text-gray-300 hover:text-green-600")
                             }`}
-                            title={user.activated !== undefined ? (user.activated ? "Désactiver" : "Activer") : (user.online ? "Désactiver" : "Activer")}
+                            title={user.activated !== undefined ? (user.activated ? "Deactivate" : "Activate") : (user.online ? "Deactivate" : "Activate")}
                           >
                             <Icon d={ICONS.power} size={16} />
                           </button>
@@ -400,7 +400,7 @@ export default function UsersRoles() {
                           <button
                             onClick={() => deleteUser(user.id)}
                             className="text-gray-400 hover:text-red-500 transition-colors"
-                            title="Supprimer"
+                            title="Delete"
                           >
                             <Icon d={ICONS.delete} size={16} />
                           </button>
@@ -418,12 +418,12 @@ export default function UsersRoles() {
           <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-white">
             <div className="flex items-center gap-4 flex-wrap">
               <span className="text-sm text-gray-500">
-                Affichage de <span className="font-semibold">{pagination.from || 0}</span> à{" "}
-                <span className="font-semibold">{pagination.to || 0}</span> sur{" "}
-                <span className="font-semibold">{pagination.total || 0}</span> utilisateurs
+                Showing <span className="font-semibold">{pagination.from || 0}</span> to{" "}
+                <span className="font-semibold">{pagination.to || 0}</span> of{" "}
+                <span className="font-semibold">{pagination.total || 0}</span> users
               </span>
               <div className="flex items-center gap-1.5 text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded border border-gray-200/50">
-                <span>Afficher</span>
+                <span>Show</span>
                 <select
                   value={perPage}
                   onChange={(e) => setPerPage(Number(e.target.value))}
@@ -435,7 +435,7 @@ export default function UsersRoles() {
                   <option value={50}>50</option>
                   <option value={100}>100</option>
                 </select>
-                <span>par page</span>
+                <span>per page</span>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -444,7 +444,7 @@ export default function UsersRoles() {
                 disabled={pagination.current_page === 1}
                 className="px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                Précédent
+                Previous
               </button>
               {Array.from({ length: pagination.last_page }, (_, index) => {
                 const pageNum = index + 1;
@@ -479,7 +479,7 @@ export default function UsersRoles() {
                 disabled={pagination.current_page === pagination.last_page}
                 className="px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                Suivant
+                Next
               </button>
             </div>
           </div>
@@ -487,10 +487,10 @@ export default function UsersRoles() {
 
         <div className="px-6 py-3 border-t border-gray-100 bg-gray-50/50">
           <div className="flex items-center justify-between text-xs text-gray-500">
-            <span>Total : {pagination ? pagination.total : filtered.length} utilisateur(s)</span>
+            <span>Total: {pagination ? pagination.total : filtered.length} user(s)</span>
             <span>
-              Actifs : {filtered.filter(u => u.activated !== undefined ? u.activated : u.online).length} | 
-              Inactifs : {filtered.filter(u => u.activated !== undefined ? !u.activated : !u.online).length}
+              Active: {filtered.filter(u => u.activated !== undefined ? u.activated : u.online).length} |
+              Inactive: {filtered.filter(u => u.activated !== undefined ? !u.activated : !u.online).length}
             </span>
           </div>
         </div>

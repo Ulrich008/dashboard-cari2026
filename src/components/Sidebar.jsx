@@ -36,7 +36,7 @@ const ICONS = {
 };
 
 const NAV_ITEMS = [
-  { label: "Tableau de bord",       icon: "dashboard", path: "/dashboard" },
+  { label: "Dashboard",             icon: "dashboard", path: "/dashboard" },
   { label: "Pages",                 icon: "pages",     path: "/pages" },
   { label: "Menus",                 icon: "menu",      path: "/menus" },
   { label: "Participants",          icon: "users",     path: "/participants" },
@@ -131,21 +131,21 @@ export default function Sidebar({ activeItem = "Pages", onNavigate }) {
             {user?.name?.charAt(0)?.toUpperCase() || 'U'}
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold text-gray-800 truncate">{user?.name || 'Utilisateur'}</p>
+            <p className="text-sm font-semibold text-gray-800 truncate">{user?.name || 'User'}</p>
             <p className="text-xs text-gray-400 truncate">{user?.email || ''}</p>
           </div>
         </div>
         <button 
           onClick={() => {
             Swal.fire({
-              title: 'Se déconnecter ?',
-              text: 'Êtes-vous sûr de vouloir vous déconnecter ?',
+              title: 'Log out?',
+              text: 'Are you sure you want to log out?',
               icon: 'warning',
               showCancelButton: true,
               confirmButtonColor: '#1a7a3c',
               cancelButtonColor: '#d33',
-              confirmButtonText: 'Oui, me déconnecter',
-              cancelButtonText: 'Annuler'
+              confirmButtonText: 'Yes, log me out',
+              cancelButtonText: 'Cancel'
             }).then((result) => {
               if (result.isConfirmed) {
                 logout();
@@ -155,7 +155,7 @@ export default function Sidebar({ activeItem = "Pages", onNavigate }) {
           className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-red-500 hover:bg-red-50 transition-colors font-medium"
         >
           <Icon d={ICONS.logout} size={16} />
-          <span>Se déconnecter</span>
+          <span>Log out</span>
         </button>
       </div>
     </>

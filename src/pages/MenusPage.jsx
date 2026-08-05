@@ -27,30 +27,30 @@ export default function MenusPage() {
     setLoading(true);
     menuService.getAll()
       .then(res => setMenus(res.data.data ?? res.data))
-      .catch(() => Swal.fire('Erreur', 'Impossible de charger les menus.', 'error'))
+      .catch(() => Swal.fire('Error', 'Unable to load menus.', 'error'))
       .finally(() => setLoading(false));
   };
 
   useEffect(() => { loadMenus(); }, []);
 
   const handleToggle = async (item) => {
-    const action = item.activated ? 'désactiver' : 'activer';
+    const action = item.activated ? 'disable' : 'enable';
     const result = await Swal.fire({
-      title: `${item.activated ? 'Désactiver' : 'Activer'} "${item.label}" ?`,
+      title: `${item.activated ? 'Disable' : 'Enable'} "${item.label}"?`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#1a7a3c',
       cancelButtonColor: '#d33',
-      confirmButtonText: `Oui, ${action}`,
-      cancelButtonText: 'Annuler',
+      confirmButtonText: `Yes, ${action}`,
+      cancelButtonText: 'Cancel',
     });
     if (!result.isConfirmed) return;
     try {
       await menuService.toggle(item.id);
-      Swal.fire({ icon: 'success', title: 'Succès', timer: 1200, showConfirmButton: false });
+      Swal.fire({ icon: 'success', title: 'Success', timer: 1200, showConfirmButton: false });
       loadMenus();
     } catch {
-      Swal.fire('Erreur', `Impossible de ${action} ce menu.`, 'error');
+      Swal.fire('Error', `Unable to ${action} this menu.`, 'error');
     }
   };
 
@@ -58,7 +58,7 @@ export default function MenusPage() {
     <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
       activated ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
     }`}>
-      {activated ? 'Actif' : 'Inactif'}
+      {activated ? 'Active' : 'Inactive'}
     </span>
   );
 
@@ -74,7 +74,7 @@ export default function MenusPage() {
           </div>
         </td>
         <td className="px-4 py-3 text-xs text-gray-500 font-mono">
-          {item.url ?? <span className="text-gray-300 italic">aucune</span>}
+          {item.url ?? <span className="text-gray-300 italic">none</span>}
         </td>
         <td className="px-4 py-3 text-xs text-gray-500">
           {item.page_slug ?? <span className="text-gray-300 italic">—</span>}
@@ -85,7 +85,7 @@ export default function MenusPage() {
           <div className="flex items-center gap-2 justify-end">
             <button
               onClick={() => navigate(`/menus/edit/${item.id}`)}
-              title="Modifier"
+              title="Edit"
               className="p-1.5 rounded-lg text-gray-400 hover:text-[#1a7a3c] hover:bg-green-50 transition-colors"
             >
               <Icon d={ICONS.edit} size={15} />
@@ -93,7 +93,7 @@ export default function MenusPage() {
             {depth === 0 && (
               <button
                 onClick={() => navigate(`/menus/create?parent_id=${item.id}`)}
-                title="Ajouter un sous-menu"
+                title="Add a submenu"
                 className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
               >
                 <Icon d={ICONS.child} size={15} />
@@ -101,7 +101,7 @@ export default function MenusPage() {
             )}
             <button
               onClick={() => handleToggle(item)}
-              title={item.activated ? 'Désactiver' : 'Activer'}
+              title={item.activated ? 'Disable' : 'Enable'}
               className={`p-1.5 rounded-lg transition-colors ${
                 item.activated
                   ? 'text-gray-400 hover:text-red-500 hover:bg-red-50'
@@ -124,15 +124,15 @@ export default function MenusPage() {
       {/* Header */}
       <div className="flex items-center justify-between px-8 pt-8 pb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Menus de navigation</h1>
-          <p className="text-sm text-gray-500 mt-1">Gérez la structure de navigation du site vitrine.</p>
+          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Navigation menus</h1>
+          <p className="text-sm text-gray-500 mt-1">Manage the showcase site's navigation structure.</p>
         </div>
         <button
           onClick={() => navigate('/menus/create')}
           className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#1a7a3c] text-white text-sm font-semibold hover:bg-[#155f2f] transition-colors shadow-sm"
         >
           <Icon d={ICONS.plus} size={15} />
-          Ajouter un menu
+          Add a menu
         </button>
       </div>
 
@@ -144,16 +144,16 @@ export default function MenusPage() {
               <div className="w-8 h-8 border-2 border-[#1a7a3c] border-t-transparent rounded-full animate-spin" />
             </div>
           ) : menus.length === 0 ? (
-            <div className="text-center py-16 text-gray-400 text-sm">Aucun menu configuré.</div>
+            <div className="text-center py-16 text-gray-400 text-sm">No menus configured.</div>
           ) : (
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-100 bg-gray-50/60">
                   <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Label</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">URL</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Page liée</th>
-                  <th className="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wide">Ordre</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Statut</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Linked page</th>
+                  <th className="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wide">Order</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Status</th>
                   <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wide">Actions</th>
                 </tr>
               </thead>

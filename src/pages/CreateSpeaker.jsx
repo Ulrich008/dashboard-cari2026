@@ -35,9 +35,9 @@ const ICONS = {
 };
 
 const MEMBER_TYPES = [
-  { value: "speaker", label: "Speaker", description: "Conférencier" },
-  { value: "program_committee", label: "Program Committee", description: "Membre du comité de programme" },
-  { value: "organizing_committee", label: "Organizing Committee", description: "Membre du comité d'organisation" },
+  { value: "speaker", label: "Speaker", description: "Speaker" },
+  { value: "program_committee", label: "Program Committee", description: "Program committee member" },
+  { value: "organizing_committee", label: "Organizing Committee", description: "Organizing committee member" },
 ];
 
 export default function CreateSpeaker() {
@@ -91,19 +91,19 @@ export default function CreateSpeaker() {
       console.error("Erreur lors du chargement du speaker:", error);
       Swal.fire({
         icon: 'error',
-        title: 'Erreur',
-        text: 'Erreur lors du chargement du speaker'
+        title: 'Error',
+        text: 'Error while loading the speaker'
       });
     }
   };
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.prenom.trim()) newErrors.prenom = "Le prénom est requis";
-    if (!formData.nom.trim()) newErrors.nom = "Le nom est requis";
-    if (!formData.type) newErrors.type = "Le type est requis";
-    if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = "Email invalide";
-    if (formData.website && !/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/.test(formData.website)) newErrors.website = "URL invalide";
+    if (!formData.prenom.trim()) newErrors.prenom = "First name is required";
+    if (!formData.nom.trim()) newErrors.nom = "Last name is required";
+    if (!formData.type) newErrors.type = "Type is required";
+    if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = "Invalid email";
+    if (formData.website && !/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/.test(formData.website)) newErrors.website = "Invalid URL";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -112,7 +112,7 @@ export default function CreateSpeaker() {
     const file = e.target.files[0];
     if (!file) return;
     if (file.size > 2 * 1024 * 1024) {
-      Swal.fire({ icon: 'warning', title: 'Fichier trop lourd', text: 'Le fichier ne doit pas dépasser 2MB.' });
+      Swal.fire({ icon: 'warning', title: 'File too large', text: 'The file must not exceed 2MB.' });
       return;
     }
     const reader = new FileReader();
@@ -121,7 +121,7 @@ export default function CreateSpeaker() {
     setPhotoUploading(true);
     fichierService.upload(file, 'photo_speaker')
       .then(fichier => setFormData(prev => ({ ...prev, photo_fichier_id: fichier.id })))
-      .catch(() => Swal.fire({ icon: 'error', title: 'Erreur', text: "Impossible d'uploader la photo." }))
+      .catch(() => Swal.fire({ icon: 'error', title: 'Error', text: "Unable to upload the photo." }))
       .finally(() => setPhotoUploading(false));
   };
 
@@ -136,8 +136,8 @@ export default function CreateSpeaker() {
           await speakerService.update(id, memberData);
           Swal.fire({
             icon: 'success',
-            title: 'Succès',
-            text: 'Speaker mis à jour avec succès',
+            title: 'Success',
+            text: 'Speaker updated successfully',
             timer: 1500,
             showConfirmButton: false
           });
@@ -145,8 +145,8 @@ export default function CreateSpeaker() {
           await speakerService.create(memberData);
           Swal.fire({
             icon: 'success',
-            title: 'Succès',
-            text: 'Speaker créé avec succès',
+            title: 'Success',
+            text: 'Speaker created successfully',
             timer: 1500,
             showConfirmButton: false
           });
@@ -157,8 +157,8 @@ export default function CreateSpeaker() {
         console.error("Erreur lors de la sauvegarde:", error);
         Swal.fire({
           icon: 'error',
-          title: 'Erreur',
-          text: 'Erreur lors de la sauvegarde du speaker'
+          title: 'Error',
+          text: 'Error while saving the speaker'
         });
       } finally {
         setIsLoading(false);
@@ -173,12 +173,12 @@ export default function CreateSpeaker() {
           <button
             onClick={() => navigate("/speakers")}
             className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-            title="Retour"
+            title="Back"
           >
             <Icon d={ICONS.arrowLeft} size={20} className="text-gray-600" />
           </button>
           <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
-            {isEditing ? "Modifier un membre" : "Ajouter un speaker / committee"}
+            {isEditing ? "Edit member" : "Add a speaker / committee member"}
           </h1>
         </div>
         <div className="flex items-center gap-3">
@@ -186,7 +186,7 @@ export default function CreateSpeaker() {
             onClick={() => navigate("/speakers")}
             className="px-4 py-2 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
           >
-            Annuler
+            Cancel
           </button>
           <button
             onClick={handleSubmit}
@@ -194,7 +194,7 @@ export default function CreateSpeaker() {
             className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#1a7a3c] text-white text-sm font-semibold hover:bg-[#155f2f] transition-colors shadow-sm disabled:opacity-50"
           >
             <Icon d={ICONS.save} size={15} />
-            {isLoading ? "En cours..." : (isEditing ? "Mettre à jour" : "Ajouter")}
+            {isLoading ? "Saving..." : (isEditing ? "Update" : "Add")}
           </button>
         </div>
       </div>
@@ -207,7 +207,7 @@ export default function CreateSpeaker() {
               {/* Photo */}
               <div>
                 <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">
-                  Photo <span className="text-gray-400 font-normal text-xs">(optionnel)</span>
+                  Photo <span className="text-gray-400 font-normal text-xs">(optional)</span>
                 </h2>
                 <div className="flex items-center gap-6">
                   <div className="relative">
@@ -229,21 +229,21 @@ export default function CreateSpeaker() {
                     </label>
                   </div>
                   <p className="text-xs text-gray-400">
-                    Format recommandé : JPG, PNG. Taille max : 2MB
+                    Recommended format: JPG, PNG. Max size: 2MB
                   </p>
-                  {photoUploading && <p className="text-xs text-[#1a7a3c] mt-1">Upload en cours…</p>}
+                  {photoUploading && <p className="text-xs text-[#1a7a3c] mt-1">Uploading…</p>}
                 </div>
               </div>
 
               {/* Informations générales */}
               <div>
                 <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">
-                  Informations générales
+                  General information
                 </h2>
                 <div className="grid grid-cols-2 gap-6">
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Prénom <span className="text-red-500">*</span>
+                      First name <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
                       <Icon d={ICONS.user} size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -251,7 +251,7 @@ export default function CreateSpeaker() {
                         type="text"
                         value={formData.prenom}
                         onChange={(e) => setFormData({...formData, prenom: e.target.value})}
-                        placeholder="Ex: John"
+                        placeholder="e.g. John"
                         className={`w-full pl-10 pr-3 py-2.5 rounded-lg border ${
                           errors.prenom ? 'border-red-400' : 'border-gray-200'
                         } text-sm text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30 focus:border-[#1a7a3c] transition`}
@@ -262,7 +262,7 @@ export default function CreateSpeaker() {
 
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Nom <span className="text-red-500">*</span>
+                      Last name <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
                       <Icon d={ICONS.user} size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -270,7 +270,7 @@ export default function CreateSpeaker() {
                         type="text"
                         value={formData.nom}
                         onChange={(e) => setFormData({...formData, nom: e.target.value})}
-                        placeholder="Ex: Doe"
+                        placeholder="e.g. Doe"
                         className={`w-full pl-10 pr-3 py-2.5 rounded-lg border ${
                           errors.nom ? 'border-red-400' : 'border-gray-200'
                         } text-sm text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30 focus:border-[#1a7a3c] transition`}
@@ -281,7 +281,7 @@ export default function CreateSpeaker() {
 
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Email <span className="text-gray-400 font-normal text-xs">(optionnel)</span>
+                      Email <span className="text-gray-400 font-normal text-xs">(optional)</span>
                     </label>
                     <div className="relative">
                       <Icon d={ICONS.mail} size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -289,7 +289,7 @@ export default function CreateSpeaker() {
                         type="email"
                         value={formData.email}
                         onChange={(e) => setFormData({...formData, email: e.target.value})}
-                        placeholder="ex: john.doe@example.com"
+                        placeholder="e.g. john.doe@example.com"
                         className={`w-full pl-10 pr-3 py-2.5 rounded-lg border ${
                           errors.email ? 'border-red-400' : 'border-gray-200'
                         } text-sm text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30 focus:border-[#1a7a3c] transition`}
@@ -300,7 +300,7 @@ export default function CreateSpeaker() {
 
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Affiliation <span className="text-gray-400 font-normal text-xs">(optionnel)</span>
+                      Affiliation <span className="text-gray-400 font-normal text-xs">(optional)</span>
                     </label>
                     <div className="relative">
                       <Icon d={ICONS.building} size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -336,7 +336,7 @@ export default function CreateSpeaker() {
 
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Téléphone <span className="text-gray-400 font-normal text-xs">(optionnel)</span>
+                      Phone <span className="text-gray-400 font-normal text-xs">(optional)</span>
                     </label>
                     <div className="relative">
                       <Icon d={ICONS.phone} size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -344,7 +344,7 @@ export default function CreateSpeaker() {
                         type="text"
                         value={formData.telephone}
                         onChange={(e) => setFormData({...formData, telephone: e.target.value})}
-                        placeholder="Ex: +229 97 00 00 00"
+                        placeholder="e.g. +229 97 00 00 00"
                         className="w-full pl-10 pr-3 py-2.5 rounded-lg border border-gray-200 text-sm text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30 focus:border-[#1a7a3c] transition"
                       />
                     </div>
@@ -387,10 +387,10 @@ export default function CreateSpeaker() {
                 </div>
               </div>
 
-              {/* Statut */}
+              {/* Status */}
               <div>
                 <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">
-                  Statut
+                  Status
                 </h2>
                 <div className="flex items-center gap-6">
                   <label className="flex items-center gap-2 cursor-pointer">
@@ -400,7 +400,7 @@ export default function CreateSpeaker() {
                       onChange={() => setFormData({...formData, activated: true})}
                       className="w-4 h-4 text-[#1a7a3c] focus:ring-[#1a7a3c]"
                     />
-                    <span className="text-sm text-gray-700">Actif</span>
+                    <span className="text-sm text-gray-700">Active</span>
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
@@ -409,7 +409,7 @@ export default function CreateSpeaker() {
                       onChange={() => setFormData({...formData, activated: false})}
                       className="w-4 h-4 text-gray-400 focus:ring-gray-400"
                     />
-                    <span className="text-sm text-gray-700">Désactivé</span>
+                    <span className="text-sm text-gray-700">Disabled</span>
                   </label>
                 </div>
               </div>

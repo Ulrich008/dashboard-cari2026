@@ -53,17 +53,17 @@ export default function CreatePromoCode() {
           pourcentage: data.pourcentage ?? "",
         });
       })
-      .catch(() => Swal.fire("Erreur", "Impossible de charger ce code promo.", "error"))
+      .catch(() => Swal.fire("Error", "Unable to load this promo code.", "error"))
       .finally(() => setLoadingData(false));
   }, [id, isEditing]);
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.code.trim()) newErrors.code = "Le code promo est requis";
+    if (!formData.code.trim()) newErrors.code = "The promo code is required";
     if (formData.pourcentage === "" || isNaN(formData.pourcentage)) {
-      newErrors.pourcentage = "Le pourcentage est requis";
+      newErrors.pourcentage = "The percentage is required";
     } else if (Number(formData.pourcentage) < 0 || Number(formData.pourcentage) > 100) {
-      newErrors.pourcentage = "Le pourcentage doit être compris entre 0 et 100";
+      newErrors.pourcentage = "The percentage must be between 0 and 100";
     }
 
     setErrors(newErrors);
@@ -96,8 +96,8 @@ export default function CreatePromoCode() {
 
       Swal.fire({
         icon: "success",
-        title: "Succès",
-        text: isEditing ? "Code promo mis à jour avec succès" : "Code promo créé avec succès",
+        title: "Success",
+        text: isEditing ? "Promo code updated successfully" : "Promo code created successfully",
         timer: 1500,
         showConfirmButton: false,
       });
@@ -106,8 +106,8 @@ export default function CreatePromoCode() {
     } catch (error) {
       Swal.fire({
         icon: "error",
-        title: "Erreur",
-        text: error.response?.data?.message ?? "Erreur lors de la sauvegarde du code promo",
+        title: "Error",
+        text: error.response?.data?.message ?? "Error saving the promo code",
       });
     } finally {
       setIsLoading(false);
@@ -117,7 +117,7 @@ export default function CreatePromoCode() {
   if (loadingData) {
     return (
       <div className="flex-1 flex items-center justify-center min-h-screen bg-[#f5f6f8] text-gray-400">
-        Chargement...
+        Loading...
       </div>
     );
   }
@@ -129,12 +129,12 @@ export default function CreatePromoCode() {
           <button
             onClick={() => navigate("/finance")}
             className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-            title="Retour"
+            title="Back"
           >
             <Icon d={ICONS.arrowLeft} size={20} className="text-gray-600" />
           </button>
           <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
-            {isEditing ? "Modifier un code promo" : "Ajouter un Code promo"}
+            {isEditing ? "Edit promo code" : "Add a promo code"}
           </h1>
         </div>
         <div className="flex items-center gap-3">
@@ -142,7 +142,7 @@ export default function CreatePromoCode() {
             onClick={() => navigate("/finance")}
             className="px-4 py-2 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
           >
-            Annuler
+            Cancel
           </button>
           <button
             onClick={handleSubmit}
@@ -150,7 +150,7 @@ export default function CreatePromoCode() {
             className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#1a7a3c] text-white text-sm font-semibold hover:bg-[#155f2f] transition-colors shadow-sm disabled:opacity-50"
           >
             <Icon d={ICONS.save} size={15} />
-            {isLoading ? "En cours..." : isEditing ? "Mettre à jour" : "Ajouter"}
+            {isLoading ? "In progress..." : isEditing ? "Update" : "Add"}
           </button>
         </div>
       </div>
@@ -161,12 +161,12 @@ export default function CreatePromoCode() {
             <div className="p-8 space-y-8">
               <div>
                 <h2 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">
-                  Informations du code promo
+                  Promo code information
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Code Promo <span className="text-red-500">*</span>
+                      Promo Code <span className="text-red-500">*</span>
                     </label>
                     <div className="flex gap-2">
                       <div className="flex-1 relative">
@@ -175,7 +175,7 @@ export default function CreatePromoCode() {
                           type="text"
                           value={formData.code}
                           onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
-                          placeholder="Ex: SPON-1234"
+                          placeholder="E.g.: SPON-1234"
                           className={`w-full pl-10 pr-3 py-2.5 rounded-lg border ${
                             errors.code ? "border-red-400" : "border-gray-200"
                           } text-sm text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30 focus:border-[#1a7a3c] transition uppercase`}
@@ -186,7 +186,7 @@ export default function CreatePromoCode() {
                         onClick={generateCode}
                         className="px-3 py-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors text-sm whitespace-nowrap"
                       >
-                        Générer
+                        Generate
                       </button>
                     </div>
                     {errors.code && <p className="text-xs text-red-500">{errors.code}</p>}
@@ -194,7 +194,7 @@ export default function CreatePromoCode() {
 
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Type d'usage <span className="text-red-500">*</span>
+                      Usage type <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
                       <Icon d={ICONS.users} size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -203,15 +203,15 @@ export default function CreatePromoCode() {
                         onChange={(e) => setFormData({ ...formData, type_usage: e.target.value })}
                         className="w-full pl-10 pr-3 py-2.5 rounded-lg border border-gray-200 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30 focus:border-[#1a7a3c] transition"
                       >
-                        <option value="unique">Usage unique (1 seule utilisation)</option>
-                        <option value="massif">Usage massif (illimité)</option>
+                        <option value="unique">Single use (1 use only)</option>
+                        <option value="massif">Mass use (unlimited)</option>
                       </select>
                     </div>
                   </div>
 
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-semibold text-gray-700">
-                      Pourcentage de réduction <span className="text-red-500">*</span>
+                      Discount percentage <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
                       <Icon d={ICONS.percent} size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -221,7 +221,7 @@ export default function CreatePromoCode() {
                         max="100"
                         value={formData.pourcentage}
                         onChange={(e) => setFormData({ ...formData, pourcentage: e.target.value })}
-                        placeholder="Ex: 20"
+                        placeholder="E.g.: 20"
                         className={`w-full pl-10 pr-8 py-2.5 rounded-lg border ${
                           errors.pourcentage ? "border-red-400" : "border-gray-200"
                         } text-sm text-gray-800 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30 focus:border-[#1a7a3c] transition`}
@@ -233,12 +233,12 @@ export default function CreatePromoCode() {
 
                   {isEditing && current && (
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-sm font-semibold text-gray-700">Nombre d'utilisations</label>
+                      <label className="text-sm font-semibold text-gray-700">Number of uses</label>
                       <div className="px-3 py-2.5 rounded-lg bg-gray-50 border border-gray-100 text-sm text-gray-600">
-                        {current.nombre_utilisations ?? 0} — statut : {current.activated ? "Actif" : "Désactivé"}
+                        {current.nombre_utilisations ?? 0} — status: {current.activated ? "Active" : "Disabled"}
                       </div>
                       <p className="text-xs text-gray-400">
-                        Le statut (actif/désactivé) et l'historique se gèrent depuis la liste des codes promo.
+                        Status (active/disabled) and history are managed from the promo codes list.
                       </p>
                     </div>
                   )}
@@ -250,7 +250,7 @@ export default function CreatePromoCode() {
                   onClick={() => navigate("/finance")}
                   className="px-6 py-2.5 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
                 >
-                  Annuler
+                  Cancel
                 </button>
                 <button
                   onClick={handleSubmit}
@@ -258,7 +258,7 @@ export default function CreatePromoCode() {
                   className="px-6 py-2.5 rounded-lg bg-[#1a7a3c] text-white text-sm font-semibold hover:bg-[#155f2f] transition-colors shadow-sm disabled:opacity-50 flex items-center gap-2"
                 >
                   <Icon d={ICONS.save} size={15} />
-                  {isLoading ? "En cours..." : isEditing ? "Mettre à jour" : "Ajouter"}
+                  {isLoading ? "In progress..." : isEditing ? "Update" : "Add"}
                 </button>
               </div>
             </div>

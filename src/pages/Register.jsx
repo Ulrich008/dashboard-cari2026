@@ -23,7 +23,7 @@ const Register = () => {
       await register(formData);
       navigate('/login');
     } catch (err) {
-      setError(err.response?.data?.message || 'Erreur d\'inscription');
+      setError(err.response?.data?.message || 'Registration error');
     } finally {
       setLoading(false);
     }
@@ -39,7 +39,7 @@ const Register = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#f5f6f8]">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h1 className="text-2xl font-bold mb-6 text-center">Inscription Participant</h1>
+        <h1 className="text-2xl font-bold mb-6 text-center">Participant Registration</h1>
         
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
@@ -50,7 +50,7 @@ const Register = () => {
         <div>
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2">
-              Prénom
+              First name
             </label>
             <input
               type="text"
@@ -64,7 +64,7 @@ const Register = () => {
 
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2">
-              Nom
+              Last name
             </label>
             <input
               type="text"
@@ -92,7 +92,7 @@ const Register = () => {
 
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2">
-              Mot de passe
+              Password
             </label>
             <input
               type="password"
@@ -106,7 +106,7 @@ const Register = () => {
 
           <div className="mb-6">
             <label className="block text-gray-700 text-sm font-bold mb-2">
-              Confirmation du mot de passe
+              Confirm password
             </label>
             <input
               type="password"
@@ -123,13 +123,13 @@ const Register = () => {
             disabled={loading}
             className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
           >
-            {loading ? 'Inscription...' : 'S\'inscrire'}
+            {loading ? 'Registering...' : 'Register'}
           </button>
         </div>
 
         <div className="mt-4 text-center">
           <Link to="/login" className="text-blue-600 hover:underline">
-            Déjà inscrit ? Se connecter
+            Already registered? Sign in
           </Link>
         </div>
       </div>
