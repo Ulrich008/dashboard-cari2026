@@ -3,11 +3,13 @@ import Tabs from "../components/Tabs";
 import ListeTab from "./participants/ListeTab";
 import ImportPapiersTab from "./participants/ImportPapiersTab";
 import PapiersTab from "./participants/PapiersTab";
+import AuteursExportTab from "./participants/AuteursExportTab";
 
 const TABS = [
   { key: "liste", label: "Participants" },
   { key: "import-papiers", label: "Import Papers" },
   { key: "papiers", label: "Accepted Papers" },
+  { key: "auteurs-export", label: "Authors Export" },
 ];
 
 export default function Participants() {
@@ -30,6 +32,7 @@ export default function Participants() {
           <ImportPapiersTab onImportSuccess={() => setActive("papiers")} />
         )}
         {active === "papiers" && <PapiersTab />}
+        {active === "auteurs-export" && <AuteursExportTab />}
       </div>
     </div>
   );
