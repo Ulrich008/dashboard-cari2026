@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { participantService } from "../../services/participantService";
+import { registrationService } from "../../services/registrationService";
 import Swal from "sweetalert2";
 import { useAuth } from "../../contexts/AuthContext";
+import Modal from "../../components/Modal";
 
 const Icon = ({ d, size = 18, className = "" }) => (
   <svg
@@ -37,6 +39,7 @@ const ICONS = {
   ticket:   "M20 12v-2a2 2 0 0 0-2-2h-2M4 12v-2a2 2 0 0 1 2-2h2M20 12v4a2 2 0 0 1-2 2h-2M4 12v4a2 2 0 0 0 2 2h2M8 8h8M8 16h8",
   lock:     "M19 11H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2zM7 11V7a5 5 0 0 1 10 0v4",
   unlock:   "M19 11H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2zM7 11V7a5 5 0 0 1 9.9-1",
+  gift:     "M20 12v10H4V12M2 7h20v5H2V7zM12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z",
 };
 
 const PAYMENT_STATUS_OPTIONS = [
@@ -83,6 +86,9 @@ export default function ListeTab({ onGoToImport }) {
   const [pagination, setPagination] = useState(null);
   const [perPage, setPerPage] = useState(10);
   const [stats, setStats] = useState({ total: 0, active: 0, inactive: 0, authors: 0 });
+  const [exemptModal, setExemptModal] = useState(null); // participant
+  const [exemptMotif, setExemptMotif] = useState("");
+  const [exemptSubmitting, setExemptSubmitting] = useState(false);
 
   useEffect(() => {
     loadStats();
@@ -220,6 +226,36 @@ export default function ListeTab({ onGoToImport }) {
     } catch (error) {
       console.error("Error changing MyInfo lock:", error);
       Swal.fire("Error", error.response?.data?.message ?? "An error occurred.", "error");
+    }
+  };
+
+  const openExemptModal = (participant) => {
+    setExemptMotif("");
+    setExemptModal(participant);
+  };
+
+  const closeExemptModal = () => {
+    setExemptModal(null);
+    setExemptMotif("");
+  };
+
+  const submitExemptModal = async () => {
+    if (!exemptMotif.trim()) {
+      Swal.fire("Reason required", "Please specify a reason for this action.", "warning");
+      return;
+    }
+
+    setExemptSubmitting(true);
+    try {
+      await registrationService.markExempt(exemptModal.registration_id, exemptMotif);
+      closeExemptModal();
+      await loadParticipants(currentPage);
+      Swal.fire({ icon: "success", title: "Success", text: "Registration marked as exempt.", timer: 1500, showConfirmButton: false });
+    } catch (error) {
+      console.error("Error marking registration as exempt:", error);
+      Swal.fire("Error", error.response?.data?.message ?? "An error occurred.", "error");
+    } finally {
+      setExemptSubmitting(false);
     }
   };
 
@@ -694,6 +730,15 @@ export default function ListeTab({ onGoToImport }) {
                       >
                         <Icon d={participant.myinfo_deverrouille_par_admin ? ICONS.unlock : ICONS.lock} size={16} />
                       </button>
+                      {participant.registration_id && participant.payment_method !== "exempt" && (
+                        <button
+                          onClick={() => openExemptModal(participant)}
+                          className="text-gray-400 hover:text-purple-600 transition-colors"
+                          title="Mark registration as exempt (free registration)"
+                        >
+                          <Icon d={ICONS.gift} size={16} />
+                        </button>
+                      )}
                       {!isEditor(currentUser) && (
                         <button
                           onClick={() => deleteParticipant(participant.id)}
@@ -794,6 +839,45 @@ export default function ListeTab({ onGoToImport }) {
           </div>
         </div>
       </div>
+
+      <Modal
+        open={!!exemptModal}
+        title="Mark as exempt (free registration)"
+        onClose={closeExemptModal}
+        footer={
+          <>
+            <button onClick={closeExemptModal} className="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+              Cancel
+            </button>
+            <button
+              onClick={submitExemptModal}
+              disabled={exemptSubmitting}
+              className="px-4 py-2 rounded-lg bg-[#1a7a3c] text-white text-sm font-semibold hover:bg-[#155f2f] disabled:opacity-60 transition-colors"
+            >
+              {exemptSubmitting ? "Saving..." : "Confirm"}
+            </button>
+          </>
+        }
+      >
+        {exemptModal && (
+          <div className="space-y-4">
+            <p className="text-sm text-gray-600">
+              This registration will be marked as complimentary: the amount will be set to 0, the status set to paid,
+              a badge generated and a confirmation email sent to the participant.
+            </p>
+            <div>
+              <label className="block text-xs font-medium text-gray-500 mb-1">Reason (required)</label>
+              <textarea
+                value={exemptMotif}
+                onChange={(e) => setExemptMotif(e.target.value)}
+                rows={3}
+                placeholder="Explain the reason for this action..."
+                className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a7a3c]/30"
+              />
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }

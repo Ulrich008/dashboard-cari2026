@@ -3,11 +3,13 @@ import Tabs from "../components/Tabs";
 import RegistrationsTab from "./finance/RegistrationsTab";
 import DiscountCodesTab from "./finance/DiscountCodesTab";
 import GalaTicketsTab from "./finance/GalaTicketsTab";
+import ExemptRequestsTab from "./finance/ExemptRequestsTab";
 
 const TABS = [
   { key: "registrations", label: "Registrations & Paiements" },
   { key: "discount-codes", label: "Codes promo" },
   { key: "gala", label: "Gala Dinner" },
+  { key: "exempt-requests", label: "Free Registrations" },
 ];
 
 export default function Finance() {
@@ -28,6 +30,7 @@ export default function Finance() {
         {active === "registrations" && <RegistrationsTab />}
         {active === "discount-codes" && <DiscountCodesTab />}
         {active === "gala" && <GalaTicketsTab />}
+        {active === "exempt-requests" && <ExemptRequestsTab />}
       </div>
     </div>
   );

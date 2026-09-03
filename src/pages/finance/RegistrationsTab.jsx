@@ -30,6 +30,7 @@ const ICONS = {
   clock:   "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 6v6l4 2",
   xcircle: "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM15 9l-6 6M9 9l6 6",
   download: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3",
+  gift: "M20 12v10H4V12M2 7h20v5H2V7zM12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z",
 };
 
 const PAYMENT_STATUS_STYLE = {
@@ -60,6 +61,7 @@ export default function RegistrationsTab() {
   const [search, setSearch] = useState("");
   const [statutPaiement, setStatutPaiement] = useState("");
   const [statutRegistration, setStatutRegistration] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("");
   const [showFilters, setShowFilters] = useState(false);
 
   const [registrations, setRegistrations] = useState([]);
@@ -74,7 +76,7 @@ export default function RegistrationsTab() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [search, statutPaiement, statutRegistration, perPage]);
+  }, [search, statutPaiement, statutRegistration, paymentMethod, perPage]);
 
   useEffect(() => {
     const delay = setTimeout(() => {
@@ -82,7 +84,7 @@ export default function RegistrationsTab() {
     }, 150);
     return () => clearTimeout(delay);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, search, statutPaiement, statutRegistration, perPage]);
+  }, [currentPage, search, statutPaiement, statutRegistration, paymentMethod, perPage]);
 
   const loadRegistrations = async (page = 1) => {
     try {
@@ -92,6 +94,7 @@ export default function RegistrationsTab() {
         search,
         statut_paiement: statutPaiement,
         statut_registration: statutRegistration,
+        payment_method: paymentMethod,
         per_page: perPage,
       });
       if (res && res.meta) {
@@ -158,6 +161,9 @@ export default function RegistrationsTab() {
           break;
         case "cancel-checkin":
           await registrationService.cancelCheckIn(registration.id, form.motif);
+          break;
+        case "markExempt":
+          await registrationService.markExempt(registration.id, form.motif);
           break;
         default:
           break;
@@ -258,6 +264,7 @@ export default function RegistrationsTab() {
     "apply-discount": "Apply a promo code",
     "remove-discount": "Remove promo code",
     "cancel-checkin": "Cancel check-in",
+    markExempt: "Mark as exempt (free registration)",
   }[actionModal?.type];
 
   return (
@@ -278,7 +285,7 @@ export default function RegistrationsTab() {
           <button
             onClick={() => setShowFilters(!showFilters)}
             className={`flex items-center justify-center w-9 h-9 rounded-lg border border-gray-200 transition-colors shrink-0 ${
-              showFilters || statutPaiement || statutRegistration ? "bg-[#1a7a3c] text-white border-[#1a7a3c]" : "text-gray-500 hover:bg-gray-50"
+              showFilters || statutPaiement || statutRegistration || paymentMethod ? "bg-[#1a7a3c] text-white border-[#1a7a3c]" : "text-gray-500 hover:bg-gray-50"
             }`}
           >
             <Icon d={ICONS.filter} size={16} />
@@ -312,6 +319,17 @@ export default function RegistrationsTab() {
                 <option value="paid">Paid</option>
                 <option value="cancelled">Cancelled</option>
                 <option value="checked_in">Checked-in</option>
+              </select>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-medium text-gray-500">Payment method:</span>
+              <select
+                value={paymentMethod}
+                onChange={(e) => setPaymentMethod(e.target.value)}
+                className="px-2 py-1 rounded-lg border border-gray-200 text-sm text-gray-700 focus:outline-none focus:ring-1 focus:ring-[#1a7a3c]/30"
+              >
+                <option value="">All</option>
+                <option value="exempt">Exempt (free)</option>
               </select>
             </div>
           </div>
@@ -360,9 +378,13 @@ export default function RegistrationsTab() {
                       )}
                     </td>
                     <td className="px-4 py-4">
-                      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${PAYMENT_STATUS_STYLE[registration.statut_paiement] ?? "bg-gray-100 text-gray-600"}`}>
-                        {statusLabel(registration.statut_paiement, {})}
-                      </span>
+                      {registration.payment_method === "exempt" ? (
+                        <span className="px-2 py-1 rounded-full text-xs font-semibold bg-purple-100 text-purple-700">Exempt</span>
+                      ) : (
+                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${PAYMENT_STATUS_STYLE[registration.statut_paiement] ?? "bg-gray-100 text-gray-600"}`}>
+                          {statusLabel(registration.statut_paiement, {})}
+                        </span>
+                      )}
                     </td>
                     <td className="px-4 py-4">
                       <span className={`px-2 py-1 rounded-full text-xs font-semibold ${REGISTRATION_STATUS_STYLE[registration.statut_registration] ?? "bg-gray-100 text-gray-600"}`}>
@@ -388,6 +410,11 @@ export default function RegistrationsTab() {
                         >
                           <Icon d={ICONS.percent} size={16} />
                         </button>
+                        {registration.payment_method !== "exempt" && (
+                          <button onClick={() => openModal("markExempt", registration)} className="text-gray-400 hover:text-purple-600 transition-colors" title="Mark as exempt (free registration)">
+                            <Icon d={ICONS.gift} size={16} />
+                          </button>
+                        )}
                         {registration.statut_registration === "checked_in" && (
                           <button onClick={() => openModal("cancel-checkin", registration)} className="text-gray-400 hover:text-red-500 transition-colors" title="Cancel check-in">
                             <Icon d={ICONS.xcircle} size={16} />
@@ -536,6 +563,13 @@ export default function RegistrationsTab() {
 
             {actionModal.type === "cancel-checkin" && (
               <p className="text-sm text-gray-600">This participant's check-in will be cancelled.</p>
+            )}
+
+            {actionModal.type === "markExempt" && (
+              <p className="text-sm text-gray-600">
+                This registration will be marked as complimentary: the amount will be set to 0, the status set to paid,
+                a badge generated and a confirmation email sent to the participant.
+              </p>
             )}
 
             <div>

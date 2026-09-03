@@ -24,6 +24,16 @@ export const registrationService = {
     return response.data.data || response.data;
   },
 
+  markExempt: async (id, motif) => {
+    const response = await api.post(`/admin/registrations/${id}/mark-exempt`, { motif });
+    return response.data.data || response.data;
+  },
+
+  cancelExemption: async (id, motif) => {
+    const response = await api.post(`/admin/registrations/${id}/cancel-exemption`, { motif });
+    return response.data.data || response.data;
+  },
+
   applyDiscount: async (id, discount_code, motif) => {
     const response = await api.post(`/admin/registrations/${id}/apply-discount`, { discount_code, motif });
     return response.data.data || response.data;
