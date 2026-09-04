@@ -17,29 +17,18 @@ const StatCard = ({ label, value }) => (
   </div>
 );
 
-const PapersCell = ({ papiers }) => {
-  if (!papiers || papiers.length === 0) return <span>-</span>;
+const ExpectedAuthors = ({ auteurs }) => {
+  if (!auteurs || auteurs.length === 0) return <span>-</span>;
 
   return (
-    <div className="space-y-2">
-      {papiers.map((papier) => (
-        <div key={papier.id}>
-          <div className="font-medium text-gray-800">
-            #{papier.id} — {papier.titre}
-          </div>
-          {(papier.auteurs_attendus || []).length > 0 && (
-            <div className="text-xs text-gray-500 mt-0.5">
-              {papier.auteurs_attendus.map((a, idx) => (
-                <span key={idx}>
-                  {a.prenom} {a.nom}{a.est_auteur_principal ? " (Principal)" : ""}
-                  {idx < papier.auteurs_attendus.length - 1 ? ", " : ""}
-                </span>
-              ))}
-            </div>
-          )}
-        </div>
+    <span>
+      {auteurs.map((a, idx) => (
+        <span key={idx}>
+          {a.prenom} {a.nom}{a.est_auteur_principal ? " (Principal)" : ""}
+          {idx < auteurs.length - 1 ? ", " : ""}
+        </span>
       ))}
-    </div>
+    </span>
   );
 };
 
@@ -179,6 +168,10 @@ export default function AuteursExportTab() {
             </div>
           )}
 
+          <p className="px-6 pb-2 text-xs text-gray-400 italic">
+            Payment and gala status reflect the participant's overall registration — not this specific paper or event.
+          </p>
+
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -187,24 +180,26 @@ export default function AuteursExportTab() {
                   <th className="text-left px-4 py-3 text-gray-500 font-medium">Email</th>
                   <th className="text-left px-4 py-3 text-gray-500 font-medium">Institution</th>
                   <th className="text-left px-4 py-3 text-gray-500 font-medium">Country</th>
-                  <th className="text-left px-4 py-3 text-gray-500 font-medium">Paper(s) &amp; Expected Authors</th>
-                  <th className="text-left px-4 py-3 text-gray-500 font-medium">Payment Status</th>
+                  <th className="text-left px-4 py-3 text-gray-500 font-medium">Paper ID</th>
+                  <th className="text-left px-4 py-3 text-gray-500 font-medium">Paper Title</th>
+                  <th className="text-left px-4 py-3 text-gray-500 font-medium">Expected Authors</th>
+                  <th className="text-left px-4 py-3 text-gray-500 font-medium">Payment Status (participant-wide)</th>
                   <th className="text-left px-4 py-3 text-gray-500 font-medium">Amount</th>
-                  <th className="text-left px-4 py-3 text-gray-500 font-medium">Method</th>
-                  <th className="text-left px-4 py-3 text-gray-500 font-medium">Gala</th>
+                  <th className="text-left px-4 py-3 text-gray-500 font-medium">Method (participant-wide)</th>
+                  <th className="text-left px-4 py-3 text-gray-500 font-medium">Gala (participant-wide)</th>
                 </tr>
               </thead>
               <tbody>
                 {authors.length === 0 ? (
                   <tr>
-                    <td colSpan={9} className="px-6 py-10 text-center text-gray-400">
+                    <td colSpan={11} className="px-6 py-10 text-center text-gray-400">
                       No authors found for this event.
                     </td>
                   </tr>
                 ) : (
                   authors.map((author, i) => (
                     <tr
-                      key={author.id}
+                      key={`${author.participant_id}-${author.papier_id}`}
                       className={`border-b border-gray-50 hover:bg-gray-50/60 transition-colors ${
                         i === authors.length - 1 ? "border-b-0" : ""
                       }`}
@@ -213,7 +208,9 @@ export default function AuteursExportTab() {
                       <td className="px-4 py-4 text-gray-600">{author.email}</td>
                       <td className="px-4 py-4 text-gray-600">{author.institution || "-"}</td>
                       <td className="px-4 py-4 text-gray-600">{author.pays || "-"}</td>
-                      <td className="px-4 py-4 text-gray-600"><PapersCell papiers={author.papiers} /></td>
+                      <td className="px-4 py-4 text-gray-600 font-mono text-xs">#{author.papier_id}</td>
+                      <td className="px-4 py-4 text-gray-600">{author.papier_titre}</td>
+                      <td className="px-4 py-4 text-gray-600 text-xs"><ExpectedAuthors auteurs={author.auteurs_attendus} /></td>
                       <td className="px-4 py-4">
                         <span className="px-2 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-700">
                           {STATUS_LABELS[author.statut_paiement] || author.statut_paiement || "-"}
